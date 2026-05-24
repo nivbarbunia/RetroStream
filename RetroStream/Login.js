@@ -11,9 +11,5 @@ emailInput.addEventListener("input", function () {
     message.textContent = emailInput.value;
 });
 
-form.addEventListener("submit", function (event) {
-    event.preventDefault();
-    console.log("form submitted");
-});
 
 
