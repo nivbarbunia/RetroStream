@@ -1,0 +1,90 @@
+#headline {
+  font-style: oblique;
+  color: rgb(0, 0, 0);
+  text-align: center;
+  margin-top: 150px;
+  margin-bottom: 75px;
+}
+
+body {
+  background: radial-gradient(circle at center, rgb(37, 255, 66), black 85%);
+  font-size: larger;
+  font-weight: 700;
+  color: rgb(0, 0, 0);
+}
+
+.profiles {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  gap: 80px;
+}
+
+.profile img {
+  width: 150px;
+  height: 150px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.name-section {
+  margin-right: 35px;
+  text-align: center;
+}
+
+.name-section i {
+  opacity: 0;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+
+.name-section p:hover i {
+  opacity: 1;
+}
+
+.name-section i:hover {
+  transform: scale(1.2);
+  transition: transform 0.3s ease;
+}
+
+.name-input {
+  opacity: 0;
+}
+
+.name-section:focus-within p {
+  opacity: 0;
+}
+
+.name-section:focus-within .name-input {
+  opacity: 1;
+  transform: translateY(-35px);
+  margin-left: 35px;
+  width: 150px;
+}
+
+.profile img:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 20px black;
+  transition: transform 0.3s ease;
+}
+
+.plus:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 20px black;
+  transition: transform 0.3s ease;
+}
+
+.add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.plus {
+  width: 150px;
+  height: 150px;
+  border-radius: 10px;
+  font-size: 8rem;
+  cursor: pointer;
+}

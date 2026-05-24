@@ -1,0 +1,51 @@
+body {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 80vh;
+  background: radial-gradient(circle at center, black, rgb(37, 255, 66));
+  /* background-image: url(https://res.cloudinary.com/atzuma/image/upload/c_thumb,g_face:center,h_630,q_80,w_1200/v1532704512/atzuma/hsa2vvurhbav0ctlham2.jpg);
+        background-position: center; */
+
+}
+
+#headline {
+  font-style: oblique;
+  color: rgb(37, 255, 66);
+}
+
+.wrapper {
+  width: 420px;
+  height: auto;
+  border: 5px solid rgb(37, 255, 66);
+  border-radius: 80px;
+  background: transparent;
+  backdrop-filter: blur(17px);
+  color: rgb(249, 249, 249);
+  font-size: larger;
+}
+
+.formlink {
+  font-weight: bold;
+  color: rgb(37, 255, 66);
+}
+
+#forgot {
+  margin-right: 70px;
+}
+
+#submit {
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+#submit:hover {
+  background-color: rgb(37, 255, 66);
+  ;
+}
+
+#checkbox {
+  cursor: pointer;
+}

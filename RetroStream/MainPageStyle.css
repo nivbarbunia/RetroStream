@@ -1,0 +1,76 @@
+body {
+  background-color: black;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: radial-gradient(circle at right, black, rgb(37, 255, 66) 30%);
+}
+
+.navbar h1 {
+  color: rgb(37, 255, 66);
+  border: 2px solid rgb(37, 255, 66);
+  padding: 10px;
+  border-radius: 20px;
+  text-align: center;
+  background: radial-gradient(circle at right and left, rgb(37, 255, 66), black 50%);
+  cursor: pointer;
+}
+
+.navbar h1:hover {
+  box-shadow: 0 0 20px rgb(37, 255, 66);
+  transition: transform 0.3s ease;
+}
+
+.navright {
+  display: flex;
+}
+
+.links {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  text-align: center;
+  margin-top: 35px;
+}
+
+.navbar a:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 20px black;
+  transition: transform 0.3s ease;
+}
+
+.navbar a {
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+  color: black;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.icons {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin-left: 10px;
+}
+
+.icons i {
+  margin-top: 15px;
+}
+
+#profile {
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#profile:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 50px black;
+  transition: transform 0.3s ease;
+}
