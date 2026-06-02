@@ -17,14 +17,51 @@ body {
 }
 
 .wrapper {
-  width: 420px;
-  height: auto;
+  width: 600px;
+  min-height: 350px;
+  padding: 40px 50px;
   border: 5px solid rgb(37, 255, 66);
   border-radius: 80px;
   background: transparent;
   backdrop-filter: blur(17px);
   color: rgb(249, 249, 249);
-  font-size: larger;
+  font-size: 18px;
+  box-sizing: border-box;
+}
+
+.wrapper input {
+  border-radius: 10px;
+  border-color: rgb(58, 253, 84);
+  margin: 2px;
+  padding: 6px;
+  background-color: rgb(15, 14, 14);
+  color: white;
+}
+
+.wrapper input:-webkit-autofill,
+.wrapper input:-webkit-autofill:hover,
+.wrapper input:-webkit-autofill:focus {
+  -webkit-text-fill-color: white;
+  box-shadow: 0 0 0 1000px rgb(15, 14, 14) inset;
+  caret-color: white;
+  border: 2px solid rgb(58, 253, 84);
+}
+
+.wrapper input:focus {
+  outline: none;
+  border: 3px solid rgb(124, 255, 142);
+}
+
+.wrapper button {
+  font-size: 16px;
+  padding: 6px 14px;
+  background-color: rgb(15, 14, 14);
+  color: rgb(37, 255, 66);
+
+}
+
+#headline {
+  font-size: 32px;
 }
 
 .formlink {
@@ -43,9 +80,22 @@ body {
 
 #submit:hover {
   background-color: rgb(37, 255, 66);
-  ;
+  color: black;
 }
 
 #checkbox {
   cursor: pointer;
+}
+
+.wrapper input.input-error {
+  border: 2px solid #ff5c5c;
+  box-shadow: 0 0 8px rgba(255, 92, 92, 0.4);
+  outline: none;
+}
+
+#message {
+  color: #ff5c5c;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  font-weight: bold;
 }
