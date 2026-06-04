@@ -8,7 +8,7 @@ form.addEventListener("submit", function (event) {
 
     const email = emailInput.value;
     const password = passwordInput.value;
-
+    
     if (email.length === 0) {
         emailInput.classList.add("input-error");
         message.textContent = "לא הוזנה כתובת אימייל";
@@ -39,3 +39,5 @@ form.addEventListener("input", function (event) {
     passwordInput.classList.remove("input-error");
     message.textContent = "";
 });
+
+//test github 
