@@ -20,6 +20,7 @@ body {
 .retro-navbar .nav-link {
   color: black !important;
   font-size: 1 rem;
+  text-align: center; 
   font-weight: bold;
   border-radius: 5px;
   padding: 4px 5px;
