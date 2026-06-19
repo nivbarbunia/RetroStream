@@ -1,4 +1,4 @@
-body::before{
+/*body::before{
   content: "";
   position: fixed;
   inset: 0;
@@ -11,11 +11,21 @@ body::before{
   );
   z-index: 9999;
 }
+  */
 body {
-  background: radial-gradient(
-    circle at center,
-    rgba(37,255,66,0.15),
-    transparent 60%),
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 8px,
+      transparent 6px
+    ),
+    radial-gradient(
+      circle at center,
+      rgba(37,255,66,0.14),
+      transparent 60%
+    ),
     black;
   font-family: 'Varela Round', sans-serif;
 }
@@ -35,7 +45,7 @@ body {
   font-weight: bold;
   animation: neon 0.6s ease-in-out infinite;
 }
-
+/*
 @keyframes neon {
   0%,100% {
     box-shadow: 
@@ -53,7 +63,7 @@ body {
      0 0 6px rgba(37, 255, 66, 0.3),
      0 0 18px rgba(37, 255, 66, 0.3); 
   }
-}
+} */
 
 .retro-navbar .nav-link {
   color: black !important;
@@ -245,6 +255,8 @@ body {
   border-radius: 10px;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  z-index: 2;
 }
 .content-title {
   text-align: center;
@@ -263,4 +275,43 @@ body {
   margin-top: 4px;
   font-size: 0.85rem;
   color: #ccc;
+}
+
+.top-feed-row{
+  display: flex;
+  gap:80px;
+}
+.top-card {
+  position: relative;
+  isolation: isolate;
+}
+
+
+.rank-number {
+  pointer-events: none;
+  text-shadow: none;
+  position: absolute;
+  font-size: 6rem;
+  left: -30px;
+  bottom: -50px;
+  color:rgba(37, 255, 66, 0.655);
+  font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif
+}
+.not-found{
+  color: rgb(168, 168, 168);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80px;
+}
+.not-found i {
+  font-size: 5rem;
+  color: rgb(37, 255, 66);
+  opacity: 0.4;
+  padding: 50px;
+  margin-bottom: 20px;
+
+  text-shadow:
+    0 0 10px rgba(37, 255, 66, 0.4),
+    0 0 20px rgba(37, 255, 66, 0.2);
 }

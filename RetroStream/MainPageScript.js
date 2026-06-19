@@ -226,7 +226,8 @@ heroSection.innerHTML= `
 `;
 
 const feedContainer = document.getElementById("feedContainer");
-
+//FUNCTIONS
+//CARD RENDER
 function renderCard(item) {
    return `
       <article class="content-card"> 
@@ -236,7 +237,7 @@ function renderCard(item) {
     </article>      
    `;
 }
-
+//SECTION RENDER
 function renderSection(title, items){
    if(items.length===0) return "";
    return `
@@ -248,16 +249,84 @@ function renderSection(title, items){
       </section>      
    `;
 }
+//TOP10 CARD RENDER
+function renderTopCard(item,index){
+   return`
+      <article class="top-card content-card">
+         <span class="rank-number">${index + 1}</span>
+         <img class="content-img" src="${item.image}" alt="${item.title}">
+         <h3 class="content-title">${item.title}</h3>
+         <p class="content-details">${item.year} · ${item.genre[0]}</p> 
+      </article>
+   `; /*add summary? */
+}
+//TOP10 RENDER
+function renderTopSection(items){
+   return`
+      <section class="content-section">
+         <h2 class="section-title">טופ 10 ברטרו סטרים:</h2>
+         <div class="top-feed-row">
+            ${items.map((item, index) => renderTopCard(item, index)).join("")}
+         </div>
+      </section>
+   `
+}
 
-function renderFeed() {
+//FEED RENDER
+function renderFeed(items = contentItems) {
    const top10 = [...contentItems].sort((a,b)=> b.likes - a.likes).slice(0,10); //allocate top 10 contents
    feedContainer.innerHTML=`
-      ${renderSection("המשך צפייה", contentItems.slice(0,5))}
-      ${renderSection("קומדיה", contentItems.filter(item => item.genre.includes("קומדיה")))}
-      ${renderSection("דרמה",contentItems.filter(item=>item.genre.includes("דרמה")))}
-      ${renderSection("טופ 10 ברטרו סטרים",top10)}
-      ${renderSection("צפייה קלילה", contentItems.filter(item => item.type==="סדרה" && item.episodeLength<=25))}
+      ${renderSection("המשך צפייה", items.slice(0,5))}
+      ${renderTopSection(top10)}
+      ${renderSection("קומדיה", items.filter(item => item.genre.includes("קומדיה")))}
+      ${renderSection("דרמה",items.filter(item=>item.genre.includes("דרמה")))}
+      ${renderSection("צפייה קלילה", items.filter(item => item.type==="סדרה" && item.episodeLength<=25))}
    `;
 }
+
+//SEARCH RENDER
+function renderSearchResults(items, searchText) {
+   heroSection.style.display = "none";
+   feedContainer.innerHTML = `
+      <section class="content-section">
+         <h2 class="section-title">תוצאות חיפוש עבור: ${searchText}</h2>
+         <div class="feed-row">
+            ${items.map(renderCard).join("")}
+         </div>
+      </section>
+   `;
+   if(items.length===0){
+      feedContainer.innerHTML = `
+      <section class="content-section">
+         <h2 class="section-title">תוצאות חיפוש עבור: ${searchText}</h2>
+            <div class="not-found">
+            <i class="fa-solid fa-satellite-dish"></i>
+            <h1> לא נמצאו תוצאות </h1>
+            <i class="fa-solid fa-satellite-dish"></i>
+            </div>
+      </section>
+   `;
+   }
+}
+
+
+//event listeners
+searchInput.addEventListener("input", function(){
+   const searchText= searchInput.value.trim();
+   if (searchText==="") {
+     heroSection.style.display ="block";
+     renderFeed();
+     return;
+   }
+   const filteredItems = contentItems.filter(item=>
+      item.title.includes(searchText) ||
+      item.genre.some(genre=>genre.includes(searchText)) ||
+      item.origin?.some(origin=> origin.includes(searchText))
+   );
+   renderSearchResults(filteredItems, searchText);
+});
+
 renderFeed();
+
+
 
