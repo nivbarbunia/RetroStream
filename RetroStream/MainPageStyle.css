@@ -1,21 +1,58 @@
+body::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.1) 0px,
+    rgba(255,255,255,0.1) 1px,
+    transparent 3px, transparent 6px
+  );
+  z-index: 9999;
+}
 body {
-  background-color: black;
+  background: radial-gradient(
+    circle at center,
+    rgba(37,255,66,0.15),
+    transparent 60%),
+    black;
   font-family: 'Varela Round', sans-serif;
 }
 
 .retro-navbar {
-  background: radial-gradient(circle at right, black, rgb(37, 255, 66) 30%);
+  background: radial-gradient(circle at right, black, rgb(37, 255, 66) 25%);
 }
 
 .logo {
   color: rgb(37, 255, 66) !important;
-  border: 2px solid rgb(37, 255, 66);
+  border: 3px solid rgb(37, 255, 66);
   padding: 6px 14px;
   border-radius: 15px;
   background: radial-gradient(circle at right and left, rgb(37, 255, 66), black 50%);
   font-size: 1.5rem;
   margin-right: 0px !important;
   font-weight: bold;
+  animation: neon 0.6s ease-in-out infinite;
+}
+
+@keyframes neon {
+  0%,100% {
+    box-shadow: 
+     0 0 4px rgba(37, 255, 66, 0.3),
+     0 0 12px rgba(37, 255, 66, 0.3);
+    text-shadow: 
+     0 0 3px rgba(37, 255, 66, 0.6),
+     0 0 9px rgba(37, 255, 66, 0.6);  
+  }
+  50% {
+     box-shadow: 
+     0 0 8px rgba(37, 255, 66, 0.5),
+     0 0 24px rgba(37, 255, 66, 0.5);
+    text-shadow: 
+     0 0 6px rgba(37, 255, 66, 0.3),
+     0 0 18px rgba(37, 255, 66, 0.3); 
+  }
 }
 
 .retro-navbar .nav-link {
@@ -163,19 +200,37 @@ body {
   font-weight: 900;
   font-size: 1.2rem;
   border: none;
-  padding: 16px 32px;
-  border-radius: 8px;
+  padding: 16px 34px;
+  border-radius: 12px;
+  cursor: pointer;
   transition: 0.2s;
 }
 .hero-btn:hover{
   transform: translateY(-2px);
-  box-shadow: 0 0 25px rgb(205, 210, 205);
+  box-shadow: 0 0 25px rgba(37, 255, 66, 0.6);
 }
 
 
 
-.feed-item {
+.content-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.content-card:hover{
+  transform:
+    scale(1.05)
+    translateY(-8px);
+  cursor: pointer;  
+  .content-img {
+    box-shadow: 0 0 20px rgb(37, 255, 66);
+  }
+  .content-details{
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+  .content-title {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px) scale(1.15);
+  }
 }
 .content-img {
   width: 100%;
@@ -185,19 +240,21 @@ body {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.content-img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgb(37, 255, 66);
-}
 .content-title {
-  margin-top: 8px;
+  text-align: center;
+  margin-top: 16px;
   margin-bottom: 2px;
   font-size: 1rem;
   font-weight: bold;
   color: white;
+  transition: 0.2s ease;
 }
 .content-details {
+  transition: 0.3s ease;
+  text-align: center;
+  opacity: 0;
   margin: 0;
+  margin-top: 4px;
   font-size: 0.85rem;
   color: #ccc;
 }
