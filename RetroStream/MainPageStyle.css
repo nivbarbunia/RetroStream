@@ -211,8 +211,14 @@ body {
 }
 
 
+.feed-row {
+  display: flex;
+  gap: 20px;
+}
 
 .content-card {
+  padding-top: 12px;
+  flex: 0 0 220px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .content-card:hover{
