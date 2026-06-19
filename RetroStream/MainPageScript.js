@@ -24,6 +24,7 @@ const contentItems = [
      episodeLength: 25,
      genre: ["קומדיה"],
      origin: ["ערוץ הילדים"],
+     description:"",
      image: "Assets/Content/Series/Pijamot.png",
      likes: 0
    },
@@ -34,6 +35,7 @@ const contentItems = [
       type: "סדרה",
       genre: ["מדע בדיוני", "דרמה", "נוער"],
       origin: ["ערוץ הילדים", "hot"],
+      description:"כשאסון עולמי מאיים להשמיד את האנושות, חבורת צעירים מוצאת את עצמה במרכזה של מזימה חוצת זמנים. האם ניתן לשנות את העתיד?",
       image: "Assets/Content/Series/Hai.png",
       likes: 0
    },
@@ -44,6 +46,7 @@ const contentItems = [
       episodeLength: 40,
       genre: ["קומדיה"],
       origin: ["ערוצים ישראלים", "קשת"],
+      description:"ארבעה חברים רווקים המתגוררים בלב תל אביב מנסים לנווט בין מערכות יחסים, עבודה וחיי היומיום. בכל פרק הם נקלעים לסיטואציות חדשות, מסתבכים בדרכים לא צפויות ונעזרים זה בזה כדי להתמודד עם האבומינציה שהיא: תל אביב.",
       image: "Assets/Content/Series/Naor.png",
       likes: 0
    },
@@ -54,6 +57,7 @@ const contentItems = [
       episodeLength: 25,
       genre: ["מדע בדיוני", "דרמה", "נוער"],
       origin: ["ניקלודיאון", "yes"],
+      description:"",
       image: "Assets/Content/Series/hamama.png",
       likes: 0
    },
@@ -64,6 +68,7 @@ const contentItems = [
       episodeLength: 20,
       genre: ["מצוייר", "ילדים"],
       origin: ["ניקלודיאון"],
+      description:"",
       image: "Assets/Content/Series/sponge.png",
       likes: 0
    },
@@ -74,6 +79,7 @@ const contentItems = [
       episodeLength: 20,
       genre: ["מצוייר", "ילדים"],
       origin: ["דיסני"],
+      description:"",
       image: "Assets/Content/Series/PnP.png",
       likes: 0
    },
@@ -84,6 +90,7 @@ const contentItems = [
       episodeLength: 25,
       genre: ["קומדיה"],
       origin: ["ג'טיקס"],
+      description:"",
       image: "Assets/Content/Series/Gurveoach.png",
       likes: 0
    },
@@ -94,6 +101,7 @@ const contentItems = [
       episodeLength: 25,
       genre: ["קומדיה"],
       origin: ["ערוץ הילדים", "יס"],
+      description:"",
       image: "Assets/Content/Series/Zumzum.png",
       likes: 0
    },
@@ -104,6 +112,7 @@ const contentItems = [
       episodeLength: 25,
       genre: ["דרמה"],
       origin: ["ערוץ הילדים"],
+      description:"",
       image: "Assets/Content/Series/Adumot.png",
       likes: 0
    },
@@ -114,6 +123,7 @@ const contentItems = [
       episodeLength: 25,
       genre: ["קומדיה"],
       origin: ["ערוצים ישראלים"],
+      description:"",
       image: "Assets/Content/Series/Shemesh.png",
       likes: 0
    },
@@ -124,6 +134,7 @@ const contentItems = [
       episodeLength: 35,
       genre: ["טלנובלה"],
       origin: ["ערוצים ישראלים"],
+      description:"",
       image: "Assets/Content/Series/Alufa.png",
       likes: 0
    },
@@ -134,6 +145,7 @@ const contentItems = [
       episodeLength: 20,
       genre: ["קומדיה"],
       origin: ["yes", "ניקלודיאון"],
+      description:"",
       image: "Assets/Content/Series/fox.png",
       likes: 0
    },
@@ -144,6 +156,7 @@ const contentItems = [
       episodeLength: 50,
       genre: ["טלנובלה"],
       origin: ["ויוה"],
+      description:"",
       image: "Assets/Content/Series/osher.png",
       likes: 0
    },
@@ -152,8 +165,9 @@ const contentItems = [
       year: 2010,
       type: "סדרה",
       episodeLength: 25,
-      genre: [ "נוער", "דרמה"],
+      genre: [ "דרמה", "נוער"],
       origin: ["ערוץ הילדים", "yes"],
+      description:"",
       image: "Assets/Content/Series/Alifim.png",
       likes: 0,
    },
@@ -164,6 +178,7 @@ const contentItems = [
       episodeLength: 30,
       genre: ["מדע בדיוני", "דרמה"],
       origin: ["hot"],
+      description:"",
       image: "Assets/Content/Series/Metim.png",
       likes: 0
    },
@@ -174,6 +189,7 @@ const contentItems = [
       duration: 98,
       genre: ["הרפתקאות", "פנטזיה", "נוער"],
       franchise: "גאליס",
+      description:"",
       image: "Assets/Content/Movies/GalisConnect.png",
       likes: 0
    },  
@@ -184,10 +200,29 @@ const contentItems = [
       duration: 32,
       genre: ["דרמה", "ילדים", "נוער", "צבא", "יום הזיכרון"],
       franchise: null,
+      description:"",
       image: "Assets/Content/Movies/BigBro.png",
       likes: 0 
     }
 ];
+
+const heroSection = document.getElementById("heroSection");
+const featuredItem = contentItems[2];
+
+heroSection.innerHTML= `
+   <div class="hero-content">
+      <div class="hero-text">
+         <p class="hero-label">המלצת השבוע</p>
+         <div class="hero-heading">
+            <h1 class="hero-title">${featuredItem.title}</h1>
+            <span class="hero-details">${featuredItem.year} · ${featuredItem.genre[0]} · ${featuredItem.origin?.[0] || featuredItem.genre[1]}</span>
+         </div>   
+         <p class="hero-desc">${featuredItem.description}</p>
+         <button class="hero-btn">צפה עכשיו ▶</button>
+      </div>
+      <img class="hero-img" src="${featuredItem.image}" alt="${featuredItem.title}"
+   </div>         
+`;
 
 const feedContainer = document.getElementById("feedContainer");
 
@@ -198,8 +233,9 @@ contentItems.forEach(function (item) {
    <article class="content-card"> 
     <img class="content-img" src="${item.image}" alt="${item.title}">
     <h3 class="content-title">${item.title}</h3>
-    <p class="content-meta">${item.year}</p>
+    <p class="content-details">${item.year} · ${item.genre[0]}</p>
    </article> 
   `;
   feedContainer.appendChild(card);
 });
+

@@ -7,6 +7,7 @@
 
 body {
   background: radial-gradient(circle at center, rgb(37, 255, 66), black 85%);
+  font-family: 'Varela Round', sans-serif;
   font-size: larger;
   font-weight: 700;
   color: rgb(0, 0, 0);
