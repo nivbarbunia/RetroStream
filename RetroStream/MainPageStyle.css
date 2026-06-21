@@ -148,6 +148,8 @@ body {
 
 .hero-section {
   margin-bottom: 10px;
+  max-width: 1500px;
+  margin-inline: auto;
 }
 
 .hero-content {
@@ -220,7 +222,10 @@ body {
   box-shadow: 0 0 25px rgba(37, 255, 66, 0.6);
 }
 
-
+.content-section{
+  max-width: 1500px;
+  margin-inline: auto;
+}
 .feed-row {
   display: flex;
   gap: 20px;
@@ -303,7 +308,12 @@ body {
   align-items: center;
   justify-content: center;
   padding-top: 80px;
+  h1{
+    font-size: 4rem;
+  }
 }
+
+
 .not-found i {
   font-size: 5rem;
   color: rgb(37, 255, 66);
