@@ -26,6 +26,7 @@ const contentItems = [
      origin: ["ערוץ הילדים"],
      description:"",
      image: "Assets/Content/Series/Pijamot.png",
+     liked: false,
      likes: 200
    },
    {
@@ -37,6 +38,7 @@ const contentItems = [
       origin: ["ערוץ הילדים", "hot"],
       description:"כשאסון עולמי מאיים להשמיד את האנושות, חבורת צעירים מוצאת את עצמה במרכזה של מזימה חוצת זמנים. האם ניתן לשנות את העתיד?",
       image: "Assets/Content/Series/Hai.png",
+      liked: false,
       likes: 201
    },
    {
@@ -48,6 +50,7 @@ const contentItems = [
       origin: ["ערוצים ישראלים", "קשת"],
       description:"ארבעה חברים רווקים המתגוררים בלב תל אביב מנסים לנווט בין מערכות יחסים, עבודה וחיי היומיום. בכל פרק הם נקלעים לסיטואציות חדשות, מסתבכים בדרכים לא צפויות ונעזרים זה בזה כדי להתמודד עם האבומינציה שהיא: תל אביב.",
       image: "Assets/Content/Series/Naor.png",
+      liked: false,
       likes: 20
    },
    {
@@ -59,6 +62,7 @@ const contentItems = [
       origin: ["ניקלודיאון", "yes"],
       description:"",
       image: "Assets/Content/Series/hamama.png",
+      liked: false,
       likes: 100
    },
    {
@@ -70,6 +74,7 @@ const contentItems = [
       origin: ["ניקלודיאון"],
       description:"",
       image: "Assets/Content/Series/sponge.png",
+      liked: false,
       likes: 87
    },
    {
@@ -81,6 +86,7 @@ const contentItems = [
       origin: ["דיסני"],
       description:"",
       image: "Assets/Content/Series/PnP.png",
+      liked: false,
       likes: 59
    },
    {
@@ -92,6 +98,7 @@ const contentItems = [
       origin: ["ג'טיקס"],
       description:"",
       image: "Assets/Content/Series/Gurveoach.png",
+      liked: false,
       likes: 49
    },
    {
@@ -103,6 +110,7 @@ const contentItems = [
       origin: ["ערוץ הילדים", "יס"],
       description:"",
       image: "Assets/Content/Series/Zumzum.png",
+      liked: false,
       likes: 39
    },
    {
@@ -114,6 +122,7 @@ const contentItems = [
       origin: ["ערוץ הילדים"],
       description:"",
       image: "Assets/Content/Series/Adumot.png",
+      liked: false,
       likes: 20
    },
    {
@@ -125,6 +134,7 @@ const contentItems = [
       origin: ["ערוצים ישראלים"],
       description:"",
       image: "Assets/Content/Series/Shemesh.png",
+      liked: false,
       likes: 102
    },
    {
@@ -136,6 +146,7 @@ const contentItems = [
       origin: ["ערוצים ישראלים"],
       description:"",
       image: "Assets/Content/Series/Alufa.png",
+      liked: false,
       likes: 12
    },
    {
@@ -147,6 +158,7 @@ const contentItems = [
       origin: ["yes", "ניקלודיאון"],
       description:"",
       image: "Assets/Content/Series/fox.png",
+      liked: false,
       likes: 4
    },
    {
@@ -158,6 +170,7 @@ const contentItems = [
       origin: ["ויוה"],
       description:"",
       image: "Assets/Content/Series/osher.png",
+      liked: false,
       likes: 19
    },
    {
@@ -169,6 +182,7 @@ const contentItems = [
       origin: ["ערוץ הילדים", "yes"],
       description:"",
       image: "Assets/Content/Series/Alifim.png",
+      liked: false,
       likes: 46
    },
    {
@@ -180,6 +194,7 @@ const contentItems = [
       origin: ["hot"],
       description:"",
       image: "Assets/Content/Series/Metim.png",
+      liked: false,
       likes: 72
    },
    {
@@ -191,6 +206,7 @@ const contentItems = [
       franchise: "גאליס",
       description:"",
       image: "Assets/Content/Movies/GalisConnect.png",
+      liked: false,
       likes: 2
    },  
    {
@@ -202,10 +218,13 @@ const contentItems = [
       franchise: null,
       description:"",
       image: "Assets/Content/Movies/BigBro.png",
-      likes: 30 
+      liked: false,
+      likes: 30
+       
     }
 ];
 
+const sorted=[...contentItems].sort((a,b)=>a.title.localeCompare(b.title, 'he'));
 const heroSection = document.getElementById("heroSection");
 const featuredItem =  contentItems[Math.floor(Math.random() * contentItems.length)];
 
@@ -230,11 +249,17 @@ const feedContainer = document.getElementById("feedContainer");
 //CARD RENDER
 function renderCard(item) {
    return `
-      <article class="content-card"> 
+      <article class="content-card">
          <img class="content-img" src="${item.image}" alt="${item.title}">
          <h3 class="content-title">${item.title}</h3>
          <p class="content-details">${item.year} · ${item.genre[0]}</p>
-    </article>      
+         <div class="like-section">
+            <button class="like-btn" data-title="${item.title}">
+               <i class="fa-regular fa-heart"></i>
+            </button>
+            <span>${item.likes}</span>
+         </div>      
+    </article>
    `;
 }
 //SECTION RENDER
@@ -256,16 +281,16 @@ function renderTopCard(item,index){
          <span class="rank-number">${index + 1}</span>
          <img class="content-img" src="${item.image}" alt="${item.title}">
          <h3 class="content-title">${item.title}</h3>
-         <p class="content-details">${item.year} · ${item.genre[0]}</p> 
+         <p class="content-details">${item.year} · ${item.genre[0]}</p>
       </article>
-   `; /*add summary? */
+   `;
 }
-//TOP10 RENDER
+//TOP10 SECTION RENDER
 function renderTopSection(items){
    return`
       <section class="content-section">
          <h2 class="section-title">טופ 10 ברטרו סטרים:</h2>
-         <div class="top-feed-row">
+         <div class="feed-row top-feed-row">
             ${items.map((item, index) => renderTopCard(item, index)).join("")}
          </div>
       </section>
@@ -281,6 +306,7 @@ function renderFeed(items = contentItems) {
       ${renderSection("קומדיה", items.filter(item => item.genre.includes("קומדיה")))}
       ${renderSection("דרמה",items.filter(item=>item.genre.includes("דרמה")))}
       ${renderSection("צפייה קלילה", items.filter(item => item.type==="סדרה" && item.episodeLength<=25))}
+      ${renderSection("סדר אלפבטי", sorted)}
    `;
 }
 
@@ -312,6 +338,7 @@ function renderSearchResults(items, searchText) {
 
 
 //event listeners
+//search function
 searchInput.addEventListener("input", function(){
    const searchText= searchInput.value.trim();
    if (searchText==="") {
@@ -325,6 +352,23 @@ searchInput.addEventListener("input", function(){
       item.origin?.some(origin=> origin.includes(searchText))
    );
    renderSearchResults(filteredItems, searchText);
+});
+//like function
+document.addEventListener("click", function(e){
+   const btn = e.target.closest(".like-btn");
+   if (!btn) return;
+   
+   const title = btn.dataset.title;
+   const item= contentItems.find(i=> i.title===title);
+   const icon = btn.querySelector("i");
+   const span = btn.nextElementSibling;
+
+   item.liked = !item.liked;
+   item.likes += item.liked? 1:-1;
+   icon.className = item.liked ? "fa-solid fa-heart" : "fa-regular fa-heart";
+   btn.classList.toggle("liked");
+   span.textContent = item.likes;
+   
 });
 
 renderFeed();
