@@ -3,6 +3,7 @@ const passwordInput = document.getElementById("password");
 const message = document.getElementById("message");
 const form = document.getElementById("myform");
 
+//SUBMIT INSTANCES
 form.addEventListener("submit", function (event) {
     event.preventDefault();
 
@@ -14,11 +15,13 @@ form.addEventListener("submit", function (event) {
         message.textContent = "לא הוזנה כתובת אימייל";
         return;
     }
-    if (!email.includes("@") || !email.includes(".")) {
+    //default browser email validity check
+    if (!emailInput.validity.valid) {
         emailInput.classList.add("input-error");
         message.textContent = "נסו להשתמש בפורמט yourname@email.com";
         return;
     }
+    
     if (password.length === 0) {
         passwordInput.classList.add("input-error");
         message.textContent = "לא הוזנה סיסמא";
