@@ -33,8 +33,19 @@ form.addEventListener("submit", function (event) {
         return;
     }
 
-    window.location.href = "ProfilesScreen.html";
-
+    fetch("/login", {
+        method:"POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email,password })        
+    })
+    .then(res=> res.json())
+    .then(data=> {
+        if (data.success){
+            window.location.href= "/profiles";
+        } else{
+            message.textContent = data.message;
+        }
+    });
 });
 
 form.addEventListener("input", function (event) {
