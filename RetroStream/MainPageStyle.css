@@ -1,17 +1,6 @@
-/*body::before{
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.1) 0px,
-    rgba(255,255,255,0.1) 1px,
-    transparent 3px, transparent 6px
-  );
-  z-index: 9999;
+:root{ 
+  --green: rgb(37, 255, 66);
 }
-  */
 body {
   background:
     repeating-linear-gradient(
@@ -31,15 +20,15 @@ body {
 }
 
 .retro-navbar {
-  background: radial-gradient(circle at right, black, rgb(37, 255, 66) 25%);
+  background: radial-gradient(circle at right, black, var(--green) 25%);
 }
 
 .logo {
-  color: rgb(37, 255, 66) !important;
-  border: 3px solid rgb(37, 255, 66);
+  color: var(--green) !important;
+  border: 3px solid var(--green);
   padding: 6px 14px;
   border-radius: 15px;
-  background: radial-gradient(circle at right and left, rgb(37, 255, 66), black 50%);
+  background: radial-gradient(circle at right and left, var(--green), black 50%);
   font-size: 1.5rem;
   margin-right: 0px !important;
   font-weight: bold;
@@ -126,7 +115,7 @@ body {
   width: 180px;
   opacity: 1;
   padding: 6px 14px;
-  border: 2px solid rgb(37, 255, 66);
+  border: 2px solid var(--green);
 }
 
 #profile {
@@ -164,12 +153,12 @@ body {
   height: 400px;
   object-fit: cover;
   border-radius: 15px;
-  border: 3px solid rgb(37, 255, 66);
+  border: 3px solid var(--green);
   box-shadow: 20px 20px 40px rgb(3, 189, 28);
 }
 
 .hero-label {
-  color: rgb(37, 255, 66);
+  color: var(--green);
   font-family: 'Heebo', sans-serif;
   font-weight: 900;
   font-size: 2.5rem;
@@ -208,7 +197,7 @@ body {
   
 }
 .hero-btn{
-  background-color: rgb(37, 255, 66);
+  background-color: var(--green);
   font-weight: 900;
   font-size: 1.2rem;
   border: none;
@@ -226,19 +215,51 @@ body {
   max-width: 1500px;
   margin-inline: auto;
 }
+.section-wrapper{
+  position: relative;
+  display: flex;
+  align-items: center;
+}
 .feed-row {
   display: flex;
   gap: 20px;
   overflow-x: auto;
   flex-wrap: nowrap;
   padding:20px;
-  scrollbar-width: thin;
-  scrollbar-color: rgb(37, 255, 66) transparent;
+  scrollbar-width: none;
 }
 .top-feed-row{
   gap: 80px;
   overflow-y: hidden;
 }
+
+/*SCROLL BUTTON*/
+.scroll-btn{
+  position: absolute;
+  z-index: 10;
+  color: var(--green);
+  border: none;
+  border-radius: 10px;
+  font-size: 2.5rem;
+  cursor: pointer;
+  padding: 10px;
+  height: 330px;
+  opacity:0;
+  transition: opacity 0.2s ease;
+}
+.scroll-right{ 
+  right:0;
+  background: linear-gradient(to right, rgba(0,0,0,0.5), transparent);
+}
+.scroll-left{ 
+  left:0;
+    background: linear-gradient(to left, rgba(0,0,0,0.5), transparent); 
+}
+.section-wrapper:hover .scroll-btn{
+  opacity: 1;
+}
+
+
 .content-card {
   padding-top: 12px;
   flex: 0 0 220px;
@@ -250,7 +271,7 @@ body {
     translateY(-8px);
   cursor: pointer;  
   .content-img {
-    box-shadow: 0 0 20px rgb(37, 255, 66);
+    box-shadow: 0 0 20px var(--green);
   }
   .content-details{
     opacity: 1;
@@ -284,7 +305,6 @@ body {
   transition: 0.3s ease;
   text-align: center;
   opacity: 0;
-  margin: 0;
   margin-top: 4px;
   font-size: 0.85rem;
   color: #ccc;
@@ -356,7 +376,7 @@ body {
 
 .not-found i {
   font-size: 5rem;
-  color: rgb(37, 255, 66);
+  color: var(--green);
   opacity: 0.4;
   padding: 50px;
   margin-bottom: 20px;

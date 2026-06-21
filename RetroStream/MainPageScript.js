@@ -268,9 +268,17 @@ function renderSection(title, items){
    return `
       <section class="content-section">
          <h2 class="section-title">${title}</h2>
-         <div class="feed-row"> 
-            ${items.map(renderCard).join("")}
-         </div>
+         <div class="section-wrapper">
+            <button class="scroll-btn scroll-right">
+               <i class="fa-solid fa-chevron-right"></i>
+            </button>    
+            <div class="feed-row"> 
+               ${items.map(renderCard).join("")}
+            </div>
+            <button class="scroll-btn scroll-left">
+               <i class="fa-solid fa-chevron-left"></i>
+            </button>
+         </div>   
       </section>      
    `;
 }
@@ -290,8 +298,16 @@ function renderTopSection(items){
    return`
       <section class="content-section">
          <h2 class="section-title">טופ 10 ברטרו סטרים:</h2>
-         <div class="feed-row top-feed-row">
-            ${items.map((item, index) => renderTopCard(item, index)).join("")}
+         <div class="section-wrapper">
+            <button class="scroll-btn scroll-right">
+               <i class="fa-solid fa-chevron-right"></i>
+            </button>    
+            <div class="feed-row top-feed-row">
+               ${items.map((item, index) => renderTopCard(item, index)).join("")}
+            </div>
+            <button class="scroll-btn scroll-left">
+               <i class="fa-solid fa-chevron-left"></i>
+            </button>
          </div>
       </section>
    `
@@ -312,28 +328,29 @@ function renderFeed(items = contentItems) {
 
 //SEARCH RENDER
 function renderSearchResults(items, searchText) {
+   //hide hero section
    heroSection.style.display = "none";
-   feedContainer.innerHTML = `
-      <section class="content-section">
-         <h2 class="section-title">תוצאות חיפוש עבור: ${searchText}</h2>
-         <div class="feed-row">
-            ${items.map(renderCard).join("")}
-         </div>
-      </section>
-   `;
-   //No Results section
-   if(items.length===0){
-      feedContainer.innerHTML = `
-      <section class="content-section">
-         <h2 class="section-title">תוצאות חיפוש עבור: ${searchText}</h2>
-            <div class="not-found">
+   //adaptable html content according to results/!results
+   let innerContent;
+   if (items.length===0){
+      innerContent= `
+         <div class="not-found">
             <i class="fa-solid fa-satellite-dish"></i>
             <h1> לא נמצאו תוצאות </h1>
             <i class="fa-solid fa-satellite-dish"></i>
-            </div>
-      </section>
-   `;
+         </div>`;      
+   } else{
+      innerContent=`
+         <div class="feed-row">
+            ${items.map(renderCard).join("")}
+         </div>`;
    }
+   //HTML writing with adaptable content
+   feedContainer.innerHTML = `
+      <section class="content-section">
+         <h2 class="section-title">תוצאות חיפוש עבור: ${searchText}</h2>
+         ${innerContent} 
+      </section>`;
 }
 
 
@@ -369,6 +386,16 @@ document.addEventListener("click", function(e){
    btn.classList.toggle("liked");
    span.textContent = item.likes;
    
+});
+//SCROLL FUNCTION
+document.addEventListener("click", function(e) {
+   //is scroll button?
+   const btn = e.target.closest(".scroll-btn");
+   if(!btn) return;
+   //
+   const row= btn.parentElement.querySelector(".feed-row");
+   const direction = btn.classList.contains("scroll-right") ? 330 : -330; //if right scroll -330, else 330
+   row.scrollBy({left: direction, behavior:"smooth"});
 });
 
 renderFeed();
