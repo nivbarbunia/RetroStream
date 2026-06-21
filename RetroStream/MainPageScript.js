@@ -207,7 +207,7 @@ const contentItems = [
 ];
 
 const heroSection = document.getElementById("heroSection");
-const featuredItem = contentItems[3];
+const featuredItem =  contentItems[Math.floor(Math.random() * contentItems.length)];
 
 // HERO SECTION
 heroSection.innerHTML= `
@@ -295,6 +295,7 @@ function renderSearchResults(items, searchText) {
          </div>
       </section>
    `;
+   //No Results section
    if(items.length===0){
       feedContainer.innerHTML = `
       <section class="content-section">
