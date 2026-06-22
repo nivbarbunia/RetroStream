@@ -14,6 +14,10 @@ function renderProfile(profile) {
     `;
     profilesDiv.insertBefore(div, document.querySelector(".add"));
 
+    div.querySelector("img").addEventListener("click", function () {
+        window.location.href = "/main";
+    });
+
     const editBtn = div.querySelector(".edit-btn");
     /*EDIT PROFILE*/
     editBtn.addEventListener("click", function () {
