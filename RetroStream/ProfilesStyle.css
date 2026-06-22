@@ -36,42 +36,6 @@ body {
   text-align: center;
 }
 
-.edit-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  position: absolute;
-  left: -30px;
-  transition: opacity 0.3s ease;
-  opacity: 0;
-  pointer-events: none; 
-}
-.name-section:hover .edit-btn {
-  opacity: 1;
-  pointer-events: auto;
-}
-.name-input {
-  display: none;
-  outline: none;
-  margin: 2px;
-  padding: 6px;
-  width: 160px;
-  border-radius: 10px;
-  border: 2px solid rgb(37, 255, 66);
-  box-shadow: 0 0 10px rgba(37, 255, 66, 0.6);
-  background-color: rgb(15, 14, 14);
-  color: white;
-}
-
-
-.name-section.editing .name,
-.name-section.editing .edit-btn {
-  display: none;
-}
-.name-section.editing .name-input {
-  display: inline-block;
-
-}
 
 .profile img:hover {
   transform: scale(1.2);
@@ -99,3 +63,120 @@ body {
   flex-direction: column;
   align-items: center;
 }
+
+/*EDIT BUTTON*/
+.edit-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  position: absolute;
+  left: -30px;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none; 
+}
+.name-section:hover .edit-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* POP-UP PANEL */
+.panel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+.hidden { display: none; }
+.panel-box {
+  background: #1a1a1a;
+  padding: 2rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+}
+.panel-box input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid rgb(37, 255, 66);
+  background: #0f0e0e;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  width: 200px;
+  text-align: center;
+}
+.avatar-grid {
+  display: flex;
+  gap: 1rem;
+}
+.avatar-option {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: border-color 0.2s ease;
+}
+.avatar-option:hover {
+  border-color: rgba(37, 255, 66, 0.5);
+}
+.avatar-option.selected {
+  border-color: rgb(37, 255, 66);
+}
+.panel-buttons {
+  display: flex;
+  gap: 1rem;
+}
+.panel-buttons button {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: 'Varela Round', sans-serif;
+}
+#confirmAdd {
+  background: rgb(37, 255, 66);
+  color: black;
+  font-weight: 700;
+}
+#cancelAdd {
+  background: #444;
+  color: white;
+}
+#deleteProfile {
+  background: #cc0000;
+  color: white;
+}
+#deleteProfile.hidden {
+  display: none;
+}
+#deleteProfile.confirm-mode {
+  background: #ff0000;
+  font-weight: 700;
+  width: 220px;
+}
+.confirm-text {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.confirm-text.visible {
+  opacity: 1;
+}
+.panel-error {
+  color: #ff4444;
+  font-size: 0.9rem;
+  margin: 0;
+}
+#newProfileName.input-error {
+  border-color: #ff4444;
+}
+
