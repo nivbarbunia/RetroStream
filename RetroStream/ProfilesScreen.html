@@ -14,43 +14,30 @@
 
   <body class="d-flex flex-column justify-content-center align-items-center min-vh-100">
     
-    <h1 id="headline">בחר פרופיל</h1>
-    <br />
-    
+    <h1 id="headline">בחר פרופיל</h1><br/>
     <div class="profiles d-flex gap-5 flex-wrap justify-content-center">
-      
-      <div class="profile">
-        <img src="Assets/Users/chief.png" alt="user1" />
-        <div class="name-section">
-          <span class="name"> ניב </span>
-          <button class="edit-btn" ><i class="fa-regular fa-pen-to-square"></i></button>
-          <input type="text" value="ניב" class="name-input" />
-        </div>
-      </div>
-
-      <div class="profile">
-       <img src="Assets/Users/Roni.png" alt="user2" />
-        <div class="name-section">
-          <span class="name"> אוראל </span>
-          <button class="edit-btn" ><i class="fa-regular fa-pen-to-square"></i></button>
-          <input type="text" value="אוראל" class="name-input" />
-        </div>
-      </div>
-
-      <div class="profile">
-        <img src="Assets/Users/fadida.png" alt="user3" />
-        <div class="name-section">
-          <span class="name">ג'סי</span>
-          <button class="edit-btn" ><i class="fa-regular fa-pen-to-square"></i></button>
-          <input type="text" value="ג'סי" class="name-input" />
-        </div>
-
-      </div>
-
       <div class="add">
         <div class="plus">+</div>
         <div class="add-user">
           <span class="name">הוסף משתמש</span>
+        </div>
+      </div>
+    </div>
+    <div id="profilePanel" class="panel-overlay hidden">
+      <div class="panel-box">
+        <h2>פרסונה חדשה</h2>
+        <input type="text" id="newProfileName" placeholder="שם הפרסונה" />
+        <p id="panelError" class="panel-error hidden"></p>
+        <div class="avatar-grid">
+          <img src="Assets/Users/chief.png" class="avatar-option" />
+          <img src="Assets/Users/Roni.png" class="avatar-option" />
+          <img src="Assets/Users/fadida.png" class="avatar-option" />
+          <img src="Assets/Users/gery.png" class="avatar-option" />
+        </div>
+        <div class="panel-buttons">
+          <button id="confirmAdd">אישור</button>
+          <button id="cancelAdd">ביטול</button>
+          <button id="deleteProfile">מחק פרופיל <span id="confirmText" class="confirm-text hidden">— בטוח?</span></button>
         </div>
       </div>
     </div>
