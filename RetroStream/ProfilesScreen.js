@@ -23,6 +23,7 @@ function renderProfile(profile) {
             img.classList.toggle("selected", img.src.includes(profile.image.split("/").pop()));
         });
         document.getElementById("deleteProfile").classList.remove("hidden");
+        document.querySelector("#profilePanel h2").textContent = "עריכת פרופיל";
         document.getElementById("profilePanel").classList.remove("hidden");
     });
 }
@@ -32,10 +33,10 @@ function closePanel() {
     document.getElementById("profilePanel").classList.add("hidden");
     document.getElementById("newProfileName").value = "";
     document.getElementById("deleteProfile").classList.remove("confirm-mode");
-    document.getElementById("deleteProfile").textContent = "מחק פרופיל";
     document.getElementById("deleteProfile").classList.add("hidden");
     document.getElementById("panelError").classList.add("hidden");
     document.getElementById("newProfileName").classList.remove("input-error");
+    document.querySelector("#profilePanel h2").textContent = "פרסונה חדשה";
     document.querySelectorAll(".avatar-option").forEach(i => i.classList.remove("selected"));
     document.getElementById("confirmText").classList.remove("visible");
     document.getElementById("confirmText").classList.add("hidden");
