@@ -36,7 +36,7 @@ function closePanel() {
     document.getElementById("deleteProfile").classList.add("hidden");
     document.getElementById("panelError").classList.add("hidden");
     document.getElementById("newProfileName").classList.remove("input-error");
-    document.querySelector("#profilePanel h2").textContent = "פרסונה חדשה";
+    document.querySelector("#profilePanel h2").textContent = "פרופיל חדש";
     document.querySelectorAll(".avatar-option").forEach(i => i.classList.remove("selected"));
     document.getElementById("confirmText").classList.remove("visible");
     document.getElementById("confirmText").classList.add("hidden");
