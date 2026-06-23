@@ -1,6 +1,9 @@
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+require("dotenv").config();
+const connectDB = require("./config/db");
+const postRoutes = require("./routes/postRoutes");
 const app = express();
 const PORT = 3000;
 
@@ -222,12 +225,17 @@ const profiles = [
 // הגשת קבצים סטטיים מתיקיית RetroStream
 app.use(express.static(path.join(__dirname, "RetroStream")));
 app.use(express.json());
+//middleware session
 app.use(session({
     secret: "retrostream_secret",
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 } // one hour
 }));
+
+//connect to mongoDB and register post routes
+connectDB();
+app.use("/posts", postRoutes);
 
 function requireLogin(req, res, next){
   if(req.session.loggedIn){
