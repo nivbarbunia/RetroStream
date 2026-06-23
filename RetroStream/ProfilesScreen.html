@@ -13,9 +13,9 @@
   </head>
 
   <body class="d-flex flex-column justify-content-center align-items-center min-vh-100">
-    
     <h1 id="headline">בחר פרופיל</h1><br/>
-    <div class="profiles d-flex gap-5 flex-wrap justify-content-center">
+    <!--PROFILES SECTION-->
+    <div class="profiles d-flex gap-3 flex-wrap justify-content-center">
       <div class="add">
         <div class="plus">+</div>
         <div class="add-user">
@@ -23,9 +23,10 @@
         </div>
       </div>
     </div>
+    <!--ADD/EDIT PANEL-->
     <div id="profilePanel" class="panel-overlay hidden">
       <div class="panel-box">
-        <h2>פרופיל חדש</h2>
+        <h2 id="panelTitle"></h2>
         <input type="text" id="newProfileName" placeholder="שם הפרופיל" />
         <p id="panelError" class="panel-error hidden"></p>
         <div class="avatar-grid">
@@ -35,12 +36,13 @@
           <img src="Assets/Users/gery.png" class="avatar-option" />
         </div>
         <div class="panel-buttons">
-          <button id="confirmAdd">אישור</button>
-          <button id="cancelAdd">ביטול</button>
-          <button id="deleteProfile">מחק פרופיל <span id="confirmText" class="confirm-text hidden">— בטוח?</span></button>
+          <button id="confirmProfile">אישור</button>
+          <button id="cancelProfile">ביטול</button>
+          <button id="deleteProfile" class="hidden">מחק פרופיל <span id="confirmText" class="confirm-text hidden">— בטוח?</span></button>
         </div>
       </div>
     </div>
+
     <script src="ProfilesScreen.js"></script>
   </body>
 </html>

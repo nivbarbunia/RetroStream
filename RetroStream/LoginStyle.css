@@ -1,3 +1,8 @@
+:root{ 
+  --green: rgb(37, 255, 66);
+  --black: rgb(15,14,14);
+}
+
 body {
   font-family: 'Varela Round', sans-serif;
   display: flex;
@@ -5,7 +10,7 @@ body {
   justify-content: center;
   text-align: center;
   min-height: 80vh;
-  background: radial-gradient(circle at center, black, rgb(37, 255, 66));
+  background: radial-gradient(circle at center, var(--black), var(--green));
   /* background-image: url(https://res.cloudinary.com/atzuma/image/upload/c_thumb,g_face:center,h_630,q_80,w_1200/v1532704512/atzuma/hsa2vvurhbav0ctlham2.jpg);
         background-position: center; */
 
@@ -13,14 +18,14 @@ body {
 
 #headline {
   font-style: oblique;
-  color: rgb(37, 255, 66);
+  color: var(--green);
 }
 
 .wrapper {
   width: 600px;
   min-height: 350px;
   padding: 40px 50px;
-  border: 5px solid rgb(37, 255, 66);
+  border: 5px solid var(--green);
   border-radius: 80px;
   background: transparent;
   backdrop-filter: blur(17px);
@@ -56,7 +61,7 @@ body {
   font-size: 16px;
   padding: 6px 14px;
   background-color: rgb(15, 14, 14);
-  color: rgb(37, 255, 66);
+  color: var(--green);
 
 }
 
@@ -66,7 +71,7 @@ body {
 
 .formlink {
   font-weight: bold;
-  color: rgb(37, 255, 66);
+  color: var(--green);
 }
 
 #forgot {
@@ -79,8 +84,8 @@ body {
 }
 
 #submit:hover {
-  background-color: rgb(37, 255, 66);
-  color: black;
+  background-color: var(--green);
+  color: var(--black);
 }
 
 #checkbox {
