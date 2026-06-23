@@ -1,6 +1,7 @@
+//REQUEST HANDLER
 const Post = require("../models/postModel");
 
-//RETURNS ALL POSTS FROM /MODELS
+//RETURNS ALL POSTS FROM DATABASE
 async function getPosts(req, res) {
     const posts = await Post.find();
     res.json(posts);

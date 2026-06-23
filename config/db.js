@@ -1,3 +1,4 @@
+//ACCESS DB
 const mongoose = require("mongoose");
 //CONNECT TO MONGODB - using uri from .env
 async function connectDB() {
