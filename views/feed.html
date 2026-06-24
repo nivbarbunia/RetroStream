@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>רטרו-פורום</title>
+</head>
+<body>
+    <h1>רטרו פורום</h1>
+
+    <form id="post-form">
+        <input type="text" id="title" placeholder="כותרת" required>
+        <input type="text" id="author" placeholder="שם כותב" required>
+        <textarea id="content" placeholder="תוכן" required></textarea>
+        <button type="submit">פרסם</button>
+    </form>
+
+    <div id="posts-container"></div>
+
+    <script src="/js/feed.js"></script>
+</body>
+</html>

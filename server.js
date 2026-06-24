@@ -224,10 +224,11 @@ const profiles = [
  let nextId = 4;
 
 
-// הגשת קבצים סטטיים מתיקיית RetroStream
+//Serve static files (HTML, CSS, JS, assets) from project folder
 app.use(express.static(path.join(__dirname, "RetroStream")));
+//Parse incoming JSON request bodies
 app.use(express.json());
-//middleware session
+//Middleware session - login state: 1 hour
 app.use(session({
     secret: "retrostream_secret",
     resave: false,
@@ -267,6 +268,11 @@ app.get("/content", requireLogin, (req, res) => {
 //Get /Profiles page
 app.get("/profiles", requireLogin, (req, res) => {
   res.sendFile(path.join(__dirname, "RetroStream", "ProfilesScreen.html"));
+});
+
+//GET POSTS FEED PAGE
+app.get("/feed", requireLogin, (req, res) => {
+    res.sendFile(path.join(__dirname, "views", "feed.html"));
 });
 
 //Get personas array
