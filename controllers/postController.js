@@ -6,7 +6,7 @@ async function getPosts(req, res) {
     const posts = await Post.find();
     res.json(posts);
 }
-//CREATES POST FROM REQ BODY
+//CREATES POST FROM MODEL
 async function createPost(req, res) {
     const { title, content, author } = req.body;
     const post = await Post.create({ title, content, author });
