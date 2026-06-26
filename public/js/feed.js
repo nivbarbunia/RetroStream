@@ -18,8 +18,13 @@ function renderPost(post) {
                 <small>${post.author}  <span><i class="fa-regular fa-user fa-sm"></i></span></small>
         </div>
         <p>${post.content}</p>
-        <button onclick="deletePost('${post._id}')"><i class="fa-solid fa-trash-can"></i>
-        </button>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <small>
+                ${new Date(post.createdAt).toLocaleDateString('he-IL')}
+                ${post.updatedAt !== post.createdAt ? '(עודכן)' : ''}
+            </small>
+            <button onclick="deletePost('${post._id}')"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
     `;
     postsContainer.appendChild(div);
 }
