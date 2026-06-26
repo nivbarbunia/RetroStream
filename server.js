@@ -226,6 +226,8 @@ const profiles = [
 
 //Serve static files (HTML, CSS, JS, assets) from project folder
 app.use(express.static(path.join(__dirname, "RetroStream")));
+
+app.use(express.static(path.join(__dirname, "public")));
 //Parse incoming JSON request bodies
 app.use(express.json());
 //Middleware session - login state: 1 hour
