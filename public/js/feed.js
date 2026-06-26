@@ -16,24 +16,34 @@ function renderPost(post) {
         <h3>${post.title}</h3>
         <p>${post.content}</p>
         <small>${post.author}</small>
-        <button onclick="deletePost('${post._id}')">מחק</button>
+        <button onclick="deletePost('${post._id}')"><i class="fa-solid fa-trash-can"></i>
+        </button>
     `;
     postsContainer.appendChild(div);
 }
 
+//DELETE POST
+let postToDelete = null;
+
 async function deletePost(postId) {
-    if(!confirm("למחוק את הפוסט?")) return;
-    const res = await fetch(`/posts/${postId}`, {
-        method: "DELETE"
-    });
+    postToDelete = postId;
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+
+document.getElementById('confirmDelete').addEventListener('click', async function() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+    modal.hide();
+    const res = await fetch(`/posts/${postToDelete}`, { method: 'DELETE' });
     const result = await res.json();
-    if (result.success){
-        document.getElementById(`post-${postId}`).remove();
+    if (result.success) {
+        document.getElementById(`post-${postToDelete}`).remove();
     }
     else {
         alert("תקלה במחיקת הפוסט")
     }
-}
+    postToDelete = null;
+});
 
 
 // POST new post to server
