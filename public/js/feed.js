@@ -12,14 +12,22 @@ async function getPosts() {
 function renderPost(post) {
     const div = document.createElement("div");
     div.id = `post-${post._id}`;
+    const dateStr = post.updatedAt !== post.createdAt 
+    ? new Date(post.updatedAt).toLocaleDateString('he-IL')
+    : new Date(post.createdAt).toLocaleDateString('he-IL');
     div.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3>${post.title}</h3>
                 <small>${post.author}  <span><i class="fa-regular fa-user fa-sm"></i></span></small>
         </div>
         <p>${post.content}</p>
-        <button onclick="deletePost('${post._id}')"><i class="fa-solid fa-trash-can"></i>
-        </button>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <small>
+                ${dateStr}
+                ${post.updatedAt !== post.createdAt ? ' (עודכן) ' : ''}
+            </small>
+            <button onclick="deletePost('${post._id}')"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
     `;
     postsContainer.appendChild(div);
 }
