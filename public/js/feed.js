@@ -18,9 +18,35 @@ function renderPost(post) {
                 <small>${post.author}  <span><i class="fa-regular fa-user fa-sm"></i></span></small>
         </div>
         <p>${post.content}</p>
+        <button onclick="deletePost('${post._id}')"><i class="fa-solid fa-trash-can"></i>
+        </button>
     `;
     postsContainer.appendChild(div);
 }
+
+//DELETE POST
+let postToDelete = null;
+
+async function deletePost(postId) {
+    postToDelete = postId;
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+}
+
+document.getElementById('confirmDelete').addEventListener('click', async function() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+    modal.hide();
+    const res = await fetch(`/posts/${postToDelete}`, { method: 'DELETE' });
+    const result = await res.json();
+    if (result.success) {
+        document.getElementById(`post-${postToDelete}`).remove();
+    }
+    else {
+        alert("תקלה במחיקת הפוסט")
+    }
+    postToDelete = null;
+});
+
 
 // POST new post to server
 form.addEventListener("submit", async function(e) {
