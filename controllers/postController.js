@@ -19,4 +19,12 @@ async function deletePost(req, res) {
     res.json({ success: true, message: "Post deleted successfully" });
 }
 
-module.exports = { getPosts, createPost, deletePost };
+async function editPost(req,res){
+    const post = await Post.findByIdAndUpdate(req.params.id,
+        { title: req.body.title, content: req.body.content, author: req.body.author},
+        {new: true}
+    );
+    res.json({success:true, post});
+}
+
+module.exports = { getPosts, createPost, deletePost, editPost};
