@@ -12,6 +12,9 @@ async function getPosts() {
 function renderPost(post) {
     const div = document.createElement("div");
     div.id = `post-${post._id}`;
+    const dateStr = post.updatedAt !== post.createdAt 
+    ? new Date(post.updatedAt).toLocaleDateString('he-IL')
+    : new Date(post.createdAt).toLocaleDateString('he-IL');
     div.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3>${post.title}</h3>
@@ -20,8 +23,8 @@ function renderPost(post) {
         <p>${post.content}</p>
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <small>
-                ${new Date(post.createdAt).toLocaleDateString('he-IL')}
-                ${post.updatedAt !== post.createdAt ? '(עודכן)' : ''}
+                ${dateStr}
+                ${post.updatedAt !== post.createdAt ? ' (עודכן) ' : ''}
             </small>
             <button onclick="deletePost('${post._id}')"><i class="fa-solid fa-trash-can"></i></button>
         </div>
