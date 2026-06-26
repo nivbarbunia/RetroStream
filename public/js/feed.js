@@ -13,9 +13,11 @@ function renderPost(post) {
     const div = document.createElement("div");
     div.id = `post-${post._id}`;
     div.innerHTML = `
-        <h3>${post.title}</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>${post.title}</h3>
+                <small>${post.author}  <span><i class="fa-regular fa-user fa-sm"></i></span></small>
+        </div>
         <p>${post.content}</p>
-        <small>${post.author}</small>
     `;
     postsContainer.appendChild(div);
 }
