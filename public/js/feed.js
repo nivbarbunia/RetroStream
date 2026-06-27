@@ -1,10 +1,11 @@
 const form = document.getElementById("post-form");
 const postsContainer = document.getElementById("posts-container");
 
-// GET all posts from server and render them to DOM
+// GET all posts from server, reset DOM, and render posts to DOM  
 async function getPosts() {
     const res = await fetch("/posts");
     const posts = await res.json();
+    postsContainer.innerHTML = "";
     posts.forEach(renderPost);
 }
 
@@ -12,6 +13,9 @@ async function getPosts() {
 function renderPost(post) {
     const div = document.createElement("div");
     div.id = `post-${post._id}`;
+    div.dataset.title = post.title;
+    div.dataset.content = post.content;
+    div.dataset.author = post.author;
     const dateStr = post.updatedAt !== post.createdAt 
     ? new Date(post.updatedAt).toLocaleDateString('he-IL')
     : new Date(post.createdAt).toLocaleDateString('he-IL');
@@ -26,7 +30,8 @@ function renderPost(post) {
                 ${dateStr}
                 ${post.updatedAt !== post.createdAt ? ' (עודכן) ' : ''}
             </small>
-            <button onclick="deletePost('${post._id}')"><i class="fa-solid fa-trash-can"></i></button>
+            <button id="edit-btn" onclick="editPost('${post._id}')"><i class="fa-regular fa-pen-to-square"></i></button>
+            <button id="delete-btn" onclick="deletePost('${post._id}')"><i class="fa-solid fa-trash-can"></i></button>
         </div>
     `;
     postsContainer.appendChild(div);
@@ -54,6 +59,42 @@ document.getElementById('confirmDelete').addEventListener('click', async functio
     }
     postToDelete = null;
 });
+
+let postToEdit = null;
+
+async function editPost(postId) {
+    postToEdit = postId;
+    const postDiv = document.getElementById(`post-${postId}`); 
+    const modal = new bootstrap.Modal(document.getElementById('editModal'));
+    document.getElementById('editTitle').value = postDiv.dataset.title;
+    document.getElementById('editAuthor').value = postDiv.dataset.author;
+    document.getElementById('editContent').value = postDiv.dataset.content;
+    modal.show();
+}
+document.getElementById('edit-form').addEventListener('submit', async function(e) {
+    e.preventDefault(); 
+    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+    modal.hide();
+    const res= await fetch(`/posts/${postToEdit}`, {
+        method: `PUT`,
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            title: document.getElementById('editTitle').value,
+            author: document.getElementById('editAuthor').value,
+            content: document.getElementById('editContent').value,
+        })
+    });
+    const result = await res.json();
+    if (result.success){
+        getPosts();
+    }
+    else {
+        alert("תקלה בעדכון הפוסט");
+    }   
+    postToEdit=null;
+});
+
+
 
 
 // POST new post to server
