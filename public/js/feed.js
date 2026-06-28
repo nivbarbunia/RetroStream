@@ -1,11 +1,24 @@
 const form = document.getElementById("post-form");
 const postsContainer = document.getElementById("posts-container");
+const searchInput = document.getElementById("searchInput");
+const authorSelect = document.getElementById("authorSelect");
+let allPosts = [];
 
-// GET all posts from server, reset DOM, and render posts to DOM  
+// GET all posts from server and render to DOM  
 async function getPosts() {
     const res = await fetch("/posts");
-    const posts = await res.json();
+    allPosts = await res.json();
+    populateAuthors();
+    renderFeed();
+}
+// Clear DOM and render each post to DOM
+function renderPosts(posts) {
     postsContainer.innerHTML = "";
+    if (posts.length ===0){
+        document.getElementById("not-found").classList.remove("hidden");
+        return;
+    }
+    document.getElementById("not-found").classList.add("hidden");
     posts.forEach(renderPost);
 }
 
@@ -50,7 +63,9 @@ document.getElementById('confirmDelete').addEventListener('click', async functio
     const res = await fetch(`/posts/${postToDelete}`, { method: 'DELETE' });
     const result = await res.json();
     if (result.success) {
-        document.getElementById(`post-${postToDelete}`).remove();
+        allPosts = allPosts.filter(post => post._id !== postToDelete);
+        populateAuthors();
+        renderFeed();
     }
     else {
         alert("תקלה במחיקת הפוסט")
@@ -82,6 +97,7 @@ document.getElementById('edit-form').addEventListener('submit', async function(e
     }
 
     bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+
     const res= await fetch(`/posts/${postToEdit}`, {
         method: `PUT`,
         headers: {'Content-Type': 'application/json'},
@@ -101,9 +117,32 @@ document.getElementById('edit-form').addEventListener('submit', async function(e
     postToEdit=null;
 });
 
+//SEARCH & FILTER
+function renderFeed() {
+    const searchText = searchInput.value.trim();
+    const selectedAuthor = authorSelect.value;
 
+    const filtered = allPosts.filter(post => {
+        const matchesSearch = post.title.includes(searchText) || post.content.includes(searchText);
+        const matchesAuthor = selectedAuthor === "" || post.author === selectedAuthor;
+        return matchesSearch && matchesAuthor;
+    });
 
+    renderPosts(filtered);
+}
 
+searchInput.addEventListener("input", renderFeed);
+authorSelect.addEventListener("change", renderFeed);
+
+function populateAuthors() {
+    const selected = authorSelect.value;
+    const authors = [...new Set(allPosts.map(post => post.author))];
+    authorSelect.innerHTML = `<option value="">כל הכותבים</option>`;
+    authors.forEach(author => {
+        authorSelect.innerHTML += `<option value="${author}">${author}</option>`;
+    });
+    authorSelect.value = authors.includes(selected) ? selected : "";
+}
 // POST new post to server
 form.addEventListener("submit", async function(e) {
     e.preventDefault();
@@ -119,7 +158,9 @@ form.addEventListener("submit", async function(e) {
 
     const data = await res.json();
     if (data.success) {
-        renderPost(data.post);
+        allPosts.push(data.post);
+        populateAuthors();
+        renderFeed();
         form.reset();
     }
 });
