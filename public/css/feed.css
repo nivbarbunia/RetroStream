@@ -41,8 +41,8 @@ h2{
     font-size: 2rem;
     
 }
-#post-form input,
-#post-form textarea {
+.form input,
+.form textarea {
     background: var(--black);
     border: 2px solid var(--green);
     border-radius: 10px;
@@ -51,7 +51,7 @@ h2{
     font-size: 1rem;
     outline: none;
 }
-#post-form textarea{
+.form textarea{
     font: inherit;
     resize: none;
     box-sizing: border-box;
@@ -59,8 +59,8 @@ h2{
 }
 
 
-#post-form input:focus,
-#post-form textarea:focus {
+.form input:focus,
+.form textarea:focus {
     border-color: white;
     box-shadow: 2px 5px 5px var(--green);
 }
@@ -114,15 +114,13 @@ h2{
 }
 #posts-container p { /* card content */
     color: #eee;
-    margin-bottom: 6px; 
+    margin-bottom: 6px;
     font-size: 1.1rem;
-    #posts-container p {
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     word-break: break-all;
-}
 }
 #posts-container small { /* card author */
     color: #ccc;
@@ -131,25 +129,35 @@ h2{
     color: var(--green);
 }
 
-/* DELETE BUTTON */
+/* CARD BUTTONS */
 #posts-container button {
     cursor: pointer;
     background: transparent;
     border: none;
-    color: #cc0000;
     border-radius: 8px;
     padding: 4px 12px;
-    margin-top: 10px;
     transition: 0.2s;
-    display: block;
-    margin-right: auto;
 }
-#posts-container button:hover {
+/*DELETE BUTTON*/
+#delete-btn{
+    color: #cc0000;
+}
+#delete-btn:hover {
     background: #cc0000;
     color: white;
 }
+/*EDIT BUTTON*/
+#edit-btn{
+    color: var(--green);
 
-/* DELETE MODAL */
+}
+#edit-btn:hover {
+    background: rgba(37, 255, 66, 0.8);
+    color: var(--black);
+}
+
+
+/* MODAL */
 .modal-content{
     background-color: var(--black);
     border: 3px solid var(--green);
@@ -157,7 +165,6 @@ h2{
     color: #eee;
 }
 .modal-title{
-    color: red;
     font-size: 2rem;
 }
 .modal-header, .modal-footer{
@@ -166,4 +173,17 @@ h2{
 }
 .modal-body{
     font-size: 1.5rem;
+}
+
+/*EDIT MODAL*/
+#editContent{
+    font-size: 1rem;
+}
+#confirmEdit{
+    background-color: var(--green);
+    color: var(--black);
+    transition: 0.2s;
+}
+#confirmEdit:hover {
+    background-color:rgba(37, 255, 66, 0.8);
 }

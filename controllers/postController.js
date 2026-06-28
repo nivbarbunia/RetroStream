@@ -18,5 +18,14 @@ async function deletePost(req, res) {
     if (!post) return res.json({ success: false, message: "Post not found" });
     res.json({ success: true, message: "Post deleted successfully" });
 }
+//EDIT POST
+async function editPost(req,res){
+    const post = await Post.findByIdAndUpdate(req.params.id,
+        { title: req.body.title, content: req.body.content, author: req.body.author},
+        {new: true}
+    );
+    if (!post) return res.json({ success: false, message: "Post not found" });
+    res.json({success:true, post});
+}
 
-module.exports = { getPosts, createPost, deletePost };
+module.exports = { getPosts, createPost, deletePost, editPost};
