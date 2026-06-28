@@ -1,10 +1,15 @@
 const form = document.getElementById("post-form");
 const postsContainer = document.getElementById("posts-container");
+let allPosts = [];
 
-// GET all posts from server, reset DOM, and render posts to DOM  
+// GET all posts from server and render to DOM  
 async function getPosts() {
     const res = await fetch("/posts");
-    const posts = await res.json();
+    allPosts = await res.json();
+    renderPosts(allPosts);
+}
+// Clear DOM and render each post to DOM
+function renderPosts(posts) {
     postsContainer.innerHTML = "";
     posts.forEach(renderPost);
 }
