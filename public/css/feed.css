@@ -21,7 +21,7 @@ body {
 }
 
 /* HEADLINE */
-h1 {
+#headline {
     color: var(--green);
     font-size: 4rem;
     text-shadow: 0 0 10px rgba(37, 255, 66, 0.4);
@@ -63,6 +63,53 @@ h2{
 .form textarea:focus {
     border-color: white;
     box-shadow: 2px 5px 5px var(--green);
+}
+/*SEARCH & FILTER */
+#search-filter input,
+#search-filter select {
+    background: var(--black);
+    border: 2px solid var(--green);
+    border-radius: 10px;
+    color: white;
+    padding: 8px;
+    font-size: 1rem;
+    outline: none;
+}
+#search-filter select{
+    cursor: pointer;
+}
+#search-filter input:focus{
+    border-color: white;
+    box-shadow: 2px 5px 5px var(--green);
+}
+#search-filter option {
+    background: var(--black);
+    color: white;
+}
+/* NO POSTS DESIGN */
+#not-found.hidden{
+    display: none;
+}
+#not-found{
+  color: rgb(168, 168, 168);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 80px;
+  h1{
+    font-size: 4rem;
+  }
+}
+#not-found i {
+  font-size: 5rem;
+  color: var(--green);
+  opacity: 0.4;
+  padding: 50px;
+  margin-bottom: 20px;
+
+  text-shadow:
+    0 0 10px rgba(37, 255, 66, 0.4),
+    0 0 20px rgba(37, 255, 66, 0.2);
 }
 /* POST CARD */
 #post-form button {

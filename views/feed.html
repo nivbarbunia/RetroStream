@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <body>
-    <h1>רטרו פורום</h1>
+    <h1 id="headline">רטרו פורום</h1>
     <form id="post-form" class="form d-flex flex-column gap-3 mx-auto mb-5" style="max-width: 500px;">
         <h2>צור פוסט</h2>
         <div class="d-flex gap-2">
@@ -21,9 +21,19 @@
         <button type="submit">פרסם</button>
     </form>
 
+    <div id="search-filter" class="d-flex gap-3 mb-4" style="max-width: 500px;">
+        <input type="text" id="searchInput" class="w-75" placeholder="חיפוש לפי כותרת או תוכן">
+        <select id="authorSelect" class="w-25" placeholder="סנן לפי כותב:"></select>
+    </div>
+
     <div id="posts-container"></div>
+    <div id="not-found" class="hidden">
+        <i class="fa-solid fa-satellite-dish"></i>
+        <h1> לא נמצאו פוסטים </h1>
+        <i class="fa-solid fa-satellite-dish"></i>
+    </div>
    
-    <div class="modal fade" id="deleteModal" tabindex="-1">  <!-- CONFIRM DELETE--> 
+    <div class="modal fade" id="deleteModal" tabindex="-1">  <!--DELETE MODAL--> 
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
