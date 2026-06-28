@@ -42,13 +42,11 @@ let postToDelete = null;
 
 async function deletePost(postId) {
     postToDelete = postId;
-    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-    modal.show();
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
 }
 
 document.getElementById('confirmDelete').addEventListener('click', async function() {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-    modal.hide();
+    bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
     const res = await fetch(`/posts/${postToDelete}`, { method: 'DELETE' });
     const result = await res.json();
     if (result.success) {
@@ -60,21 +58,30 @@ document.getElementById('confirmDelete').addEventListener('click', async functio
     postToDelete = null;
 });
 
+//EDIT POST
 let postToEdit = null;
 
 async function editPost(postId) {
     postToEdit = postId;
     const postDiv = document.getElementById(`post-${postId}`); 
-    const modal = new bootstrap.Modal(document.getElementById('editModal'));
+    //modal form fields load current field values
     document.getElementById('editTitle').value = postDiv.dataset.title;
     document.getElementById('editAuthor').value = postDiv.dataset.author;
     document.getElementById('editContent').value = postDiv.dataset.content;
-    modal.show();
+    new bootstrap.Modal(document.getElementById('editModal')).show();
 }
 document.getElementById('edit-form').addEventListener('submit', async function(e) {
-    e.preventDefault(); 
-    const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-    modal.hide();
+    e.preventDefault();
+    const postDiv = document.getElementById(`post-${postToEdit}`);
+
+    if (document.getElementById("editTitle").value === postDiv.dataset.title &&
+    document.getElementById("editAuthor").value === postDiv.dataset.author && 
+    document.getElementById("editContent").value === postDiv.dataset.content) {
+        alert("לא בוצעו שינויים");
+        return;
+    }
+
+    bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
     const res= await fetch(`/posts/${postToEdit}`, {
         method: `PUT`,
         headers: {'Content-Type': 'application/json'},
