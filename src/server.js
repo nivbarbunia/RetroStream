@@ -5,7 +5,7 @@ const path = require("path");
 const session = require("express-session");
 require("dotenv").config();
 const connectDB = require("./config/db");
-const postRoutes = require("./routes/postRoutes");
+const postRoutes = require("./routes/post.routes");
 const app = express();
 const PORT = 3000;
 
@@ -254,12 +254,12 @@ function requireLogin(req, res, next){
 
 // Get / — login page
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "Login.html"));
+  res.sendFile(path.join(__dirname, "views", "login.html"));
 });
 
 // Get /main — feed page
 app.get("/main", requireLogin, (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "MainPage.html"));
+    res.sendFile(path.join(__dirname, "views", "mainpage.html"));
 });
 
 // Get /content — content items array
@@ -269,7 +269,7 @@ app.get("/content", requireLogin, (req, res) => {
 
 //Get /Profiles page
 app.get("/profiles", requireLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "ProfilesScreen.html"));
+  res.sendFile(path.join(__dirname, "views", "profiles.html"));
 });
 
 //GET POSTS FEED PAGE
