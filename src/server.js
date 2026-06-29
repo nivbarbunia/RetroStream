@@ -7,18 +7,9 @@ require("dotenv").config();
 const connectDB = require("./config/db");
 const postRoutes = require("./routes/post.routes");
 const contentRoutes = require("./routes/content.routes");
+const profileRoutes = require("./routes/profile.routes");
 const app = express();
 const PORT = 3000;
-
-
-const profiles = [
-    { id: 1, name: "ניב", image: "Assets/Users/chief.png" },
-    { id: 2, name: "אוראל", image: "Assets/Users/Roni.png" },
-    { id: 3, name: "ג'סי", image: "Assets/Users/fadida.png" }
-];
-let nextId = 4;
-
-
 
 
 //Serve static files (CSS, JS, assets) from public folder
@@ -35,8 +26,9 @@ app.use(session({
 
 //connect to mongoDB and register post routes
 connectDB();
-app.use("/posts", postRoutes);
-app.use("/content", requireLogin, contentRoutes);
+app.use("/api/posts", postRoutes);
+app.use("/api/content", requireLogin, contentRoutes);
+app.use("/api/profiles", requireLogin, profileRoutes);
 
 function requireLogin(req, res, next){
   if(req.session.loggedIn){
@@ -90,15 +82,7 @@ app.post("/login", (req, res) => {
     }
     return res.json({success:false, message: "אימייל או סיסמא שגויים"})
 })
-//post /ADD PROFILE
-app.post("/profiles", requireLogin,(req,res) =>{
-  const{name,image} = req.body;
-  const newProfile = {id: nextId++, name, image};
-  const exists = profiles.some(p=> p.name===name);
-  if (exists) return res.json({success:false, message: "שם זה כבר קיים"});
-  profiles.push(newProfile);
-  res.json({success: true, profile: newProfile});
-});
+
 
 
 

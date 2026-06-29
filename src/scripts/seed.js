@@ -2,6 +2,7 @@ require("dotenv").config({ path: require("path").join(__dirname, "../../.env") }
 const mongoose = require("mongoose");
 const connectDB = require("../config/db");
 const Content = require("../models/content.model");
+const Profile = require("../models/profile.model");
 
 const contentItems = [
     {
@@ -192,6 +193,11 @@ const contentItems = [
         likes: 30
     }
 ];
+const profiles = [
+    { id: 1, name: "ניב", image: "Assets/Users/chief.png", birthDate: "2000-04-09" },
+    { id: 2, name: "אוראל", image: "Assets/Users/Roni.png", birthDate: "2000-01-18" },
+    { id: 3, name: "ג'סי", image: "Assets/Users/fadida.png", birthDate: "2019-02-18" }
+];
 
 async function seed() {
     try {
@@ -200,8 +206,16 @@ async function seed() {
         await Content.insertMany(contentItems);
         console.log(`Seeded ${contentItems.length} content items`);
     } catch (err) {
-        console.error("Seed failed:", err.message);
-    } finally {
+        console.error("content seed failed:", err.message);
+    } 
+    try{
+        await Profile.deleteMany({});
+        await Profile.insertMany(profiles);
+        console.log(`Seeded ${profiles.length} profiles`);
+    } catch (err) {
+        console.error("profiles seed failed:", err.message);
+    } 
+    finally {
         mongoose.connection.close();
     }
 }

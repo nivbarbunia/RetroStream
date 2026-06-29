@@ -20,7 +20,7 @@ let sorted= [];
 const heroSection = document.getElementById("heroSection");
 
 //GET content array, Sorted array and Hero section from server, then renders feed.
-fetch("/content")
+fetch("/api/content")
     .then(res => res.json())
     .then(data => {
         contentItems = data.content;
