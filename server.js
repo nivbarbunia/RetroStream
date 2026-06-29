@@ -221,12 +221,12 @@ const profiles = [
     { id: 2, name: "אוראל", image: "Assets/Users/Roni.png" },
     { id: 3, name: "ג'סי", image: "Assets/Users/fadida.png" }
 ];
- let nextId = 4;
+let nextId = 4;
 
 
-//Serve static files (HTML, CSS, JS, assets) from project folder
-app.use(express.static(path.join(__dirname, "RetroStream")));
 
+
+//Serve static files (CSS, JS, assets) from public folder
 app.use(express.static(path.join(__dirname, "public")));
 //Parse incoming JSON request bodies
 app.use(express.json());
@@ -254,12 +254,12 @@ function requireLogin(req, res, next){
 
 // Get / — login page
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "RetroStream", "Login.html"));
+  res.sendFile(path.join(__dirname, "views", "Login.html"));
 });
 
 // Get /main — feed page
 app.get("/main", requireLogin, (req, res) => {
-    res.sendFile(path.join(__dirname, "RetroStream", "MainPage.html"));
+    res.sendFile(path.join(__dirname, "views", "MainPage.html"));
 });
 
 // Get /content — content items array
@@ -269,7 +269,7 @@ app.get("/content", requireLogin, (req, res) => {
 
 //Get /Profiles page
 app.get("/profiles", requireLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, "RetroStream", "ProfilesScreen.html"));
+  res.sendFile(path.join(__dirname, "views", "ProfilesScreen.html"));
 });
 
 //GET POSTS FEED PAGE
