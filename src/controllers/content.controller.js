@@ -147,10 +147,33 @@ async function updateContent(req, res) {
     }
 }
 
+async function searchContent(req, res) {
+    try {
+        const { title, genre, type, origin } = req.query;
+        const filter = {};
+
+        if (title)  filter.title  = { $regex: title, $options: "i" };
+        if (type)   filter.type   = type;
+        if (genre)  filter.genre  = { $in: [genre] };
+        if (origin) filter.origin = { $in: [origin] };
+
+        const content = await Content.find(filter);
+
+        if (content.length === 0) {
+            return res.status(404).json({ success: false, message: "לא נמצא תוכן" });
+        }
+
+        res.json({ success: true, content });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
+    }
+}
+
 module.exports = {
     getContent,
     getContentById,
     createContent,
     updateContent,
-    deleteContent
+    deleteContent,
+    searchContent
 };
