@@ -23,7 +23,7 @@ const heroSection = document.getElementById("heroSection");
 fetch("/content")
     .then(res => res.json())
     .then(data => {
-        contentItems = data;
+        contentItems = data.content;
         sorted=[...contentItems].sort((a,b)=>a.title.localeCompare(b.title, 'he'));
         const featuredItem =  contentItems[Math.floor(Math.random() * contentItems.length)]; 
         // HERO SECTION
@@ -41,7 +41,7 @@ fetch("/content")
                <img class="hero-img" src="${featuredItem.image}" alt="${featuredItem.title}">
             </div>         
          `;
-        renderFeed(data);
+        renderFeed(data.content);
     });
 
 
