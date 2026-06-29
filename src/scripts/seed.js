@@ -1,8 +1,11 @@
 require("dotenv").config({ path: require("path").join(__dirname, "../../.env") });
 const mongoose = require("mongoose");
 const connectDB = require("../config/db");
+const bcrypt = require("bcrypt");
+const User = require("../models/user.model");
 const Content = require("../models/content.model");
 const Profile = require("../models/profile.model");
+
 
 const contentItems = [
     {
@@ -194,9 +197,9 @@ const contentItems = [
     }
 ];
 const profiles = [
-    { id: 1, name: "ניב", image: "Assets/Users/chief.png", birthDate: "2000-04-09" },
-    { id: 2, name: "אוראל", image: "Assets/Users/Roni.png", birthDate: "2000-01-18" },
-    { id: 3, name: "ג'סי", image: "Assets/Users/fadida.png", birthDate: "2019-02-18" }
+    {name: "ניב", image: "Assets/Users/chief.png", birthDate: "2000-04-09" },
+    {name: "אוראל", image: "Assets/Users/Roni.png", birthDate: "2000-01-18" },
+    {name: "ג'סי", image: "Assets/Users/fadida.png", birthDate: "2019-02-18" }
 ];
 
 async function seed() {
@@ -214,6 +217,18 @@ async function seed() {
         console.log(`Seeded ${profiles.length} profiles`);
     } catch (err) {
         console.error("profiles seed failed:", err.message);
+    }
+    try {
+        await User.deleteMany({});
+        const hashedPassword = await bcrypt.hash("123456", 10);
+        await User.create({
+            name: "ניב",
+            email: "user@example.com",
+            password: hashedPassword
+        });
+        console.log("Seeded 1 user");
+    } catch (err) {
+        console.error("users seed failed:", err.message);
     } 
     finally {
         mongoose.connection.close();

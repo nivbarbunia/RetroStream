@@ -6,6 +6,8 @@ const session = require("express-session");
 require("dotenv").config();
 const connectDB = require("./config/db");
 const postRoutes = require("./routes/post.routes");
+const bcrypt = require("bcrypt");
+const User = require("./models/user.model");
 const contentRoutes = require("./routes/content.routes");
 const profileRoutes = require("./routes/profile.routes");
 const app = express();
@@ -61,54 +63,22 @@ app.get("/feed", requireLogin, (req, res) => {
     res.sendFile(path.join(__dirname, "views", "feed.html"));
 });
 
-//Get personas array
-app.get("/profiles/data", requireLogin, (req, res) => {
-    res.json(profiles);
-});
-
 //POSTS
 
 //Post /login - gets email & password - returns success || !success
-app.post("/login", (req, res) => {
-    const{email,password} = req.body;
+app.post("/login", async (req, res) => {
+    const { email, password } = req.body;
 
-    if(!email || !password){
-        return res.json({success: false, message: "שדות חסרים"});
+    if (!email || !password) {
+        return res.json({ success: false, message: "שדות חסרים" });
     }
 
-    if(email=== "user@example.com" && password==="123456"){
+    const user = await User.findOne({ email });
+    if (user && await bcrypt.compare(password, user.password)) {
         req.session.loggedIn = true;
-        return res.json({success:true});
+        return res.json({ success: true });
     }
-    return res.json({success:false, message: "אימייל או סיסמא שגויים"})
-})
-
-
-
-
-// PUT /profiles/:id — עדכון פרסונה
-app.put("/profiles/:id", requireLogin, (req, res) => {
-    const id = parseInt(req.params.id);
-    const { name, image } = req.body;
-    const profile = profiles.find(p => p.id === id);
-
-    if (!profile) return res.json({ success: false, message: "פרסונה לא נמצאה" });
-
-    if (name) profile.name = name;
-    if (image) profile.image = image;
-
-    res.json({ success: true, profile });
-});
-
-// DELETE /profiles/:id — מחיקת פרסונה
-app.delete("/profiles/:id", requireLogin, (req, res) => {
-    const id = parseInt(req.params.id);
-    const index = profiles.findIndex(p => p.id === id);
-
-    if (index === -1) return res.json({ success: false, message: "פרסונה לא נמצאה" });
-
-    profiles.splice(index, 1);
-    res.json({ success: true });
+    return res.json({ success: false, message: "אימייל או סיסמא שגויים" });
 });
 
 // POST /logout — destroy session
