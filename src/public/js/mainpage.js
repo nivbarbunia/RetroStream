@@ -1,54 +1,59 @@
+//_______________________________//
+//         DOM ELEMENTS          //
+//_______________________________//
 const searchBox = document.querySelector(".search-box");
 const searchToggle = document.getElementById("searchToggle");
 const searchInput = document.getElementById("searchInput");
-
-//NAVBAR FUNCTIONS
-searchToggle.addEventListener("click", function () {
-  searchBox.classList.add("open");
-
-  if (searchBox.classList.contains("open")) {
-    searchInput.focus();
-  }
-});
-
-searchInput.addEventListener("blur", function () {
-   searchBox.classList.remove("open");
-});
+const heroSection = document.getElementById("heroSection");
+const feedContainer = document.getElementById("feedContainer");
+const logoutBtn     = document.getElementById("logoutBtn");
 
 let contentItems = [];
-let sorted= [];
-const heroSection = document.getElementById("heroSection");
 
-//GET content array, Sorted array and Hero section from server, then renders feed.
-fetch("/api/content")
-    .then(res => res.json())
-    .then(data => {
-        contentItems = data.content;
-        sorted=[...contentItems].sort((a,b)=>a.title.localeCompare(b.title, 'he'));
-        const featuredItem =  contentItems[Math.floor(Math.random() * contentItems.length)]; 
-        // HERO SECTION
-         heroSection.innerHTML= `
-            <div class="hero-content">
-               <div class="hero-text">
-                  <p class="hero-label">במיוחד בשבילך</p>
-                  <div class="hero-heading">
-                     <h1 class="hero-title">${featuredItem.title}</h1>
-                     <span class="hero-details">${featuredItem.year} · ${featuredItem.genre[0]} · ${featuredItem.origin?.[0] || featuredItem.genre[1]}</span>
-                  </div>   
-                  <p class="hero-desc">${featuredItem.description}</p>
-                  <button class="hero-btn">צפה עכשיו ▶</button>
-               </div>
-               <img class="hero-img" src="${featuredItem.image}" alt="${featuredItem.title}">
-            </div>         
-         `;
-        renderFeed(data.content);
-    });
+//_______________________________//
+//             API               //
+//_______________________________//
 
+function loadContent(){
+   fetch("/api/content")
+   .then(res => res.json())
+   .then(data => {
+      contentItems = data.content;
+      const featuredItem =  contentItems[Math.floor(Math.random() * contentItems.length)]; 
+      renderHero(featuredItem);
+      renderFeed(contentItems);
+   });
+}
 
+function logout() {
+    fetch("/logout", { method: "POST" })
+        .then(res => res.json())
+        .then(() => {
+            window.location.href = "/";
+        });
+}
 
+//_______________________________//
+//         DOM FUNCTIONS         //
+//_______________________________//
 
-const feedContainer = document.getElementById("feedContainer");
-//FUNCTIONS
+//HERO SECTION
+function renderHero(item) {
+   heroSection.innerHTML= `
+   <div class="hero-content">
+      <div class="hero-text">
+         <p class="hero-label">במיוחד בשבילך</p>
+         <div class="hero-heading">
+            <h1 class="hero-title">${item.title}</h1>
+            <span class="hero-details">${item.year} · ${item.genre[0]} · ${item.origin?.[0] || item.genre[1]}</span>
+         </div>   
+         <p class="hero-desc">${item.description}</p>
+         <button class="hero-btn">צפה עכשיו ▶</button>
+      </div>
+      <img class="hero-img" src="${item.image}" alt="${item.title}">
+   </div>         
+   `;   
+}
 //CARD RENDER
 function renderCard(item) {
    return `
@@ -65,6 +70,7 @@ function renderCard(item) {
     </article>
    `;
 }
+
 //SECTION RENDER
 function renderSection(title, items){
    if(items.length===0) return "";
@@ -85,6 +91,8 @@ function renderSection(title, items){
       </section>      
    `;
 }
+
+
 //TOP10 CARD RENDER
 function renderTopCard(item,index){
    return`
@@ -119,6 +127,7 @@ function renderTopSection(items){
 //FEED RENDER
 function renderFeed(items = contentItems) {
    const top10 = [...contentItems].sort((a,b)=> b.likes - a.likes).slice(0,10); //allocate top 10 contents
+   const sorted=[...contentItems].sort((a,b)=>a.title.localeCompare(b.title, 'he'));
    feedContainer.innerHTML=`
       ${renderSection("המשך צפייה", items.slice(0,5))}
       ${renderTopSection(top10)}
@@ -129,7 +138,7 @@ function renderFeed(items = contentItems) {
    `;
 }
 
-//SEARCH RENDER
+//SEARCH RESULTS RENDER
 function renderSearchResults(items, searchText) {
    //hide hero section
    heroSection.style.display = "none";
@@ -157,8 +166,27 @@ function renderSearchResults(items, searchText) {
 }
 
 
-//event listeners
-//search function
+//_______________________________//
+//        EVENT LISTENERS        //
+//_______________________________//
+
+
+loadContent();
+
+// OPEN SEARCH BOX
+searchToggle.addEventListener("click", function () {
+   searchBox.classList.add("open");
+   if (searchBox.classList.contains("open")) {
+      searchInput.focus();
+   }
+});
+
+// CLOSE SEARCH BOX
+searchInput.addEventListener("blur", function () {
+   searchBox.classList.remove("open");
+});
+
+//LIVE SEARCH - CLIENT SIDE
 searchInput.addEventListener("input", function(){
    const searchText= searchInput.value.trim();
    if (searchText==="") {
@@ -173,6 +201,19 @@ searchInput.addEventListener("input", function(){
    );
    renderSearchResults(filteredItems, searchText);
 });
+
+//SCROLL FUNCTION
+document.addEventListener("click", function(e) {
+   //is scroll button?
+   const btn = e.target.closest(".scroll-btn");
+   if(!btn) return;
+   //
+   const row= btn.parentElement.querySelector(".feed-row");
+   const direction = btn.classList.contains("scroll-right") ? 330 : -330; //if right scroll -330, else 330
+   row.scrollBy({left: direction, behavior:"smooth"});
+});
+
+
 //like function
 document.addEventListener("click", function(e){
    const btn = e.target.closest(".like-btn");
@@ -190,25 +231,6 @@ document.addEventListener("click", function(e){
    span.textContent = item.likes;
    
 });
-//SCROLL FUNCTION
-document.addEventListener("click", function(e) {
-   //is scroll button?
-   const btn = e.target.closest(".scroll-btn");
-   if(!btn) return;
-   //
-   const row= btn.parentElement.querySelector(".feed-row");
-   const direction = btn.classList.contains("scroll-right") ? 330 : -330; //if right scroll -330, else 330
-   row.scrollBy({left: direction, behavior:"smooth"});
-});
-//LOGOUT
-document.getElementById("logoutBtn").addEventListener("click", function () {
-    fetch("/logout", { method: "POST" })
-        .then(res => res.json())
-        .then(() => {
-            window.location.href = "/";
-        });
-});
 
-
-
-
+// LOGOUT
+logoutBtn.addEventListener("click", logout);
