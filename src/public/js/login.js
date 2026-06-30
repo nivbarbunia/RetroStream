@@ -1,38 +1,16 @@
+//_______________________________//
+//         DOM ELEMENTS          //
+//_______________________________//
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const message = document.getElementById("message");
 const form = document.getElementById("myform");
 
-//SUBMIT INSTANCES
-form.addEventListener("submit", function (event) {
-    event.preventDefault();
+//_______________________________//
+//            API                //
+//_______________________________//
 
-    const email = emailInput.value;
-    const password = passwordInput.value;
-    
-    if (email.length === 0) {
-        emailInput.classList.add("input-error");
-        message.textContent = "לא הוזנה כתובת אימייל";
-        return;
-    }
-    //default browser email validity check
-    if (!emailInput.validity.valid) {
-        emailInput.classList.add("input-error");
-        message.textContent = "נסו להשתמש בפורמט yourname@email.com";
-        return;
-    }
-    
-    if (password.length === 0) {
-        passwordInput.classList.add("input-error");
-        message.textContent = "לא הוזנה סיסמא";
-        return;
-    }
-    if (password.length < 6) {
-        passwordInput.classList.add("input-error");
-        message.textContent = "הסיסמה חייבת להכיל לפחות 6 תווים";
-        return;
-    }
-
+function login(email,password){
     fetch("/login", {
         method:"POST",
         headers: {"Content-Type": "application/json"},
@@ -46,8 +24,45 @@ form.addEventListener("submit", function (event) {
             message.textContent = data.message;
         }
     });
+}
+
+//_______________________________//
+//          FUNCTIONS            //
+//_______________________________//
+
+function showError(msg, field) {
+    message.textContent = msg;
+    field.classList.add("input-error");
+}
+
+//_______________________________//
+//          LISTENERS            //
+//_______________________________//
+
+//SUBMIT INSTANCES
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const email = emailInput.value;
+    const password = passwordInput.value;
+    //ERRORS
+    if (email.length === 0) {
+        return showError("לא הוזנה כתובת אימייל", emailInput);
+    }
+    if (!emailInput.validity.valid) {
+        return showError("נסו להשתמש בפורמט yourname@email.com", emailInput);
+    }
+    if (password.length === 0) {
+        return showError("לא הוזנה סיסמא", passwordInput);
+    }
+    if (password.length < 6) {
+        return showError("הסיסמה חייבת להכיל לפחות 6 תווים", passwordInput);
+    }
+    //SERVER REQUEST
+    login(email, password);
 });
 
+//CLEAR ERRORS WHILE TYPING
 form.addEventListener("input", function (event) {
     emailInput.classList.remove("input-error");
     passwordInput.classList.remove("input-error");
