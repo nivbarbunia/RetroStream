@@ -1,25 +1,25 @@
-//
-//ELEMENTS
-//
+//_______________________________//
+//         DOM ELEMENTS          //
+//_______________________________//
 const profilesDiv = document.querySelector(".profiles");
-const addBtn      = document.querySelector(".add");
-const panel       = document.getElementById("profilePanel");
-const panelTitle  = document.getElementById("panelTitle");
-const nameInput   = document.getElementById("newProfileName");
-const panelError  = document.getElementById("panelError");
-const deleteBtn   = document.getElementById("deleteProfile");
+const addBtn = document.querySelector(".add");
+const panel = document.getElementById("profilePanel");
+const panelTitle = document.getElementById("panelTitle");
+const nameInput = document.getElementById("newProfileName");
+const panelError = document.getElementById("panelError");
+const deleteBtn = document.getElementById("deleteProfile");
 const confirmText = document.getElementById("confirmText");
-const cancelBtn   = document.getElementById("cancelProfile");
-const confirmBtn  = document.getElementById("confirmProfile");
-const avatars     = document.querySelectorAll(".avatar-option");
+const cancelBtn = document.getElementById("cancelProfile");
+const confirmBtn = document.getElementById("confirmProfile");
+const avatars = document.querySelectorAll(".avatar-option");
 const birthDateInput = document.getElementById("newProfileBirthDate");
 
 let editingProfileId = null; // null = add mode, id = edit mode
 
 
-//
-//API - SERVER SIDE
-//
+//_______________________________//
+//             API               //
+//_______________________________//
 function loadProfiles() {
     fetch("/api/profiles")
         .then(res => res.json())
@@ -32,15 +32,15 @@ function createProfile(body) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            renderProfile(data.profile);
-            closePanel();
-        } else {
-            showError(data.message, [nameInput]);
-        }
-    });
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                renderProfile(data.profile);
+                closePanel();
+            } else {
+                showError(data.message, [nameInput]);
+            }
+        });
 }
 
 function updateProfile(id, body) {
@@ -49,32 +49,33 @@ function updateProfile(id, body) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            const edited = renderProfile(data.profile);
-            document.querySelector(`[data-id="${id}"]`).replaceWith(edited);    
-            closePanel();
-        } else {
-            showError(data.message, [nameInput]);
-        }
-    });
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const edited = renderProfile(data.profile);
+                document.querySelector(`[data-id="${id}"]`).replaceWith(edited);
+                closePanel();
+            } else {
+                showError(data.message, [nameInput]);
+            }
+        });
 }
 
 function deleteProfile(id) {
     fetch(`/api/profiles/${id}`, { method: "DELETE" })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            document.querySelector(`[data-id="${id}"]`).remove();
-            closePanel();
-        } 
-    });
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelector(`[data-id="${id}"]`).remove();
+                closePanel();
+            }
+        });
 }
 
-//
-//DOM
-//
+
+//_______________________________//
+//         DOM FUNCTIONS         //
+//_______________________________//
 
 function renderProfile(profile) {
     const div = document.createElement("div");
@@ -116,7 +117,7 @@ function openPanel(profile = null) {
     panel.classList.remove("hidden");
 }
 //ERROR MESSAGE
-function showError(msg, fields=[]) {
+function showError(msg, fields = []) {
     panelError.textContent = msg;
     panelError.classList.remove("hidden");
     fields.forEach(f => f.classList.add("input-error"));
@@ -128,7 +129,7 @@ function closePanel() {
     nameInput.value = "";
     nameInput.classList.remove("input-error");
     avatars.forEach(i => i.classList.remove("selected"));
-    birthDateInput.value="";
+    birthDateInput.value = "";
     birthDateInput.classList.remove("input-error");
     panelError.classList.add("hidden");
     deleteBtn.classList.remove("confirm-mode");
@@ -141,9 +142,9 @@ function closePanel() {
 
 
 
-//
-//STATIC EVENT LISTENERS
-//
+//_______________________________//
+//        EVENT LISTENERS        //
+//_______________________________//
 
 
 // initial load
@@ -180,7 +181,7 @@ confirmBtn.addEventListener("click", function () {
     const birthDate = birthDateInput.value;
     const today = new Date().toISOString().split("T")[0]; //max date
     const minDate = new Date();
-    minDate.setFullYear(minDate.getFullYear() - 120); 
+    minDate.setFullYear(minDate.getFullYear() - 120);
     const min = minDate.toISOString().split("T")[0]; //min date
     if (!name && !birthDate) return showError("יש למלא שם ולמלא תאריך לידה", [nameInput, birthDateInput]);
     if (!name) return showError("יש למלא שם", [nameInput]);
@@ -189,7 +190,7 @@ confirmBtn.addEventListener("click", function () {
     if (birthDate < min) return showError("תאריך לידה ישן מדי", [birthDateInput]);
 
     const image = selected.src.split("/").slice(-3).join("/");
-    
+
 
     if (editingProfileId) {
         updateProfile(editingProfileId, { name, image, birthDate });
