@@ -6,7 +6,7 @@ let allPosts = [];
 
 // GET all posts from server and render to DOM  
 async function getPosts() {
-    const res = await fetch("/posts");
+    const res = await fetch("/api/posts");
     allPosts = await res.json();
     populateAuthors();
     renderFeed();
@@ -60,7 +60,7 @@ async function deletePost(postId) {
 
 document.getElementById('confirmDelete').addEventListener('click', async function() {
     bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
-    const res = await fetch(`/posts/${postToDelete}`, { method: 'DELETE' });
+    const res = await fetch(`/api/posts/${postToDelete}`, { method: 'DELETE' });
     const result = await res.json();
     if (result.success) {
         allPosts = allPosts.filter(post => post._id !== postToDelete);
@@ -98,7 +98,7 @@ document.getElementById('edit-form').addEventListener('submit', async function(e
 
     bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
 
-    const res= await fetch(`/posts/${postToEdit}`, {
+    const res= await fetch(`/api/posts/${postToEdit}`, {
         method: `PUT`,
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
@@ -150,7 +150,7 @@ form.addEventListener("submit", async function(e) {
     const content = document.getElementById("content").value;
     const author = document.getElementById("author").value;
 
-    const res = await fetch("/posts", {
+    const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, content, author })

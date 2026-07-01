@@ -1,5 +1,5 @@
 //REQUEST HANDLER
-const Post = require("../models/postModel");
+const Post = require("../models/post.model");
 
 //RETURNS ALL POSTS FROM DATABASE
 async function getPosts(req, res) {

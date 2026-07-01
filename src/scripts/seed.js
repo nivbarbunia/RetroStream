@@ -1,13 +1,11 @@
-const dns = require("dns");
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
-const express = require("express");
-const path = require("path");
-const session = require("express-session");
-require("dotenv").config();
-const connectDB = require("./config/db");
-const postRoutes = require("./routes/postRoutes");
-const app = express();
-const PORT = 3000;
+require("dotenv").config({ path: require("path").join(__dirname, "../../.env") });
+const mongoose = require("mongoose");
+const connectDB = require("../config/db");
+const bcrypt = require("bcrypt");
+const User = require("../models/user.model");
+const Content = require("../models/content.model");
+const Profile = require("../models/profile.model");
+
 
 const contentItems = [
     {
@@ -19,7 +17,6 @@ const contentItems = [
         origin: ["ערוץ הילדים"],
         description: "",
         image: "Assets/Content/Series/Pijamot.png",
-        liked: false,
         likes: 200
     },
     {
@@ -31,7 +28,6 @@ const contentItems = [
         origin: ["ערוץ הילדים", "hot"],
         description: "כשאסון עולמי מאיים להשמיד את האנושות, חבורת צעירים מוצאת את עצמה במרכזה של מזימה חוצת זמנים. האם ניתן לשנות את העתיד?",
         image: "Assets/Content/Series/Hai.png",
-        liked: false,
         likes: 201
     },
     {
@@ -43,7 +39,6 @@ const contentItems = [
         origin: ["ערוצים ישראלים", "קשת"],
         description: "ארבעה חברים רווקים המתגוררים בלב תל אביב מנסים לנווט בין מערכות יחסים, עבודה וחיי היומיום. בכל פרק הם נקלעים לסיטואציות חדשות, מסתבכים בדרכים לא צפויות ונעזרים זה בזה כדי להתמודד עם האבומינציה שהיא: תל אביב.",
         image: "Assets/Content/Series/Naor.png",
-        liked: false,
         likes: 20
     },
     {
@@ -55,7 +50,6 @@ const contentItems = [
         origin: ["ניקלודיאון", "yes"],
         description: "",
         image: "Assets/Content/Series/hamama.png",
-        liked: false,
         likes: 100
     },
     {
@@ -67,7 +61,6 @@ const contentItems = [
         origin: ["ניקלודיאון"],
         description: "",
         image: "Assets/Content/Series/sponge.png",
-        liked: false,
         likes: 87
     },
     {
@@ -79,7 +72,6 @@ const contentItems = [
         origin: ["דיסני"],
         description: "",
         image: "Assets/Content/Series/PnP.png",
-        liked: false,
         likes: 59
     },
     {
@@ -91,7 +83,6 @@ const contentItems = [
         origin: ["ג'טיקס"],
         description: "",
         image: "Assets/Content/Series/Gurveoach.png",
-        liked: false,
         likes: 49
     },
     {
@@ -103,7 +94,6 @@ const contentItems = [
         origin: ["ערוץ הילדים", "יס"],
         description: "",
         image: "Assets/Content/Series/Zumzum.png",
-        liked: false,
         likes: 39
     },
     {
@@ -115,7 +105,6 @@ const contentItems = [
         origin: ["ערוץ הילדים"],
         description: "",
         image: "Assets/Content/Series/Adumot.png",
-        liked: false,
         likes: 20
     },
     {
@@ -127,7 +116,6 @@ const contentItems = [
         origin: ["ערוצים ישראלים"],
         description: "",
         image: "Assets/Content/Series/Shemesh.png",
-        liked: false,
         likes: 102
     },
     {
@@ -139,7 +127,6 @@ const contentItems = [
         origin: ["ערוצים ישראלים"],
         description: "",
         image: "Assets/Content/Series/Alufa.png",
-        liked: false,
         likes: 12
     },
     {
@@ -151,7 +138,6 @@ const contentItems = [
         origin: ["yes", "ניקלודיאון"],
         description: "",
         image: "Assets/Content/Series/fox.png",
-        liked: false,
         likes: 4
     },
     {
@@ -163,7 +149,6 @@ const contentItems = [
         origin: ["ויוה"],
         description: "",
         image: "Assets/Content/Series/osher.png",
-        liked: false,
         likes: 19
     },
     {
@@ -175,7 +160,6 @@ const contentItems = [
         origin: ["ערוץ הילדים", "yes"],
         description: "",
         image: "Assets/Content/Series/Alifim.png",
-        liked: false,
         likes: 46
     },
     {
@@ -187,7 +171,6 @@ const contentItems = [
         origin: ["hot"],
         description: "",
         image: "Assets/Content/Series/Metim.png",
-        liked: false,
         likes: 72
     },
     {
@@ -199,7 +182,6 @@ const contentItems = [
         franchise: "גאליס",
         description: "",
         image: "Assets/Content/Movies/GalisConnect.png",
-        liked: false,
         likes: 2
     },
     {
@@ -211,137 +193,46 @@ const contentItems = [
         franchise: null,
         description: "",
         image: "Assets/Content/Movies/BigBro.png",
-        liked: false,
         likes: 30
     }
 ];
-
 const profiles = [
-    { id: 1, name: "ניב", image: "Assets/Users/chief.png" },
-    { id: 2, name: "אוראל", image: "Assets/Users/Roni.png" },
-    { id: 3, name: "ג'סי", image: "Assets/Users/fadida.png" }
+    {name: "ניב", image: "Assets/Users/chief.png", birthDate: "2000-04-09" },
+    {name: "אוראל", image: "Assets/Users/Roni.png", birthDate: "2000-01-18" },
+    {name: "ג'סי", image: "Assets/Users/fadida.png", birthDate: "2019-02-18" }
 ];
- let nextId = 4;
 
-
-//Serve static files (HTML, CSS, JS, assets) from project folder
-app.use(express.static(path.join(__dirname, "RetroStream")));
-
-app.use(express.static(path.join(__dirname, "public")));
-//Parse incoming JSON request bodies
-app.use(express.json());
-//Middleware session - login state: 1 hour
-app.use(session({
-    secret: "retrostream_secret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 } // one hour
-}));
-
-//connect to mongoDB and register post routes
-connectDB();
-app.use("/posts", postRoutes);
-
-function requireLogin(req, res, next){
-  if(req.session.loggedIn){
-    next();
-  } else{
-    res.redirect("/");
-  }
+async function seed() {
+    try {
+        await connectDB();
+        await Content.deleteMany({});
+        await Content.insertMany(contentItems);
+        console.log(`Seeded ${contentItems.length} content items`);
+    } catch (err) {
+        console.error("content seed failed:", err.message);
+    } 
+    try{
+        await Profile.deleteMany({});
+        await Profile.insertMany(profiles);
+        console.log(`Seeded ${profiles.length} profiles`);
+    } catch (err) {
+        console.error("profiles seed failed:", err.message);
+    }
+    try {
+        await User.deleteMany({});
+        const hashedPassword = await bcrypt.hash("123456", 10);
+        await User.create({
+            name: "ניב",
+            email: "user@example.com",
+            password: hashedPassword
+        });
+        console.log("Seeded 1 user");
+    } catch (err) {
+        console.error("users seed failed:", err.message);
+    } 
+    finally {
+        mongoose.connection.close();
+    }
 }
 
-//GETS
-
-// Get / — login page
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "RetroStream", "Login.html"));
-});
-
-// Get /main — feed page
-app.get("/main", requireLogin, (req, res) => {
-    res.sendFile(path.join(__dirname, "RetroStream", "MainPage.html"));
-});
-
-// Get /content — content items array
-app.get("/content", requireLogin, (req, res) => {
-    res.json(contentItems);
-});
-
-//Get /Profiles page
-app.get("/profiles", requireLogin, (req, res) => {
-  res.sendFile(path.join(__dirname, "RetroStream", "ProfilesScreen.html"));
-});
-
-//GET POSTS FEED PAGE
-app.get("/feed", requireLogin, (req, res) => {
-    res.sendFile(path.join(__dirname, "views", "feed.html"));
-});
-
-//Get personas array
-app.get("/profiles/data", requireLogin, (req, res) => {
-    res.json(profiles);
-});
-
-//POSTS
-
-//Post /login - gets email & password - returns success || !success
-app.post("/login", (req, res) => {
-    const{email,password} = req.body;
-
-    if(!email || !password){
-        return res.json({success: false, message: "שדות חסרים"});
-    }
-
-    if(email=== "user@example.com" && password==="123456"){
-        req.session.loggedIn = true;
-        return res.json({success:true});
-    }
-    return res.json({success:false, message: "אימייל או סיסמא שגויים"})
-})
-//post /ADD PROFILE
-app.post("/profiles", requireLogin,(req,res) =>{
-  const{name,image} = req.body;
-  const newProfile = {id: nextId++, name, image};
-  const exists = profiles.some(p=> p.name===name);
-  if (exists) return res.json({success:false, message: "שם זה כבר קיים"});
-  profiles.push(newProfile);
-  res.json({success: true, profile: newProfile});
-});
-
-
-
-// PUT /profiles/:id — עדכון פרסונה
-app.put("/profiles/:id", requireLogin, (req, res) => {
-    const id = parseInt(req.params.id);
-    const { name, image } = req.body;
-    const profile = profiles.find(p => p.id === id);
-
-    if (!profile) return res.json({ success: false, message: "פרסונה לא נמצאה" });
-
-    if (name) profile.name = name;
-    if (image) profile.image = image;
-
-    res.json({ success: true, profile });
-});
-
-// DELETE /profiles/:id — מחיקת פרסונה
-app.delete("/profiles/:id", requireLogin, (req, res) => {
-    const id = parseInt(req.params.id);
-    const index = profiles.findIndex(p => p.id === id);
-
-    if (index === -1) return res.json({ success: false, message: "פרסונה לא נמצאה" });
-
-    profiles.splice(index, 1);
-    res.json({ success: true });
-});
-
-// POST /logout — destroy session
-app.post("/logout", (req, res) => {
-    req.session.destroy();
-    res.json({ success: true });
-});
-
-//listening
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+seed();
