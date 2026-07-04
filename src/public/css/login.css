@@ -13,7 +13,21 @@
     justify-content: center;
     text-align: center;
     min-height: 80vh;
-    background: radial-gradient(circle at center, var(--black), var(--green));
+      background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 8px,
+      transparent 6px
+    ),
+    radial-gradient(
+      circle at center,
+      rgba(37,255,66,0.14),
+      transparent 60%
+    ),
+    black;
+  font-family: 'Varela Round', sans-serif;
   }
 
   #headline {
@@ -33,7 +47,13 @@
     color: rgb(249, 249, 249);
     font-size: 1rem;
     box-sizing: border-box;
+    animation: fadeIn 0.8s ease;
   }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
   .wrapper input {
     border-radius: 10px;
