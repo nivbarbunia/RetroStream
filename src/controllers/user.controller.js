@@ -54,13 +54,22 @@ async function updateUser(req, res) {
         if (!isSelf && !isAdmin) {
             return res.status(403).json({ success: false, message: "אין הרשאה" });
         }
-
-        const { name, email, password } = req.body;
+        
+        const { name, email, password, currentPassword } = req.body;
         const update = {};
         if (name)  update.name = name;
         if (email) update.email = email;
-        if (password) update.password = await bcrypt.hash(password, 10);
-
+        // if password is being changed, verify current password (unless admin)
+        if (password){
+            if (isSelf) {
+                const target = await User.findById(targetId);
+                const match = await bcrypt.compare(currentPassword || "", target.password);
+                if (!match) {
+                    return res.status(400).json({ success: false, message: "הסיסמה הנוכחית שגויה" });
+                }
+            }    
+            update.password = await bcrypt.hash(password, 10);
+        }    
         const user = await User.findByIdAndUpdate(
             targetId,
             update,

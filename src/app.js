@@ -36,6 +36,7 @@ app.get("/main", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "
 app.get("/profiles", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "views", "profiles.html")));
 app.get("/feed", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "views", "feed.html")));
 app.get("/register", (req, res) => res.sendFile(path.join(__dirname, "views", "register.html")));
+app.get("/account", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "views", "account.html")));
 
 // auth
 app.use("/api/auth", authRoutes);

@@ -1,0 +1,183 @@
+:root {
+  --green: rgb(37, 255, 66);
+  --black: rgb(15, 14, 14);
+}
+
+html {
+  font-size: clamp(16px, 1vw + 6px, 40px);
+}
+
+body {
+  font-family: 'Varela Round', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 80vh;
+    background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 8px,
+      transparent 6px
+    ),
+    radial-gradient(
+      circle at center,
+      rgba(37,255,66,0.14),
+      transparent 60%
+    ),
+    black;
+}
+
+#headline {
+  font-style: oblique;
+  font-size: 2rem;
+  color: var(--green);
+  margin-bottom: 1.5rem;
+}
+
+.wrapper {
+  width: clamp(320px, 40vw, 750px);
+  padding: 2rem 2.5rem;
+  border: 5px solid var(--green);
+  border-radius: 40px;
+  background: transparent;
+  backdrop-filter: blur(17px);
+  color: rgb(249, 249, 249);
+  box-sizing: border-box;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* FIELD ROW — label + value + edit button */
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(37, 255, 66, 0.3);
+  flex-wrap: wrap;
+}
+.field-label {
+  color: var(--green);
+  font-weight: bold;
+  min-width: 4rem;
+  text-align: right;
+}
+.field-value {
+  flex: 1;
+  text-align: right;
+}
+
+/* EDIT MODE (inline for name/email) */
+.field-edit {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.field-edit input {
+  flex: 1;
+  min-width: 8rem;
+}
+
+/* PASSWORD EDIT (stacked inputs) */
+.password-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+.password-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+/* INPUTS */
+input {
+  border-radius: 10px;
+  border: 2px solid rgb(58, 253, 84);
+  padding: 0.4rem 0.6rem;
+  background-color: var(--black);
+  color: white;
+  outline: none;
+  font-family: 'Varela Round', sans-serif;
+}
+input:focus {
+  border-color: rgb(124, 255, 142);
+}
+input.input-error {
+  border-color: #ff5c5c;
+  box-shadow: 0 0 8px rgba(255, 92, 92, 0.4);
+}
+
+/* BUTTONS */
+button {
+  border-radius: 8px;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  font-family: 'Varela Round', sans-serif;
+  font-size: 0.9rem;
+  background-color: var(--black);
+  color: var(--green);
+}
+button:hover {
+  background-color: var(--green);
+  color: var(--black);
+}
+.edit-btn {
+  background: transparent;
+  color: var(--green);
+  font-size: 1.1rem;
+  padding: 0.3rem;
+}
+.edit-btn:hover {
+  background: transparent;
+  transform: scale(1.15);
+  color: rgb(124, 255, 142);
+}
+
+/* ACTIONS */
+.account-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+.back {
+  font-weight: bold;
+  color: white;
+}
+#deleteAccount {
+  background: #cc0000;
+  color: white;
+}
+#deleteAccount.confirm-mode {
+  background: #ff0000;
+  font-weight: 700;
+}
+.confirm-text {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.confirm-text.visible {
+  opacity: 1;
+}
+
+#message {
+  margin-top: 1rem;
+  font-weight: bold;
+  min-height: 1.2rem;
+}
+
+.hidden {
+  display: none;
+}
