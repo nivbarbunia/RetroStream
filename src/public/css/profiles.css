@@ -1,17 +1,21 @@
+html {
+  font-size: clamp(16px, 1vw + 6px, 40px);
+}
 :root{ 
   --green: rgb(37, 255, 66);
   --black: rgb(15,14,14);
+  --avatar-size: clamp(120px, 12vw, 400px);
 }
 #headline {
   font-style: oblique;
   font-size: 3rem;
   color: var(--black);
   padding: 6px;
-  border: 3px solid var(--black);
+  border: 0.2rem solid var(--black);
   border-radius: 15px;
-  box-shadow: 1px 1px 1px 1px var(--green);
+  box-shadow: 0.1rem 0.1rem 0.1rem 0.1rem var(--green);
   text-align: center;
-  text-shadow: 1px 1px 1px var(--green);
+  text-shadow: 0.1rem 0.1rem 0.1rem var(--green);
   margin: 0 0 50px 0;
 }
 
@@ -38,10 +42,10 @@ body {
 } 
 
 .profile img {
-  width: 170px;
-  height: 170px;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
   border-radius: 50%;
-  border: 3px solid var(--black);
+  border: 0.2rem solid var(--black);
   cursor: pointer;
   transition: transform 0.3s ease;
 }
@@ -68,8 +72,11 @@ body {
 }
 
 .plus {
-  width: 170px;
-  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
   border-radius: 10px;
   font-size: 8rem;
   cursor: pointer;
@@ -82,7 +89,7 @@ body {
 }
 
 .profile, .add {
-  width: 190px;
+  width: var(--avatar-size);
   text-align: center;
   display: flex;
   flex-direction: column;
