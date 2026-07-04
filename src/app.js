@@ -3,12 +3,13 @@ const express = require("express");
 const path = require("path");
 const session = require("express-session");
 //MIDDLEWARE
-const requireLogin = require("./middleware/auth.middleware");
+const { requireLogin } = require("./middleware/auth.middleware");
 //ROUTES
 const contentRoutes = require("./routes/content.routes");
 const profileRoutes = require("./routes/profile.routes");
 const postRoutes = require("./routes/post.routes");
 const authRoutes = require("./routes/auth.routes");
+const userRoutes = require("./routes/user.routes");
 
 
 const app = express();
@@ -27,6 +28,7 @@ app.use(session({
 app.use("/api/posts", postRoutes); //temporary
 app.use("/api/content", requireLogin, contentRoutes);
 app.use("/api/profiles", requireLogin, profileRoutes);
+app.use("/api/users", userRoutes);
 
 // PAGE routes
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "views", "login.html")));

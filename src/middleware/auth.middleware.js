@@ -1,3 +1,4 @@
+const User = require("../models/user.model");
 // Protects routes — redirects to login page if not authenticated
 function requireLogin(req, res, next) {
     if (req.session.userId) {
@@ -6,5 +7,12 @@ function requireLogin(req, res, next) {
         res.redirect("/");
     }
 }
-
-module.exports = requireLogin;
+async function requireAdmin(req, res, next) {
+    const user = await User.findById(req.session.userId);
+    if (user && user.role === "admin") {
+        next();
+    } else {
+        res.status(403).json({ success: false, message: "אין הרשאה" });
+    }
+}
+module.exports = { requireLogin, requireAdmin };
