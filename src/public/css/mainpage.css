@@ -102,17 +102,96 @@ body {
   border: 2px solid var(--green);
 }
 
+
+
+/* PROFILE DROPDOWN */
+.profile-menu {
+  position: relative;
+  margin-left: 0.2rem;
+}
+
 #profile {
-  width: 50px;
-  height: 50px;
-  border-radius: 5px;
+  width: 2.8rem;
+  aspect-ratio: 1/1;
+  border-radius: 0.4rem;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 #profile:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 30px black;
+  box-shadow: 0 0 1.3rem black;
+}
+.dropdown {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  i{
+    opacity: 0;
+  }
+}
+.dropdown:hover i{
+  transition: opacity 0.2s ease;
+  opacity: 1;
+  color: var(--black);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: var(--black, rgb(15,14,14));
+  border: 0.15rem solid var(--green);
+  border-radius: 0.8rem;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-width: 10rem;
+  z-index: 100;
+}
+.profile-dropdown span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.profile-dropdown a,
+.profile-dropdown button {
+  background: transparent;
+  border: none;
+  color: white;
+  text-align: right;
+  text-decoration: none;
+  padding: 0.5rem 0.8rem;
+  font-family: 'Varela Round', sans-serif;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.profile-dropdown span:hover {
+  background: var(--green);
+  i,a {
+    color: var(--black);
+  }
+  button {
+    color: #ff5c5c;
+  }
+}
+.profile-dropdown i {
+  color: var(--green);
+  font-size: 1.2rem;
+}
+#logoutIcon{
+  color: #ff5c5c;
+}
+
+.profile-dropdown.hidden {
+  display: none;
 }
 
 /*hero section /////
@@ -209,9 +288,6 @@ body {
 .content-section{
   max-width: min(96vw);
   margin-inline: auto;
-  .h2{
-    font: size 80px;
-  }
 }
 .section-wrapper{
   position: relative;

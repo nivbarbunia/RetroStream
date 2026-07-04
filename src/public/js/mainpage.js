@@ -6,7 +6,9 @@ const searchToggle = document.getElementById("searchToggle");
 const searchInput = document.getElementById("searchInput");
 const heroSection = document.getElementById("heroSection");
 const feedContainer = document.getElementById("feedContainer");
-const logoutBtn     = document.getElementById("logoutBtn");
+const profileImg = document.getElementById("profile");
+const profileDropdown = document.getElementById("profileDropdown");
+const logoutBtn = document.getElementById("logoutBtn");
 
 let contentItems = [];
 
@@ -172,6 +174,17 @@ function renderSearchResults(items, searchText) {
 
 
 loadContent();
+
+// TOGGLE PROFILE DROPDOWN
+profileImg.addEventListener("click", function (e) {
+    e.stopPropagation();
+    profileDropdown.classList.toggle("hidden");
+});
+
+// close dropdown when clicking outside
+document.addEventListener("click", function () {
+    profileDropdown.classList.add("hidden");
+});
 
 // OPEN SEARCH BOX
 searchToggle.addEventListener("click", function () {
