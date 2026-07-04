@@ -1,106 +1,104 @@
-:root{ 
-  --green: rgb(37, 255, 66);
-  --black: rgb(15,14,14);
-}
+  html {
+    font-size: clamp(16px, 1vw + 6px, 40px);
+  }
+  :root{ 
+    --green: rgb(37, 255, 66);
+    --black: rgb(15,14,14);
+  }
 
-body {
-  font-family: 'Varela Round', sans-serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-height: 80vh;
-  background: radial-gradient(circle at center, var(--black), var(--green));
-  /* background-image: url(https://res.cloudinary.com/atzuma/image/upload/c_thumb,g_face:center,h_630,q_80,w_1200/v1532704512/atzuma/hsa2vvurhbav0ctlham2.jpg);
-        background-position: center; */
+  body {
+    font-family: 'Varela Round', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 80vh;
+    background: radial-gradient(circle at center, var(--black), var(--green));
+  }
 
-}
+  #headline {
+    font-style: oblique;
+    font-size: 2rem;
+    color: var(--green);
+  }
 
-#headline {
-  font-style: oblique;
-  color: var(--green);
-}
+  .wrapper {
+    width: clamp(320px, 39vw, 1800px);
+    aspect-ratio: 16/9;
+    padding: 1.5rem 2rem;
+    border: 5px solid var(--green);
+    border-radius: 80px;
+    background: transparent;
+    backdrop-filter: blur(17px);
+    color: rgb(249, 249, 249);
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
 
-.wrapper {
-  width: 600px;
-  min-height: 350px;
-  padding: 40px 50px;
-  border: 5px solid var(--green);
-  border-radius: 80px;
-  background: transparent;
-  backdrop-filter: blur(17px);
-  color: rgb(249, 249, 249);
-  font-size: 18px;
-  box-sizing: border-box;
-}
+  .wrapper input {
+    border-radius: 10px;
+    font-size: 0.8rem;
+    border-color: rgb(58, 253, 84);
+    margin: 0.2rem;
+    padding: 0.4rem;
+    background-color: rgb(15, 14, 14);
+    color: white;
+  }
 
-.wrapper input {
-  border-radius: 10px;
-  border-color: rgb(58, 253, 84);
-  margin: 2px;
-  padding: 6px;
-  background-color: rgb(15, 14, 14);
-  color: white;
-}
+  .wrapper input:-webkit-autofill,
+  .wrapper input:-webkit-autofill:hover,
+  .wrapper input:-webkit-autofill:focus {
+    -webkit-text-fill-color: white;
+    box-shadow: 0 0 0 1000px rgb(15, 14, 14) inset;
+    caret-color: white;
+    border: 2px solid rgb(58, 253, 84);
+  }
 
-.wrapper input:-webkit-autofill,
-.wrapper input:-webkit-autofill:hover,
-.wrapper input:-webkit-autofill:focus {
-  -webkit-text-fill-color: white;
-  box-shadow: 0 0 0 1000px rgb(15, 14, 14) inset;
-  caret-color: white;
-  border: 2px solid rgb(58, 253, 84);
-}
+  .wrapper input:focus {
+    outline: none;
+    border: 3px solid rgb(124, 255, 142);
+  }
 
-.wrapper input:focus {
-  outline: none;
-  border: 3px solid rgb(124, 255, 142);
-}
+  .wrapper button {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    margin-top: 0.8rem;
+    background-color: rgb(15, 14, 14);
+    color: var(--green);
+    cursor: pointer;
 
-.wrapper button {
-  font-size: 16px;
-  padding: 6px 14px;
-  background-color: rgb(15, 14, 14);
-  color: var(--green);
+  }
 
-}
+  .formlink {
+    font-weight: bold;
+    color: var(--green);
+  }
 
-#headline {
-  font-size: 32px;
-}
+  .remember-forget {
+    display: flex;
+    justify-content: center;
+    gap: 5rem;
+    align-items: center;
+    font-size: 0.8rem;
+  }
 
-.formlink {
-  font-weight: bold;
-  color: var(--green);
-}
+  #submit:hover {
+    background-color: var(--green);
+    color: var(--black);
+  }
 
-#forgot {
-  margin-right: 70px;
-}
+  #checkbox {
+    cursor: pointer;
+  }
 
-#submit {
-  margin-top: 5px;
-  cursor: pointer;
-}
+  .wrapper input.input-error {
+    border: 2px solid #ff5c5c;
+    box-shadow: 0 0 8px rgba(255, 92, 92, 0.4);
+    outline: none;
+  }
 
-#submit:hover {
-  background-color: var(--green);
-  color: var(--black);
-}
-
-#checkbox {
-  cursor: pointer;
-}
-
-.wrapper input.input-error {
-  border: 2px solid #ff5c5c;
-  box-shadow: 0 0 8px rgba(255, 92, 92, 0.4);
-  outline: none;
-}
-
-#message {
-  color: #ff5c5c;
-  font-size: 0.9rem;
-  margin-top: 5px;
-  font-weight: bold;
-}
+  #message {
+    color: #ff5c5c;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
