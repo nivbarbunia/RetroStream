@@ -2,14 +2,13 @@
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
-const bcrypt = require("bcrypt"); 
 //MIDDLEWARE
 const requireLogin = require("./middleware/auth.middleware");
 //ROUTES
-const User = require("./models/user.model");
 const contentRoutes = require("./routes/content.routes");
 const profileRoutes = require("./routes/profile.routes");
 const postRoutes = require("./routes/post.routes");
+const authRoutes = require("./routes/auth.routes");
 
 const app = express();
 
@@ -34,23 +33,7 @@ app.get("/main", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "
 app.get("/profiles", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "views", "profiles.html")));
 app.get("/feed", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "views", "feed.html")));
 
-// auth (inline for now — moves to feature/authentication later)
-app.post("/login", async (req, res) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return res.json({ success: false, message: "שדות חסרים" });
-    }
-    const user = await User.findOne({ email });
-    if (user && await bcrypt.compare(password, user.password)) {
-        req.session.loggedIn = true;
-        return res.json({ success: true });
-    }
-    return res.json({ success: false, message: "אימייל או סיסמא שגויים" });
-});
-
-app.post("/logout", (req, res) => {
-    req.session.destroy();
-    res.json({ success: true });
-});
+// auth
+app.use("/api/auth", authRoutes);
 
 module.exports = app;

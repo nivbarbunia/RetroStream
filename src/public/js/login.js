@@ -11,7 +11,7 @@ const form = document.getElementById("myform");
 //_______________________________//
 
 function login(email,password){
-    fetch("/login", {
+    fetch("/api/auth/login", {
         method:"POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({email,password })        

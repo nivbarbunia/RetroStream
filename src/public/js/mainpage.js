@@ -26,7 +26,7 @@ function loadContent(){
 }
 
 function logout() {
-    fetch("/logout", { method: "POST" })
+    fetch("/api/auth/logout", { method: "POST" })
         .then(res => res.json())
         .then(() => {
             window.location.href = "/";
