@@ -15,4 +15,14 @@ async function requireAdmin(req, res, next) {
         res.status(403).json({ success: false, message: "אין הרשאה" });
     }
 }
-module.exports = { requireLogin, requireAdmin };
+
+// Protects admin HTML pages
+async function requireAdminPage(req, res, next) {
+    const user = await User.findById(req.session.userId);
+    if (user && user.role === "admin") {
+        next();
+    } else {
+        res.redirect("/");
+    }
+}
+module.exports = { requireLogin, requireAdmin, requireAdminPage };

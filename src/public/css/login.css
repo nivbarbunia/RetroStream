@@ -102,6 +102,10 @@
     font-size: 0.8rem;
   }
 
+  #submit {
+    transition: all 0.2s ease;
+    border-radius: 0.4rem;
+  }
   #submit:hover {
     background-color: var(--green);
     color: var(--black);

@@ -19,7 +19,7 @@ function login(email,password){
     .then(res=> res.json())
     .then(data=> {
         if (data.success){
-            window.location.href= "/profiles";
+            window.location.href= data.role === "admin" ? "/admin" : "/profiles";
         } else{
             message.textContent = data.message;
         }

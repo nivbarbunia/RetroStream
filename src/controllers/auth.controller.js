@@ -40,7 +40,7 @@ async function login(req, res) {
         const user = await User.findOne({ email });
         if (user && await bcrypt.compare(password, user.password)) {
             req.session.userId = user._id;
-            return res.json({ success: true });
+            return res.json({ success: true, role: user.role });
         }
         return res.json({ success: false, message: "אימייל או סיסמא שגויים" });
     } catch (err) {
