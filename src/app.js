@@ -46,6 +46,7 @@ app.get("/feed", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "
 app.get("/register", (req, res) => res.sendFile(path.join(__dirname, "views", "register.html")));
 app.get("/account", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "views", "account.html")));
 app.get("/admin", requireLogin, requireAdminPage, (req, res) => res.sendFile(path.join(__dirname, "views", "admin.html")));
+app.get("/admin/users", requireLogin, requireAdminPage, (req, res) => res.sendFile(path.join(__dirname, "views", "admin-users.html")));
 
 // auth
 app.use("/api/auth", authRoutes);
