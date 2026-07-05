@@ -1,0 +1,67 @@
+<!doctype html>
+<html dir="rtl" lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>רטרו סטרים - החשבון שלי</title>
+    <link rel="icon" href="Assets/favicon.png" type="image/png" />
+    <link rel="stylesheet" href="/css/account.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <h1 id="headline">החשבון שלי</h1>
+
+      <!-- NAME -->
+      <div class="field-row">
+        <span class="field-label">שם:</span>
+        <span id="nameDisplay" class="field-value"></span>
+        <div id="nameEdit" class="field-edit hidden">
+          <input type="text" id="nameInput" />
+          <button class="save-btn" data-field="name">שמור</button>
+          <button class="cancel-btn" data-field="name">ביטול</button>
+        </div>
+        <button class="edit-btn" data-field="name"><i class="fa-regular fa-pen-to-square"></i></button>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="field-row">
+        <span class="field-label">אימייל:</span>
+        <span id="emailDisplay" class="field-value"></span>
+        <div id="emailEdit" class="field-edit hidden">
+          <input type="email" id="emailInput" />
+          <button class="save-btn" data-field="email">שמור</button>
+          <button class="cancel-btn" data-field="email">ביטול</button>
+        </div>
+        <button class="edit-btn" data-field="email"><i class="fa-regular fa-pen-to-square"></i></button>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="field-row">
+        <span class="field-label">סיסמה:</span>
+        <span class="field-value">••••••</span>
+        <button id="changePasswordBtn" class="edit-btn"><i class="fa-regular fa-pen-to-square"></i></button>
+      </div>
+      <div id="passwordEdit" class="password-edit hidden">
+        <input type="password" id="currentPassword" placeholder="סיסמה נוכחית" />
+        <input type="password" id="newPassword" placeholder="סיסמה חדשה" />
+        <input type="password" id="confirmPassword" placeholder="אישור סיסמה חדשה" />
+        <div class="password-buttons">
+          <button id="savePassword">שמור סיסמה</button>
+          <button id="cancelPassword">ביטול</button>
+        </div>
+      </div>
+
+      <p id="message"></p>
+
+      <!-- ACTIONS -->
+      <div class="account-actions">
+        <a class="back" href="/main">חזרה לעמוד הראשי</a>
+        <button id="deleteAccount" type="button">מחק חשבון <span id="confirmText" class="confirm-text hidden">— בטוח?</span></button>
+      </div>
+    </div>
+    <script src="/js/account.js"></script>
+  </body>
+</html>
