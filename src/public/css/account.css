@@ -38,7 +38,9 @@ body {
 }
 
 .wrapper {
-  width: clamp(320px, 40vw, 750px);
+  width: clamp(320px, 60vw, 1500px);
+  height: auto;
+  margin-top: 2rem;
   padding: 2rem 2.5rem;
   border: 5px solid var(--green);
   border-radius: 40px;
@@ -47,6 +49,7 @@ body {
   color: rgb(249, 249, 249);
   box-sizing: border-box;
   animation: fadeIn 0.4s ease;
+  font-size: 1.3rem;
 }
 
 @keyframes fadeIn {

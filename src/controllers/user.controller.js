@@ -14,12 +14,19 @@ async function getUsers(req, res) {
 // SEARCH users by name or email (admin)
 async function searchUsers(req, res) {
     try {
-        const { name, email, role } = req.query;
+        const { q, name, email, role } = req.query;
         const filter = {};
+        if(q){
+            filter.$or = [
+                { name: { $regex: q.trim(), $options: "i" } },
+                { email: { $regex: q.trim(), $options: "i" } },
+                { role: { $regex: q.trim(), $options: "i" } }
+            ];
+        }
         if (name)  filter.name  = { $regex: name, $options: "i" };
         if (email) filter.email = { $regex: email, $options: "i" };
         if (role)  filter.role  = role;
-
+        
         const users = await User.find(filter).select("-password");
         if (users.length === 0) {
             return res.status(404).json({ success: false, message: "לא נמצאו משתמשים" });
@@ -55,10 +62,11 @@ async function updateUser(req, res) {
             return res.status(403).json({ success: false, message: "אין הרשאה" });
         }
         
-        const { name, email, password, currentPassword } = req.body;
+        const { name, email, role, password, currentPassword } = req.body;
         const update = {};
         if (name)  update.name = name;
         if (email) update.email = email;
+        if (role)  update.role = role;
         // if password is being changed, verify current password (unless admin)
         if (password){
             if (isSelf) {
@@ -73,7 +81,7 @@ async function updateUser(req, res) {
         const user = await User.findByIdAndUpdate(
             targetId,
             update,
-            { returnDocument: "after", runValidators: true }
+            { new:true, runValidators: true }
         ).select("-password");
 
         if (!user) {

@@ -179,7 +179,7 @@ const contentItems = [
         type: "סרט",
         duration: 98,
         genre: ["הרפתקאות", "פנטזיה", "נוער"],
-        franchise: "גאליס",
+        franchise: ["גאליס"],
         description: "",
         image: "Assets/Content/Movies/GalisConnect.png",
         likes: 2
@@ -190,7 +190,6 @@ const contentItems = [
         type: "סרט",
         duration: 32,
         genre: ["דרמה", "ילדים", "נוער", "צבא", "יום הזיכרון"],
-        franchise: null,
         description: "",
         image: "Assets/Content/Movies/BigBro.png",
         likes: 30
