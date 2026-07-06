@@ -128,7 +128,7 @@ async function updateContent(req, res) {
             req.params.id,
             updatedContent,
             {
-                new: true,
+                returnDocument: 'after',
                 runValidators: true 
             }
         );
@@ -149,12 +149,13 @@ async function updateContent(req, res) {
 
 async function searchContent(req, res) {
     try {
-        const { q, title, genre, origin, franchise, description } = req.query;
+        const { q, title, genre, origin, franchise, description, year, ratingMin, ratingMax, maxLength } = req.query;
         const filter = {};
+        const conditions = [];
 
         if (q) {
             const words = q.trim().split(/\s+/);
-            filter.$and = words.map(word => ({
+            conditions.push({ $and: words.map(word => ({
                 $or: [
                     { title: { $regex: word, $options: "i" } },
                     { genre: { $regex: word, $options: "i" } },
@@ -162,13 +163,30 @@ async function searchContent(req, res) {
                     { description: { $regex: word, $options: "i" } },
                     { franchise: { $regex: word, $options: "i" } }
                 ]
-            }));
-        }   
-        if (title)  filter.title  = { $regex: title, $options: "i" };
-        if (genre)  filter.genre  = { $in: [genre] };
-        if (origin) filter.origin = { $in: [origin] };
-        if (description) filter.description = {$regex: description, $options: "i"};
-        if (franchise) filter.franchise = {$regex: franchise, $options: "i"};
+            }))});
+        }
+
+        const addRegex = (field, values) =>
+            [].concat(values).forEach(v => conditions.push({ [field]: { $regex: v, $options: "i" } }));
+        const addExact = (field, values) =>
+            [].concat(values).forEach(v => conditions.push({ [field]: v }));
+
+        if (title)       addRegex("title", title);
+        if (genre)       addExact("genre", genre);
+        if (origin)      addExact("origin", origin);
+        if (description) addRegex("description", description);
+        if (franchise)   addRegex("franchise", franchise);
+        if (year)        [].concat(year).forEach(v => conditions.push({ year: Number(v) }));
+        if (ratingMin)   [].concat(ratingMin).forEach(v => conditions.push({ rating: { $gte: Number(v) } }));
+        if (ratingMax)   [].concat(ratingMax).forEach(v => conditions.push({ rating: { $lte: Number(v) } }));
+        if (maxLength)   [].concat(maxLength).forEach(v => conditions.push({
+            $or: [
+                { duration: { $lte: Number(v) } },
+                { episodeLength: { $lte: Number(v) } }
+            ]
+        }));
+
+        if (conditions.length) filter.$and = conditions;
 
         const content = await Content.find(filter);
 

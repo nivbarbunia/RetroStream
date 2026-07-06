@@ -85,6 +85,26 @@ input:focus, textarea:focus {
 }
 .message.error { color: #ff5c5c; }
 
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  border: 0.1rem solid var(--green);
+  border-radius: 2rem;
+  color: var(--green);
+  background: rgba(37, 255, 66, 0.08);
+}
+.chip-remove {
+  background: transparent;
+  border: none;
+  color: var(--green);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.chip-remove:hover { color: #ff5c5c; }
+
 .searchRowBtn {
   background-color: rgb(15, 14, 14);
   color: var(--green);
