@@ -128,7 +128,7 @@ async function updateContent(req, res) {
             req.params.id,
             updatedContent,
             {
-                returnDocument: 'after',
+                new: true,
                 runValidators: true 
             }
         );
@@ -149,13 +149,26 @@ async function updateContent(req, res) {
 
 async function searchContent(req, res) {
     try {
-        const { title, genre, type, origin } = req.query;
+        const { q, title, genre, origin, franchise, description } = req.query;
         const filter = {};
 
+        if (q) {
+            const words = q.trim().split(/\s+/);
+            filter.$and = words.map(word => ({
+                $or: [
+                    { title: { $regex: word, $options: "i" } },
+                    { genre: { $regex: word, $options: "i" } },
+                    { origin: { $regex: word, $options: "i" } },
+                    { description: { $regex: word, $options: "i" } },
+                    { franchise: { $regex: word, $options: "i" } }
+                ]
+            }));
+        }   
         if (title)  filter.title  = { $regex: title, $options: "i" };
-        if (type)   filter.type   = type;
         if (genre)  filter.genre  = { $in: [genre] };
         if (origin) filter.origin = { $in: [origin] };
+        if (description) filter.description = {$regex: description, $options: "i"};
+        if (franchise) filter.franchise = {$regex: franchise, $options: "i"};
 
         const content = await Content.find(filter);
 
