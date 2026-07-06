@@ -10,19 +10,20 @@ const logoutBtn        = document.getElementById("logoutBtn");
 const submitBtn        = document.getElementById("submitBtn");
 const resetBtn         = document.getElementById("resetBtn");
 const addBtn           = document.getElementById("addBtn");
+const filterChips      = document.getElementById("activeFilters");
 
-const fTitle          = document.getElementById("fTitle");
-const fYear           = document.getElementById("fYear");
-const fType           = document.getElementById("fType");
-const fEpisodeLength  = document.getElementById("fEpisodeLength");
-const fDuration       = document.getElementById("fDuration");
-const fRating         = document.getElementById("fRating");
-const fGenre          = document.getElementById("fGenre");
-const fOrigin         = document.getElementById("fOrigin");
-const fImage          = document.getElementById("fImage");
-const fVideoUrl       = document.getElementById("fVideoUrl");
-const fFranchise      = document.getElementById("fFranchise");
-const fDescription    = document.getElementById("fDescription");
+const formTitle          = document.getElementById("formTitle");
+const formYear           = document.getElementById("formYear");
+const formType           = document.getElementById("formType");
+const formEpisodeLength  = document.getElementById("formEpisodeLength");
+const formDuration       = document.getElementById("formDuration");
+const formRating         = document.getElementById("formRating");
+const formGenre          = document.getElementById("formGenre");
+const formOrigin         = document.getElementById("formOrigin");
+const formImage          = document.getElementById("formImage");
+const formVideoUrl       = document.getElementById("formVideoUrl");
+const formFranchise      = document.getElementById("formFranchise");
+const formDescription    = document.getElementById("formDescription");
 const episodeLengthWrap = document.getElementById("episodeLengthWrap");
 const durationWrap      = document.getElementById("durationWrap");
 const modalTitle      = document.getElementById("modalTitle");
@@ -31,15 +32,35 @@ const contentModal    = new bootstrap.Modal(document.getElementById("contentModa
 
 let baseContent = []; // הרשימה הנוכחית מהשרת (כל התוכן או תוצאות חיפוש)
 let editingId = null;
+let activeFilters = []; // { field, value } - צ'יפי חיפוש פעילים, כולם AND ביניהם
 
 const placeholders = {
     title: "חפש לפי כותרת...",
     genre: "חפש לפי ז'אנר...",
-    origin: "חפש לפי מדינת מקור...",
+    origin: "חפש לפי ערוץ/מקור...",
     franchise: "חפש לפי פרנצ'ייז...",
     description: "חפש לפי תיאור...",
+    year: "חפש לפי שנה...",
+    ratingMin: "דירוג מינימלי (0-10)...",
+    ratingMax: "דירוג מקסימלי (0-10)...",
+    maxLength: "אורך מקסימלי (דק')...",
     q: "חיפוש חופשי..."
 };
+
+const fieldLabels = {
+    title: "כותרת",
+    genre: "ז'אנר",
+    origin: "מקור",
+    franchise: "פרנצ'ייז",
+    description: "תיאור",
+    year: "שנה",
+    ratingMin: "דירוג מינימלי",
+    ratingMax: "דירוג מקסימלי",
+    maxLength: "אורך מקסימלי",
+    q: "חיפוש חופשי"
+};
+
+const stackableFields = ["genre", "origin", "franchise"];
 
 
 //_______________________________//
@@ -53,15 +74,21 @@ function loadContent() {
                 resetBtn.classList.add("hidden");
                 message.textContent = "";
                 searchInput.value = "";
+                activeFilters = [];
+                renderChips();
                 baseContent = data.content;
                 renderFiltered();
             }
         });
 }
 
-function searchContent() {
+function runSearch() {
+    if (!activeFilters.length) {
+        loadContent();
+        return;
+    }
     const params = new URLSearchParams();
-    params.set(searchMode.value, searchInput.value.trim());
+    activeFilters.forEach(chip => params.append(chip.field, chip.value));
 
     fetch(`/api/content/search?${params.toString()}`)
         .then(res => res.json())
@@ -78,22 +105,27 @@ function searchContent() {
         });
 }
 
+function refresh() {
+    if (activeFilters.length) runSearch();
+    else loadContent();
+}
+
 function saveContent() {
-    const type = fType.value;
+    const type = formType.value;
     const body = {
-        title: fTitle.value.trim(),
-        year: Number(fYear.value),
+        title: formTitle.value.trim(),
+        year: Number(formYear.value),
         type,
-        genre: fGenre.value.split(",").map(g => g.trim()).filter(Boolean),
-        origin: fOrigin.value.split(",").map(o => o.trim()).filter(Boolean),
-        image: fImage.value.trim(),
-        videoUrl: fVideoUrl.value.trim(),
-        franchise: fFranchise.value.split(",").map(f => f.trim()).filter(Boolean),
-        description: fDescription.value.trim(),
-        rating: fRating.value ? Number(fRating.value) : undefined
+        genre: formGenre.value.split(",").map(genre => genre.trim()).filter(Boolean),
+        origin: formOrigin.value.split(",").map(origin => origin.trim()).filter(Boolean),
+        image: formImage.value.trim(),
+        videoUrl: formVideoUrl.value.trim(),
+        franchise: formFranchise.value.split(",").map(franchise => franchise.trim()).filter(Boolean),
+        description: formDescription.value.trim(),
+        rating: formRating.value ? Number(formRating.value) : undefined
     };
-    if (type === "סדרה") body.episodeLength = fEpisodeLength.value ? Number(fEpisodeLength.value) : undefined;
-    if (type === "סרט")  body.duration      = fDuration.value ? Number(fDuration.value) : undefined;
+    if (type === "סדרה") body.episodeLength = formEpisodeLength.value ? Number(formEpisodeLength.value) : undefined;
+    if (type === "סרט")  body.duration      = formDuration.value ? Number(formDuration.value) : undefined;
 
     const isEdit = Boolean(editingId);
     const url = isEdit ? `/api/content/${editingId}` : "/api/content";
@@ -108,7 +140,7 @@ function saveContent() {
     .then(data => {
         if (data.success) {
             contentModal.hide();
-            loadContent();
+            refresh();
         } else {
             modalMessage.textContent = data.message;
         }
@@ -119,7 +151,7 @@ function deleteContent(id) {
     fetch(`/api/content/${id}`, { method: "DELETE" })
         .then(res => res.json())
         .then(data => {
-            if (data.success) loadContent();
+            if (data.success) refresh();
         });
 }
 
@@ -133,11 +165,19 @@ function logout() {
 //_______________________________//
 //         DOM / RENDER          //
 //_______________________________//
-function renderFiltered() {
+function renderChips() {
+    filterChips.innerHTML = activeFilters.map((chip, index) => `
+        <span class="filter-chip">
+            ${fieldLabels[chip.field] || chip.field}: ${chip.value}
+            <button type="button" class="chip-remove" data-index="${index}">✕</button>
+        </span>`).join("");
+}
+
+function renderFiltered() { //LIVE TYPE RENDER
     const checked = document.querySelector('input[name="typeFilter"]:checked');
     const typeValue = checked ? checked.value : "";
     const filtered = typeValue
-        ? baseContent.filter(c => c.type === typeValue)
+        ? baseContent.filter(item => item.type === typeValue)
         : baseContent;
     renderContent(filtered);
 }
@@ -146,15 +186,15 @@ function renderContent(items) {
     contentBody.innerHTML = items.map(rowHtml).join("");
 }
 
-function rowHtml(c) {
+function rowHtml(item) {
     return `
-        <tr data-id="${c._id}">
-            <td><img class="thumb" src="/${c.image}" alt="${c.title}" /></td>
-            <td>${c.title}</td>
-            <td>${c.year}</td>
-            <td>${c.type}</td>
-            <td>${(c.genre || []).join(", ")}</td>
-            <td>${c.rating ?? "-"}</td>
+        <tr data-id="${item._id}">
+            <td><img class="thumb" src="/${item.image}" alt="${item.title}" /></td>
+            <td>${item.title}</td>
+            <td>${item.year}</td>
+            <td>${item.type}</td>
+            <td>${(item.genre || []).join(", ")}</td>
+            <td>${item.rating ?? "-"}</td>
             <td class="row-actions">
                 <button class="edit-content" title="ערוך"><i class="fa-regular fa-pen-to-square"></i></button>
                 <button class="delete-content" title="מחק"><i class="fa-solid fa-trash"></i></button>
@@ -163,7 +203,7 @@ function rowHtml(c) {
 }
 
 function toggleTypeFields() {
-    if (fType.value === "סדרה") {
+    if (formType.value === "סדרה") {
         episodeLengthWrap.classList.remove("hidden");
         durationWrap.classList.add("hidden");
     } else {
@@ -176,39 +216,39 @@ function openCreateModal() {
     editingId = null;
     modalTitle.textContent = "הוספת תוכן";
     modalMessage.textContent = "";
-    fTitle.value = "";
-    fYear.value = "";
-    fType.value = "סדרה";
-    fEpisodeLength.value = "";
-    fDuration.value = "";
-    fRating.value = "";
-    fGenre.value = "";
-    fOrigin.value = "";
-    fImage.value = "";
-    fVideoUrl.value = "";
-    fFranchise.value = "";
-    fDescription.value = "";
+    formTitle.value = "";
+    formYear.value = "";
+    formType.value = "סדרה";
+    formEpisodeLength.value = "";
+    formDuration.value = "";
+    formRating.value = "";
+    formGenre.value = "";
+    formOrigin.value = "";
+    formImage.value = "";
+    formVideoUrl.value = "";
+    formFranchise.value = "";
+    formDescription.value = "";
     toggleTypeFields();
     contentModal.show();
 }
 
 function openEditModal(id) {
-    const c = baseContent.find(x => x._id === id);
+    const content = baseContent.find(item => item._id === id);
     editingId = id;
     modalTitle.textContent = "עריכת תוכן";
     modalMessage.textContent = "";
-    fTitle.value = c.title;
-    fYear.value = c.year;
-    fType.value = c.type;
-    fEpisodeLength.value = c.episodeLength ?? "";
-    fDuration.value = c.duration ?? "";
-    fRating.value = c.rating ?? "";
-    fGenre.value = (c.genre || []).join(", ");
-    fOrigin.value = (c.origin || []).join(", ");
-    fImage.value = c.image ?? "";
-    fVideoUrl.value = c.videoUrl ?? "";
-    fFranchise.value = (c.franchise || []).join(", ");
-    fDescription.value = c.description ?? "";
+    formTitle.value = content.title;
+    formYear.value = content.year;
+    formType.value = content.type;
+    formEpisodeLength.value = content.episodeLength ?? "";
+    formDuration.value = content.duration ?? "";
+    formRating.value = content.rating ?? "";
+    formGenre.value = (content.genre || []).join(", ");
+    formOrigin.value = (content.origin || []).join(", ");
+    formImage.value = content.image ?? "";
+    formVideoUrl.value = content.videoUrl ?? "";
+    formFranchise.value = (content.franchise || []).join(", ");
+    formDescription.value = content.description ?? "";
     toggleTypeFields();
     contentModal.show();
 }
@@ -230,16 +270,31 @@ submitBtn.addEventListener("click", function () {
         return;
     }
     message.classList.remove("error");
-    searchContent();
+    const field = searchMode.value;
+    if (!stackableFields.includes(field)) {
+        activeFilters = activeFilters.filter(chip => chip.field !== field);
+    }
+    activeFilters.push({ field, value: searchInput.value.trim() });
+    searchInput.value = "";
+    renderChips();
+    runSearch();
 });
 
 resetBtn.addEventListener("click", function () {
     loadContent();
 });
 
+filterChips.addEventListener("click", function (event) {
+    const removeBtn = event.target.closest(".chip-remove");
+    if (!removeBtn) return;
+    activeFilters.splice(Number(removeBtn.dataset.index), 1);
+    renderChips();
+    runSearch();
+});
+
 typeRadios.forEach(radio => {
     radio.addEventListener("change", function () {
-        typeRadios.forEach(r => r.closest(".type-radio").classList.remove("active"));
+        typeRadios.forEach(otherRadio => otherRadio.closest(".type-radio").classList.remove("active"));
         radio.closest(".type-radio").classList.add("active");
         renderFiltered();
     });
@@ -250,11 +305,11 @@ document.querySelector('input[name="typeFilter"]:checked').closest(".type-radio"
 
 addBtn.addEventListener("click", openCreateModal);
 
-fType.addEventListener("change", toggleTypeFields);
+formType.addEventListener("change", toggleTypeFields);
 
-contentBody.addEventListener("click", function (e) {
-    const editBtn = e.target.closest(".edit-content");
-    const deleteBtn = e.target.closest(".delete-content");
+contentBody.addEventListener("click", function (event) {
+    const editBtn = event.target.closest(".edit-content");
+    const deleteBtn = event.target.closest(".delete-content");
     if (editBtn) {
         openEditModal(editBtn.closest("tr").dataset.id);
     } else if (deleteBtn) {
