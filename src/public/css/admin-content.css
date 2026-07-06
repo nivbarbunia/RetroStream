@@ -19,10 +19,12 @@ body {
     var(--black);
 }
 .hidden { visibility: hidden; }
+#episodeLengthWrap.hidden,
+#durationWrap.hidden { display: none !important }
 
 /* HEADER */
-#headline {
-  color: var(--green);
+#headline, #modalTitle {
+  color: white;
   font-style: oblique;
   font-weight: bold;
   text-shadow: 0 0 0.8rem rgba(37, 255, 66, 0.5);
@@ -68,8 +70,8 @@ body {
   font-family: inherit;
 }
 
-.searchInput:focus {
-  border-color: white;
+input:focus, textarea:focus {
+  border-color: white !important;
   box-shadow: 0.125rem 0.3rem 0.3rem var(--green);
 }
 .searchInput::placeholder { color: #888; }
@@ -195,9 +197,6 @@ body {
   font-family: inherit;
   resize: vertical;
 }
-.edit-modal input:focus,
-.edit-modal select:focus,
-.edit-modal textarea:focus { border-color: rgb(124, 255, 142); }
 #modalMessage { color: #ff5c5c; font-weight: bold; }
 
 .btn-save {

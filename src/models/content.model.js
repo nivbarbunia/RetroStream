@@ -13,7 +13,7 @@ const contentSchema = new mongoose.Schema({
     duration:      { type: Number }, //MOVIE EXCLUSIVE
     description:   { type: String, default: "" },
     origin:        [String],
-    franchise:     { type: String },
+    franchise:     { type: [String] },
     rating:        { type: Number, min: 0, max: 10 },
     videoUrl:      { type: String },
     likes:         { type: Number, default: 0 }

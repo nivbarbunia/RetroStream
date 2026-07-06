@@ -88,7 +88,7 @@ function saveContent() {
         origin: fOrigin.value.split(",").map(o => o.trim()).filter(Boolean),
         image: fImage.value.trim(),
         videoUrl: fVideoUrl.value.trim(),
-        franchise: fFranchise.value.trim(),
+        franchise: fFranchise.value.split(",").map(f => f.trim()).filter(Boolean),
         description: fDescription.value.trim(),
         rating: fRating.value ? Number(fRating.value) : undefined
     };
@@ -207,7 +207,7 @@ function openEditModal(id) {
     fOrigin.value = (c.origin || []).join(", ");
     fImage.value = c.image ?? "";
     fVideoUrl.value = c.videoUrl ?? "";
-    fFranchise.value = c.franchise ?? "";
+    fFranchise.value = (c.franchise || []).join(", ");
     fDescription.value = c.description ?? "";
     toggleTypeFields();
     contentModal.show();
