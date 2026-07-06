@@ -1,30 +1,22 @@
 //REQUEST HANDLER
 const Profile = require("../models/profile.model");
 
-// RETURNS ALL PROFILES FROM DATABASE
+// RETURNS ALL PROFILES OF THE LOGGED-IN USER
 async function getProfile(req, res) {
     try{
-        const profile = await Profile.find();
+        const profile = await Profile.find({ user: req.session.userId });
         res.json({success:true , profile});
     } catch(err){
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
 
-// RETURNS ONE PROFILE ITEM BY ID
+// RETURNS ONE PROFILE ITEM BY ID (OWNER ONLY, VERIFIED BY requireProfileOwner)
 async function getProfileById(req, res) {
-    try{
-        const profile = await Profile.findById(req.params.id);
-        if(!profile) {
-            return res.status(404).json({success: false, message: "הפרופיל לא נמצא"});
-        }
-        res.json({success:true , profile});
-    } catch(err){
-        res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
-    }   
+    res.json({ success: true, profile: req.ownedProfile });
 }
 
-// CREATES NEW PROFILE
+// CREATES NEW PROFILE FOR THE LOGGED-IN USER
 async function createProfile(req, res) {
     try{
         const {
@@ -33,12 +25,13 @@ async function createProfile(req, res) {
             birthDate
         } = req.body;
 
-        const exists = await Profile.findOne({ name });  
+        const exists = await Profile.findOne({ name, user: req.session.userId });
         if (exists) {
             return res.status(400).json({ success: false, message: "שם זה כבר קיים" });
         }
 
         const profile = await Profile.create({
+            user: req.session.userId,
             name,
             image,
             birthDate
@@ -47,24 +40,21 @@ async function createProfile(req, res) {
         res.status(201).json({success: true,profile});
     } catch(err){
         if(err.name==="ValidationError"){
-            return res.status(400).json({success: false, message: "נתוני הפרופיל לא תקינים", error: err.message}); 
+            return res.status(400).json({success: false, message: "נתוני הפרופיל לא תקינים", error: err.message});
         }
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
-//DELETE PROFILE
+//DELETE PROFILE (OWNER ONLY, VERIFIED BY requireProfileOwner)
 async function deleteProfile(req, res) {
     try{
-        const profile = await Profile.findByIdAndDelete(req.params.id);
-        if (!profile) {
-            return res.status(404).json({success: false,message: "פרופיל לא נמצא"});
-        }
+        await req.ownedProfile.deleteOne();
         res.json({success: true, message: "הפרופיל נמחק בהצלחה"});
     } catch(err){
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
-//UPDATE PROFILE
+//UPDATE PROFILE (OWNER ONLY, VERIFIED BY requireProfileOwner)
 async function updateProfile(req, res) {
     try{
         const {
@@ -73,7 +63,7 @@ async function updateProfile(req, res) {
             birthDate
         } = req.body;
 
-        const exists = await Profile.findOne({ name, _id: { $ne: req.params.id } });
+        const exists = await Profile.findOne({ name, user: req.session.userId, _id: { $ne: req.params.id } });
         if (exists) {
             return res.status(400).json({ success: false, message: "שם זה כבר קיים" });
         }
@@ -88,13 +78,10 @@ async function updateProfile(req, res) {
             profileData,
             {
                 returnDocument: 'after',
-                runValidators: true 
+                runValidators: true
             }
         );
-        if (!profile) {
-            return res.status(404).json({success: false,message: "פרופיל לא נמצא"});
-        }
-        res.json({ success: true, profile });        
+        res.json({ success: true, profile });
     }catch(err){
         if (err.name==="ValidationError"){
             return res.status(400).json({success: false, message: "נתוני פרופיל לא תקינים", error: err.message});
@@ -103,14 +90,14 @@ async function updateProfile(req, res) {
     }
 }
 
-// SEARCH PROFILES BY NAME
+// SEARCH PROFILES BY NAME (LOGGED-IN USER ONLY)
 async function searchProfiles(req, res) {
     try {
         const { name } = req.query;
-        const filter = {};
+        const filter = { user: req.session.userId };
 
         if (name){
-            filter.name = { $regex: name, $options: "i" }; 
+            filter.name = { $regex: name, $options: "i" };
         }
 
         const profiles = await Profile.find(filter);
@@ -126,7 +113,29 @@ async function searchProfiles(req, res) {
     }
 }
 
+// MARKS THIS PROFILE AS THE ACTIVE ONE FOR THIS SESSION (OWNER ONLY, VERIFIED BY requireProfileOwner)
+async function selectProfile(req, res) {
+    const activeProfile = req.ownedProfile;
+    req.session.activeProfileId = activeProfile._id;
+    res.json({ success: true });
+}
+
+// RETURNS THE CURRENTLY ACTIVE PROFILE FOR THIS SESSION
+async function getActiveProfile(req, res) {
+    try {
+        const profile = await Profile.findOne({ _id: req.session.activeProfileId, user: req.session.userId });
+        if (!profile) {
+            return res.status(404).json({ success: false, message: "אין פרופיל פעיל" });
+        }
+        res.json({ success: true, profile });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
+    }
+}
+
 module.exports={
+    selectProfile,
+    getActiveProfile,
     getProfile,
     getProfileById,
     createProfile,
