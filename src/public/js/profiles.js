@@ -92,9 +92,10 @@ function renderProfile(profile) {
 
     // edit profile + dynamic listener
     div.querySelector(".edit-btn").addEventListener("click", () => openPanel(profile));
-    // click profile image -> main page dynamic listener
+    // click profile image -> mark as active, then go to main page
     div.querySelector("img").addEventListener("click", () => {
-        window.location.href = "/main";
+        fetch(`/api/profiles/${profile._id}/select`, { method: "POST" })
+            .then(() => { window.location.href = "/main"; });
     });
     return div;
 }

@@ -40,7 +40,12 @@ app.get("/", async (req, res) => {
     }
     res.sendFile(path.join(__dirname, "views", "login.html"));
 });
-app.get("/main", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "views", "mainpage.html")));
+app.get("/main", requireLogin, (req, res) => {
+    if (!req.session.activeProfileId) {
+        return res.redirect("/profiles");
+    }
+    res.sendFile(path.join(__dirname, "views", "mainpage.html"));
+});
 app.get("/profiles", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "views", "profiles.html")));
 app.get("/feed", requireLogin, (req, res) => res.sendFile(path.join(__dirname, "views", "feed.html")));
 app.get("/register", (req, res) => res.sendFile(path.join(__dirname, "views", "register.html")));

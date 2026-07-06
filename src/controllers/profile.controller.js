@@ -113,7 +113,29 @@ async function searchProfiles(req, res) {
     }
 }
 
+// MARKS THIS PROFILE AS THE ACTIVE ONE FOR THIS SESSION (OWNER ONLY, VERIFIED BY requireProfileOwner)
+async function selectProfile(req, res) {
+    const activeProfile = req.ownedProfile;
+    req.session.activeProfileId = activeProfile._id;
+    res.json({ success: true });
+}
+
+// RETURNS THE CURRENTLY ACTIVE PROFILE FOR THIS SESSION
+async function getActiveProfile(req, res) {
+    try {
+        const profile = await Profile.findOne({ _id: req.session.activeProfileId, user: req.session.userId });
+        if (!profile) {
+            return res.status(404).json({ success: false, message: "אין פרופיל פעיל" });
+        }
+        res.json({ success: true, profile });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
+    }
+}
+
 module.exports={
+    selectProfile,
+    getActiveProfile,
     getProfile,
     getProfileById,
     createProfile,
