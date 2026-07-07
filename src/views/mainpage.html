@@ -40,11 +40,15 @@
                         </button>
                     </div>
                     <div class="profile-menu">
-                        <span class="dropdown"><img id="profile" src="Assets/Users/fadida.png" alt="current user"><i class="fa-solid fa-caret-down"></i></span>
+                        <span class="dropdown"><img id="profile" src="" alt="current user"><i class="fa-solid fa-caret-down"></i></span>
                         <div id="profileDropdown" class="profile-dropdown hidden">
-                            <span><i class="fa-solid fa-shuffle"></i><a href="/profiles">החלף פרופיל</a></span>
-                            <span><i class="fa-solid fa-user-pen"></i><a href="/account">נהל חשבון</a></span>
-                            <span id="logoutBtn"><i id="logoutIcon" class="fa-solid fa-right-from-bracket"></i><button>התנתק</button></span>
+                            <span class="profile-name-row">
+                                <img id="activeProfileImg" class="profile-name-img" alt="">
+                                <p id="activeProfileName" class="profile-name m-0"></p>
+                            </span>
+                            <span class="drop-row"><i class="fa-solid fa-shuffle"></i><a href="/profiles">החלף פרופיל</a></span>
+                            <span class="drop-row"><i class="fa-solid fa-user-pen"></i><a href="/account">נהל חשבון</a></span>
+                            <span id="logoutBtn" class="drop-row"><i id="logoutIcon" class="fa-solid fa-right-from-bracket"></i><button>התנתק</button></span>
                         </div>
                     </div>
                 </div>

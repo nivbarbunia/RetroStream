@@ -21,9 +21,22 @@ function loadContent(){
    .then(res => res.json())
    .then(data => {
       contentItems = data.content;
-      const featuredItem =  contentItems[Math.floor(Math.random() * contentItems.length)]; 
+      const featuredItem =  contentItems[Math.floor(Math.random() * contentItems.length)];
       renderHero(featuredItem);
       renderFeed(contentItems);
+   });
+}
+
+function loadActiveProfile(){
+   fetch("/api/profiles/active")
+   .then(res => res.json())
+   .then(data => {
+      if (data.success) {
+         profileImg.onload = () => profileImg.classList.add("loaded");
+         profileImg.src = data.profile.image;
+         document.getElementById("activeProfileImg").src = data.profile.image;
+         document.getElementById("activeProfileName").textContent = data.profile.name;
+      }
    });
 }
 
@@ -174,6 +187,7 @@ function renderSearchResults(items, searchText) {
 
 
 loadContent();
+loadActiveProfile();
 
 // TOGGLE PROFILE DROPDOWN
 profileImg.addEventListener("click", function (e) {
