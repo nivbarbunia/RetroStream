@@ -8,5 +8,6 @@ router.get("/search", contentController.searchContent);
 router.get("/:id", contentController.getContentById);
 router.post("/", requireAdmin, contentController.createContent);
 router.delete("/:id", requireAdmin, contentController.deleteContent);
-router.put("/:id", requireAdmin, contentController.updateContent); 
+router.put("/:id", requireAdmin, contentController.updateContent);
+router.put("/:id/like", contentController.toggleLike);
 module.exports = router;

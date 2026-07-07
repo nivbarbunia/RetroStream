@@ -200,11 +200,30 @@ async function searchContent(req, res) {
     }
 }
 
+// TOGGLES A LIKE FROM THE ACTIVE PROFILE ON THIS CONTENT
+async function toggleLike(req, res) {
+    try {
+        const profileId = req.session.activeProfileId;
+        const content = await Content.findById(req.params.id);
+        if (!content) return res.status(404).json({ success: false, message: "תוכן לא נמצא" });
+
+        const index = content.likedBy.findIndex(id => id.toString() === profileId.toString());
+        if (index === -1) content.likedBy.push(profileId);
+        else content.likedBy.splice(index, 1);
+
+        await content.save();
+        res.json({ success: true, liked: index === -1 });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
+    }
+}
+
 module.exports = {
     getContent,
     getContentById,
     createContent,
     updateContent,
     deleteContent,
-    searchContent
+    searchContent,
+    toggleLike
 };
