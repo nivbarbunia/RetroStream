@@ -11,22 +11,50 @@ const profileDropdown = document.getElementById("profileDropdown");
 const logoutBtn = document.getElementById("logoutBtn");
 
 let contentItems = [];
+let activeProfileId = null;
+let currentDetailsItem = null;
+const detailsModal = new bootstrap.Modal(document.getElementById("contentDetailsModal"));
+const detailsVideo = document.getElementById("detailsVideo");
+const videoPlayBtn = document.getElementById("videoPlayBtn");
+const videoProgress = document.getElementById("videoProgress");
+const videoCurrentTime = document.getElementById("videoCurrentTime");
+const videoDuration = document.getElementById("videoDuration");
+const videoMuteBtn = document.getElementById("videoMuteBtn");
+const videoFullscreenBtn = document.getElementById("videoFullscreenBtn");
+const detailsVideoWrap = document.getElementById("detailsVideoWrap");
 
 //_______________________________//
 //             API               //
 //_______________________________//
 
+//LOADS ALL CONTENT, PICKS A RANDOM HERO ITEM, RENDERS THE FEED
 function loadContent(){
    fetch("/api/content")
    .then(res => res.json())
    .then(data => {
       contentItems = data.content;
-      const featuredItem =  contentItems[Math.floor(Math.random() * contentItems.length)]; 
+      const featuredItem =  contentItems[Math.floor(Math.random() * contentItems.length)];
       renderHero(featuredItem);
       renderFeed(contentItems);
    });
 }
 
+//LOADS THE ACTIVE PROFILE'S NAME/IMAGE INTO THE HEADER
+function loadActiveProfile(){
+   fetch("/api/profiles/active")
+   .then(res => res.json())
+   .then(data => {
+      if (data.success) {
+         activeProfileId = data.profile._id;
+         profileImg.onload = () => profileImg.classList.add("loaded");
+         profileImg.src = data.profile.image;
+         document.getElementById("activeProfileImg").src = data.profile.image;
+         document.getElementById("activeProfileName").textContent = data.profile.name;
+      }
+   });
+}
+
+//ENDS THE SESSION AND RETURNS TO LOGIN
 function logout() {
     fetch("/api/auth/logout", { method: "POST" })
         .then(res => res.json())
@@ -50,25 +78,19 @@ function renderHero(item) {
             <span class="hero-details">${item.year} · ${item.genre[0]} · ${item.origin?.[0] || item.genre[1]}</span>
          </div>   
          <p class="hero-desc">${item.description}</p>
-         <button class="hero-btn">צפה עכשיו ▶</button>
+         <button class="hero-btn" data-id="${item._id}">צפה עכשיו ▶</button>
       </div>
-      <img class="hero-img" src="${item.image}" alt="${item.title}">
-   </div>         
-   `;   
+      <img class="hero-img" src="${item.image}" alt="${item.title}" data-id="${item._id}">
+   </div>
+   `;
 }
 //CARD RENDER
 function renderCard(item) {
    return `
-      <article class="content-card">
+      <article class="content-card" data-id="${item._id}">
          <img class="content-img" src="${item.image}" alt="${item.title}">
          <h3 class="content-title">${item.title}</h3>
          <p class="content-details">${item.year} · ${item.genre[0]}</p>
-         <div class="like-section">
-            <button class="like-btn" data-title="${item.title}">
-               <i class="fa-regular fa-heart"></i>
-            </button>
-            <span>${item.likes}</span>
-         </div>      
     </article>
    `;
 }
@@ -98,7 +120,7 @@ function renderSection(title, items){
 //TOP10 CARD RENDER
 function renderTopCard(item,index){
    return`
-      <article class="top-card content-card">
+      <article class="top-card content-card" data-id="${item._id}">
          <span class="rank-number">${index + 1}</span>
          <img class="content-img" src="${item.image}" alt="${item.title}">
          <h3 class="content-title">${item.title}</h3>
@@ -128,7 +150,7 @@ function renderTopSection(items){
 
 //FEED RENDER
 function renderFeed(items = contentItems) {
-   const top10 = [...contentItems].sort((a,b)=> b.likes - a.likes).slice(0,10); //allocate top 10 contents
+   const top10 = [...contentItems].sort((a,b)=> (b.rating ?? 0) - (a.rating ?? 0)).slice(0,10); //allocate top 10 contents
    const sorted=[...contentItems].sort((a,b)=>a.title.localeCompare(b.title, 'he'));
    feedContainer.innerHTML=`
       ${renderSection("המשך צפייה", items.slice(0,5))}
@@ -166,6 +188,14 @@ function renderSearchResults(items, searchText) {
          ${innerContent} 
       </section>`;
 }
+//LIKE ANIMATION
+function updateLikeUI(item){
+   const btn = document.getElementById("detailsLikeBtn");
+   const icon = btn.querySelector("i");
+   const liked = item.likedBy?.includes(activeProfileId);
+   icon.className = liked ? "fa-solid fa-heart" : "fa-regular fa-heart";
+   btn.classList.toggle("liked", liked);
+}
 
 
 //_______________________________//
@@ -174,6 +204,7 @@ function renderSearchResults(items, searchText) {
 
 
 loadContent();
+loadActiveProfile();
 
 // TOGGLE PROFILE DROPDOWN
 profileImg.addEventListener("click", function (e) {
@@ -227,23 +258,114 @@ document.addEventListener("click", function(e) {
 });
 
 
-//like function
+// OPEN CONTENT DETAILS MODAL
 document.addEventListener("click", function(e){
-   const btn = e.target.closest(".like-btn");
-   if (!btn) return;
-   
-   const title = btn.dataset.title;
-   const item= contentItems.find(i=> i.title===title);
-   const icon = btn.querySelector("i");
-   const span = btn.nextElementSibling;
+   const trigger = e.target.closest(".content-card, .hero-btn, .hero-img");
+   if (!trigger) return;
+   openDetailsModal(trigger.dataset.id);
+});
 
-   item.liked = !item.liked;
-   item.likes += item.liked? 1:-1;
-   icon.className = item.liked ? "fa-solid fa-heart" : "fa-regular fa-heart";
-   btn.classList.toggle("liked");
-   span.textContent = item.likes;
-   
+//FILLS THE DETAILS MODAL WITH ONE CONTENT ITEM'S DATA AND SHOWS IT
+function openDetailsModal(id){
+   const item = contentItems.find(i => i._id === id);
+   currentDetailsItem = item;
+   document.getElementById("detailsTitle").textContent = item.title;
+   document.getElementById("detailsMeta").textContent = `${item.year} · ${item.type} · ${item.genre[0]}`;
+   document.getElementById("detailsDescription").textContent = item.description;
+   const hasVideo = Boolean(item.videoUrl);
+   detailsVideo.src = item.videoUrl || "";
+   detailsVideoWrap.classList.toggle("no-video", !hasVideo);
+   videoPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+   videoProgress.value = 0;
+   videoCurrentTime.textContent = "0:00";
+   videoDuration.textContent = "0:00";
+   updateLikeUI(item);
+   detailsModal.show();
+}
+
+// FORMAT SECONDS AS m:ss
+function formatTime(seconds){
+   if (!isFinite(seconds)) return "0:00";
+   const m = Math.floor(seconds / 60);
+   const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+   return `${m}:${s}`;
+}
+
+
+// LIKE BUTTON (IN MODAL) - PERSISTED, OPTIMISTIC UPDATE
+document.getElementById("detailsLikeBtn").addEventListener("click", function(){
+   const item = currentDetailsItem;
+   const wasLiked = item.likedBy?.includes(activeProfileId);
+
+   item.likedBy = item.likedBy || [];
+   if (wasLiked) item.likedBy = item.likedBy.filter(id => id !== activeProfileId);
+   else item.likedBy.push(activeProfileId);
+   updateLikeUI(item);
+
+   fetch(`/api/content/${item._id}/like`, { method: "PUT" })
+      .then(res => res.json())
+      .then(data => {
+         if (data.success) return;
+         if (wasLiked) item.likedBy.push(activeProfileId);
+         else item.likedBy = item.likedBy.filter(id => id !== activeProfileId);
+         updateLikeUI(item);
+      });
 });
 
 // LOGOUT
 logoutBtn.addEventListener("click", logout);
+
+// CUSTOM VIDEO CONTROLS
+// PLAY/PAUSE BUTTON TOGGLES PLAYBACK
+videoPlayBtn.addEventListener("click", function(){
+   if (detailsVideo.paused) detailsVideo.play();
+   else detailsVideo.pause();
+});
+
+// SWAPS THE PLAY ICON TO PAUSE WHEN PLAYBACK STARTS
+detailsVideo.addEventListener("play", () => {
+   videoPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+});
+// SWAPS THE ICON BACK TO PLAY WHEN PLAYBACK STOPS
+detailsVideo.addEventListener("pause", () => {
+   videoPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+});
+
+// SHOWS THE TOTAL DURATION ONCE THE VIDEO METADATA IS KNOWN
+detailsVideo.addEventListener("loadedmetadata", () => {
+   videoDuration.textContent = formatTime(detailsVideo.duration);
+});
+
+// KEEPS THE CURRENT TIME AND PROGRESS BAR IN SYNC WHILE PLAYING
+detailsVideo.addEventListener("timeupdate", () => {
+   videoCurrentTime.textContent = formatTime(detailsVideo.currentTime);
+   videoProgress.value = (detailsVideo.currentTime / detailsVideo.duration) * 100 || 0;
+});
+
+// DRAGGING THE PROGRESS BAR SEEKS THE VIDEO
+videoProgress.addEventListener("input", function(){
+   detailsVideo.currentTime = (videoProgress.value / 100) * detailsVideo.duration;
+});
+
+// MUTE BUTTON TOGGLES SOUND AND SWAPS THE ICON
+videoMuteBtn.addEventListener("click", function(){
+   detailsVideo.muted = !detailsVideo.muted;
+   videoMuteBtn.innerHTML = detailsVideo.muted
+      ? '<i class="fa-solid fa-volume-xmark"></i>'
+      : '<i class="fa-solid fa-volume-high"></i>';
+});
+
+// FULLSCREEN BUTTON TOGGLES FULLSCREEN ON THE WHOLE VIDEO WRAPPER (INCLUDES CONTROLS)
+videoFullscreenBtn.addEventListener("click", function(){
+   if (document.fullscreenElement) {
+      document.exitFullscreen();
+   } else {
+      detailsVideoWrap.requestFullscreen();
+   }
+});
+
+// STOP PLAYBACK WHEN THE MODAL CLOSES
+document.getElementById("contentDetailsModal").addEventListener("hidden.bs.modal", function(){
+   detailsVideo.pause();
+   detailsVideo.currentTime = 0;
+});

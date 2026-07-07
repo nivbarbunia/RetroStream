@@ -16,7 +16,7 @@ const contentSchema = new mongoose.Schema({
     franchise:     { type: [String] },
     rating:        { type: Number, min: 0, max: 10 },
     videoUrl:      { type: String },
-    likes:         { type: Number, default: 0 }
+    likedBy:       [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }]
 }, { timestamps: true });
 
 module.exports = mongoose.model("Content", contentSchema);
