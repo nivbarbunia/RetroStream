@@ -64,15 +64,15 @@
         </section>
     </main>
 
-    <!-- CONTENT DETAILS MODAL -->
-    <div class="modal fade" id="contentDetailsModal" tabindex="-1">
+    <!-- CONTENT SCREEN MODAL -->
+    <div class="modal fade" id="contentScreenModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg mt-3">
-            <div class="modal-content details-modal">
-                <button type="button" class="details-close" data-bs-dismiss="modal">
+            <div class="modal-content content-modal">
+                <button type="button" class="modal-close" data-bs-dismiss="modal">
                 <i class="fa-solid fa-xmark"></i>
                 </button>
-                <div class="details-video-wrap" id="detailsVideoWrap">
-                    <video id="detailsVideo" class="details-video"></video>
+                <div class="video-wrap" id="videoWrap">
+                    <video id="contentVideo" class="content-video"></video>
                     <div class="video-unavailable">
                         <i class="fa-solid fa-satellite-dish"></i>
                         <h2> אין וידיאו זמין לתוכן זה</h2>
@@ -87,15 +87,15 @@
                         <button id="videoPlayBtn" class="video-ctrl-btn" type="button"><i class="fa-solid fa-play"></i></button>
                     </div>
                 </div>
-                <div class="modal-body details-body">
-                    <div class="details-title-row">
-                        <h2 id="detailsTitle" class="details-title"></h2>
-                        <button id="detailsLikeBtn" class="like-btn">
+                <div class="modal-body content-modal-body">
+                    <div class="modal-title-row">
+                        <h2 id="modalTitle" class="modal-title"></h2>
+                        <button id="likeBtn" class="like-btn">
                         <i class="fa-regular fa-heart"></i>
                         </button>
                     </div>
-                    <p id="detailsMeta" class="details-meta"></p>
-                    <p id="detailsDescription" class="details-description"></p>
+                    <p id="modalDetails" class="modal-details"></p>
+                    <p id="modalDescription" class="modal-description"></p>
                 </div>
             </div>
         </div>

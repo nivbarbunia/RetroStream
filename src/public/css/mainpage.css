@@ -437,14 +437,14 @@ body {
 
 
 /* CONTENT DETAILS MODAL */
-.details-modal {
+.content-modal {
   background: var(--black);
   color: white;
   border: 2px solid var(--green);
   padding: 0;
   overflow: hidden;
 }
-.details-close {
+.modal-close {
   position: absolute;
   top: 0.75rem;
   left: 0.75rem;
@@ -458,13 +458,13 @@ body {
   cursor: pointer;
   transition: color 0.2s ease;
 }
-.details-close:hover{
+.modal-close:hover{
   color: red;
 }
-.details-video-wrap {
+.video-wrap {
   position: relative;
 }
-.details-video-wrap::after {
+.video-wrap::after {
   content: "";
   position: absolute;
   left: 0; right: 0; bottom: 0;
@@ -472,7 +472,7 @@ body {
   background: linear-gradient(to bottom, transparent, var(--black, rgb(15,14,14)));
   pointer-events: none;
 }
-.details-video {
+.content-video{
   width: 100%;
   aspect-ratio: 16/9;
   object-fit: cover;
@@ -525,25 +525,25 @@ body {
   background: var(--black);
   z-index: 4;
 }
-.details-video-wrap.no-video .video-unavailable {
+.video-wrap.no-video .video-unavailable {
   display: flex;
 }
-.details-video-wrap.no-video .video-controls {
+.video-wrap.no-video .video-controls {
   display: none;
 }
 
 /* MODAL TEXT CONTENT BELOW THE VIDEO (TITLE, LIKE BUTTON, META, DESCRIPTION) */
-.details-body {
+.content-modal-body {
   padding: 1.25rem 1.5rem;
 }
-.details-title-row {
+.modal-title-row {
   display: flex;
   align-items: center;
   justify-content: start;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
-.details-title {
+.modal-title {
   margin: 0;
   font-size: 2rem;
   font-family: 'Heebo', sans-serif;
@@ -575,10 +575,10 @@ body {
   }
 }
 
-.details-meta {
+.modal-details {
   color: var(--green);
 }
-.details-description {
+.modal-description {
   color: #ccc;
   line-height: 1.5;
 }
