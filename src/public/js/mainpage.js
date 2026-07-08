@@ -16,6 +16,8 @@ let currentContentItem = null;
 let sentMilestones = [];
 let hasPlayed = false;
 let continueItems = [];
+let recommendedItems = [];
+let likedItems = [];
 let resumeTo = 0;
 const contentModal = new bootstrap.Modal(document.getElementById("contentScreenModal"));
 const contentVideo = document.getElementById("contentVideo");
@@ -60,9 +62,23 @@ function loadContinueWatching(){
    .then(data => { continueItems = data.success ? data.history : []; });
 }
 
+//LOADS GENRE/FRANCHISE/ORIGIN-BASED RECOMMENDATIONS INTO recommendedItems (NO RENDER)
+function loadRecommendations(){
+   return fetch("/api/watch-history/recommendations")
+   .then(res => res.json())
+   .then(data => { recommendedItems = data.success ? data.content : []; });
+}
+
+//LOADS THE ACTIVE PROFILE'S LIKED CONTENT INTO likedItems (NO RENDER)
+function loadLiked(){
+   return fetch("/api/content/liked")
+   .then(res => res.json())
+   .then(data => { likedItems = data.success ? data.content : []; });
+}
+
 //INITIAL LOAD: FETCH BOTH, PICK A RANDOM HERO, RENDER THE FEED ONCE
 function initFeed(){
-   Promise.all([loadContent(), loadContinueWatching()]).then(() => {
+   Promise.all([loadContent(), loadContinueWatching(), loadRecommendations(), loadLiked()]).then(() => {
       const featuredItem = contentItems[Math.floor(Math.random() * contentItems.length)];
       renderHero(featuredItem);
       renderFeed();
@@ -117,13 +133,13 @@ function renderSection(title, items){
       <section class="content-section">
          <h4 class="section-title m-0">${title}</h4>
          <div class="section-wrapper">
-            <button class="scroll-btn scroll-right title="גלול ימינה"">
+            <button class="scroll-btn scroll-right" title="גלול ימינה">
                <i class="fa-solid fa-chevron-right"></i>
-            </button>    
-            <div class="feed-row"> 
+            </button>
+            <div class="feed-row">
                ${items.map(renderCard).join("")}
             </div>
-            <button class="scroll-btn scroll-left title="גלול שמאלה"">
+            <button class="scroll-btn scroll-left" title="גלול שמאלה">
                <i class="fa-solid fa-chevron-left"></i>
             </button>
          </div>   
@@ -149,9 +165,9 @@ function renderTopSection(items){
       <section class="content-section">
          <h4 class="section-title m-0">טופ 10 ברטרו סטרים:</h4>
          <div class="section-wrapper">
-            <button class="scroll-btn scroll-right title="גלול ימינה">
+            <button class="scroll-btn scroll-right" title="גלול ימינה">
                <i class="fa-solid fa-chevron-right"></i>
-            </button>    
+            </button>
             <div class="feed-row top-feed-row">
                ${items.map((item, index) => renderTopCard(item, index)).join("")}
             </div>
@@ -207,9 +223,11 @@ function renderFeed(items = contentItems) {
    const sorted=[...contentItems].sort((a,b)=>a.title.localeCompare(b.title, 'he')); //allocate AB order
    feedContainer.innerHTML=`
       ${renderContinueSection(continueItems)}
+      ${renderSection("מומלץ עבורך", recommendedItems)}
+      ${likedItems.length >= 5 ? renderSection("כותרים שאהבת", likedItems) : ""}
+      ${renderTopSection(top10)}
       ${renderSection("קומדיה", items.filter(item => item.genre.includes("קומדיה")))}
       ${renderSection("דרמה",items.filter(item=>item.genre.includes("דרמה")))}
-      ${renderTopSection(top10)}
       ${renderSection("צפייה קלילה", items.filter(item => item.type==="סדרה" && item.episodeLength<=25))}
       ${renderSection("סדר אלפבטי", sorted)}
    `;

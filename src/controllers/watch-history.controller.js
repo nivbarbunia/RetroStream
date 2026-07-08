@@ -1,4 +1,5 @@
 const WatchHistory = require("../models/watch-history.model");
+const Content = require("../models/content.model");
 
 // RETURNS ALL WATCH HISTORY ENTRIES
 async function getWatchHistory(req, res) {
@@ -123,6 +124,48 @@ async function getContinueWatching(req, res) {
     }
 }
 
+// RETURNS RECOMMENDATIONS FOR THE ACTIVE PROFILE, BASED ON THE TOP GENRES/FRANCHISES/ORIGINS THEY WATCHED
+async function getRecommendations(req, res) {
+    try {
+        const profileId = req.session.activeProfileId;
+        const history = await WatchHistory.find({ profile: profileId }).populate("content");
+
+        // gate: need at least 5 watched items to recommend
+        if (history.length < 5) return res.json({ success: true, content: [] });
+
+        // tally how often each genre / franchise / origin appears across the watched content
+        const genreCount = {}, franchiseCount = {}, originCount = {};
+        const watchedIds = [];
+        const tally = (map, values) => (values || []).forEach(v => { map[v] = (map[v] || 0) + 1; });
+
+        history.forEach(entry => {
+            const item = entry.content;
+            if (!item) return;   // content was deleted
+            watchedIds.push(item._id);
+            tally(genreCount, item.genre);
+            tally(franchiseCount, item.franchise);
+            tally(originCount, item.origin);
+        });
+
+        // top 2 values in each dimension
+        const top = (map) => Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 2).map(e => e[0]);
+
+        // recommend unwatched content matching any top value (rich mix)
+        const content = await Content.find({
+            _id: { $nin: watchedIds },
+            $or: [
+                { genre:     { $in: top(genreCount) } },
+                { franchise: { $in: top(franchiseCount) } },
+                { origin:    { $in: top(originCount) } }
+            ]
+        });
+
+        res.json({ success: true, content });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
+    }
+}
+
 module.exports = {
     getWatchHistory,
     getWatchHistoryById,
@@ -131,5 +174,6 @@ module.exports = {
     deleteWatchHistory,
     searchWatchHistory,
     upsertProgress,
-    getContinueWatching
+    getContinueWatching,
+    getRecommendations
 };

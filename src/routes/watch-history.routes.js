@@ -4,6 +4,7 @@ const watchHistoryController = require("../controllers/watch-history.controller"
 const { requireAdmin } = require("../middleware/auth.middleware");
 
 router.get("/continue", watchHistoryController.getContinueWatching);
+router.get("/recommendations", watchHistoryController.getRecommendations);
 router.get("/search", requireAdmin, watchHistoryController.searchWatchHistory);
 router.get("/", requireAdmin, watchHistoryController.getWatchHistory);
 router.get("/:id", requireAdmin, watchHistoryController.getWatchHistoryById);
