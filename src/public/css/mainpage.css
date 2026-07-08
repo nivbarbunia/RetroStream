@@ -27,16 +27,24 @@ body {
 
 /* NAVBAR */
 .retro-navbar {
-  background: radial-gradient(circle at right, black, var(--green) 25%);
+    background:
+    radial-gradient(circle at 12% 24%, rgba(37,255,66,0.78), transparent 80%),
+    linear-gradient(180deg, rgba(37,255,66,0.5), transparent 85%),
+    linear-gradient(90deg, #020402 10%, #061006 40%, #0b250f 50%, #16ff35 140%);
+
+  border-bottom: 0.15rem solid rgba(37,255,66,0.6);
 }
+
+
 
 
 .logo {
   color: var(--green) !important;
-  border: 3px solid var(--green);
+  border: 0.15rem solid var(--green);
   padding: 0.3rem 0.5rem;
   border-radius: 15px;
-  background: radial-gradient(circle at right and left, var(--green), black 50%);
+  background: radial-gradient(circle at right, rgba(0, 0, 0, 0.8), transparent 90%),
+  radial-gradient(circle at 20% 0%, rgba(0, 0, 0, 0.2), transparent 40%);
   font-size: 1.2rem;
   font-weight: bold;
 }
