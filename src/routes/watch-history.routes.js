@@ -10,6 +10,6 @@ router.get("/:id", requireAdmin, watchHistoryController.getWatchHistoryById);
 router.post("/", requireAdmin, watchHistoryController.createWatchHistory);
 router.put("/progress", watchHistoryController.upsertProgress);
 router.put("/:id", requireAdmin, watchHistoryController.updateWatchHistory);
-router.delete("/:id", requireAdmin, watchHistoryController.deleteWatchHistory);
+router.delete("/:id", watchHistoryController.deleteWatchHistory);
 
 module.exports = router;

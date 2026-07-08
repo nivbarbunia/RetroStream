@@ -1,6 +1,16 @@
 //REQUEST HANDLER
 const Profile = require("../models/profile.model");
 
+// RETURNS ALL PROFILES OF ALL USERS (ADMIN ONLY) 
+async function getAllProfiles(req, res) {
+    try {
+        const profiles = await Profile.find().populate("user", "name email");
+        res.json({ success: true, profiles });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
+    }
+}
+
 // RETURNS ALL PROFILES OF THE LOGGED-IN USER
 async function getProfile(req, res) {
     try{
@@ -135,6 +145,7 @@ async function getActiveProfile(req, res) {
 
 module.exports={
     selectProfile,
+    getAllProfiles,
     getActiveProfile,
     getProfile,
     getProfileById,

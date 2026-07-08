@@ -54,10 +54,11 @@ async function updateWatchHistory(req, res) {
     }
 }
 
-// DELETES A WATCH HISTORY ENTRY BY ID
+// DELETES A WATCH HISTORY ENTRY BY ID (SCOPED TO THE ACTIVE PROFILE - USER CAN ONLY DELETE THEIR OWN)
 async function deleteWatchHistory(req, res) {
     try {
-        const entry = await WatchHistory.findByIdAndDelete(req.params.id);
+        const profileId = req.session.activeProfileId;
+        const entry = await WatchHistory.findOneAndDelete({ _id: req.params.id, profile: profileId });
         if (!entry) return res.status(404).json({ success: false, message: "רשומה לא נמצאה" });
         res.json({ success: true, message: "הרשומה נמחקה בהצלחה" });
     } catch (err) {
@@ -93,11 +94,11 @@ async function upsertProgress(req, res) {
         if (!userId || !profileId) {
             return res.status(401).json({ success: false, message: "אין פרופיל פעיל" });
         }
-        const { contentId, progress, completed } = req.body;
+        const { contentId, progress, completed, duration } = req.body;
 
         const entry = await WatchHistory.findOneAndUpdate(
             { profile: profileId, content: contentId },
-            { $set: { user: userId, progress, completed, watchedAt: new Date() } },
+            { $set: { user: userId, progress, completed, duration, watchedAt: new Date() } },
             { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true, runValidators: true }
         );
         res.json({ success: true, entry });
