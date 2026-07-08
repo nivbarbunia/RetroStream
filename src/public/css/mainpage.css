@@ -237,10 +237,21 @@ body {
 /*hero section /////
 //
 */
-
+.category-header{
+  font-style: oblique;
+  font-weight: bolder;
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.9);
+  border:none;
+  border-radius: 15px;
+  text-align: center;
+  width: fit-content;
+  text-shadow: 0.1rem 0.15rem 0.1rem rgb(37, 255, 66, 0.5);
+}
 .hero-section {
   max-width: min(85vw);
   margin-inline: auto;
+  position: relative;
 }
 .hero-text {
   flex: 1;

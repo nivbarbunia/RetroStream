@@ -18,6 +18,7 @@ let hasPlayed = false;
 let continueItems = [];
 let recommendedItems = [];
 let likedItems = [];
+let chosenCategory= null;
 let resumeTo = 0;
 const contentModal = new bootstrap.Modal(document.getElementById("contentScreenModal"));
 const contentVideo = document.getElementById("contentVideo");
@@ -98,12 +99,12 @@ function logout() {
 //         DOM FUNCTIONS         //
 //_______________________________//
 
-//HERO SECTION
-function renderHero(item) {
+//HERO SECTION (label CHANGES PER CATEGORY)
+function renderHero(item, label = "במיוחד בשבילך") {
    heroSection.innerHTML= `
    <div class="hero-content">
       <div class="hero-text">
-         <p class="hero-label">במיוחד בשבילך</p>
+         <p class="hero-label">${label}</p>
          <div class="hero-heading">
             <h1 class="hero-title">${item.title}</h1>
             <span class="hero-details">${item.year} · ${item.genre[0]} · ${item.origin?.[0] || item.genre[1]}</span>
@@ -233,6 +234,82 @@ function renderFeed(items = contentItems) {
    `;
 }
 
+//_______________________________//
+//        CATEGORY MODE          //
+//_______________________________//
+
+// EACH CATEGORY = TITLE + HERO LABEL + BASE FILTER + ITS OWN ROW DEFINITIONS
+const categories = {
+   series: {
+      title: "סדרות",
+      heroLabel: "סדרה במיוחד בשבילך",
+      filter: item => item.type === "סדרה",
+      rows: [
+         { title: "קומדיות שאסור לפספס", filter: item => item.genre.includes("קומדיה") },
+         { title: "דרמות בשבילך",         filter: item => item.genre.includes("דרמה") },
+         { title: "צפייה קלילה",          filter: item => item.episodeLength <= 25 },
+         { title: "כל הסדרות א-ב",        filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he') }
+      ]
+   },
+   movies: {
+      title: "סרטים",
+      heroLabel: "סרט במיוחד בשבילך",
+      filter: item => item.type === "סרט",
+      rows: [
+         { title: "קומדיות קולנועיות", filter: item => item.genre.includes("קומדיה") },
+         { title: "סרטי ילדות",         filter: item => item.genre.includes("ילדים") },
+         { title: "כל הסרטים א-ב",      filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he') }
+      ]
+   },
+   origin: {
+      title: chosenCategory || "ערוץ הילדים",
+      heroLabel: "מומלץ מהערוץ",
+      filter: item =>  item.origin.includes(chosenCategory || "ערוץ הילדים"),
+      rows: [
+         {title: "קומדיות מבית " + (chosenCategory || "ערוץ הילדים"), filter: item=>item.genre.includes("קומדיה") },
+         {title: "מדע בדיוני מבית " + (chosenCategory || "ערוץ הילדים"), filter: item=>item.genre.includes("מדע בדיוני")},
+         {title: "כל התכנים מהערוץ א-ב", filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he')}
+      ]
+   },
+   decade: { 
+      title: "שנות ה-" + (chosenCategory || "2010"),
+      heroLabel: "קלאסיקה משנות ה-" + (chosenCategory || "2010"),
+      filter: item => 
+      Number(chosenCategory || "2010") === 2010 ? item.year>2009: 
+      Number(chosenCategory || "2010") === 2000 ? item.year>1999 && item.year<2010: item.year<2000 , 
+      rows: [
+         {title: "קומדיות " + (chosenCategory || "2010")+"s", filter: item=>item.genre.includes("קומדיה") },
+         {title: "דרמות " + (chosenCategory || "2010") + "s", filter: item=>item.genre.includes("מדע בדיוני")},
+         {title: "כל תכני העשור א-ב", filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he')}
+      ] 
+   }
+};
+
+// RENDERS THE FEED IN CATEGORY MODE: CATEGORY HERO + THE CATEGORY'S OWN ROWS
+function renderCategoryFeed(key){
+   const category = categories[key];
+   const items = contentItems.filter(category.filter);
+   categoryHeader.innerHTML = `<h2 class="category-title mb-0">${category.title}</h2>`;
+   heroSection.style.display = "block";
+   renderHero(items[Math.floor(Math.random() * items.length)], category.heroLabel);
+
+   feedContainer.innerHTML = `
+      ${category.rows.map(row => {
+         let rowItems = items.filter(row.filter);
+         if (row.sort) rowItems = [...rowItems].sort(row.sort);
+         return renderSection(row.title, rowItems);
+      }).join("")}
+   `;
+}
+
+// RETURNS TO THE DEFAULT HOME FEED (RANDOM HERO + FULL ROWS)
+function goHome(){
+   categoryHeader.innerHTML= ``;
+   heroSection.style.display = "block";
+   renderHero(contentItems[Math.floor(Math.random() * contentItems.length)]);
+   renderFeed();
+}
+
 //SEARCH RESULTS RENDER
 function renderSearchResults(items, searchText) {
    //hide hero section
@@ -276,6 +353,22 @@ function updateLikeUI(item){
 
 initFeed();
 loadActiveProfile();
+
+// NAVBAR CATEGORY CLICKS (home = default feed, the rest = category mode)
+document.querySelectorAll(".nav-link[data-category]").forEach(link => {
+   link.addEventListener("click", function(e){
+      e.preventDefault();
+      const key = link.dataset.category;
+      if (key === "home") return goHome();
+      if (categories[key]) renderCategoryFeed(key);   // unwired categories (channels/decades/mylist) do nothing yet
+   });
+});
+
+// LOGO ALSO GOES HOME
+document.getElementById("homeLink").addEventListener("click", function(e){
+   e.preventDefault();
+   goHome();
+});
 
 // TOGGLE PROFILE DROPDOWN
 profileImg.addEventListener("click", function (e) {

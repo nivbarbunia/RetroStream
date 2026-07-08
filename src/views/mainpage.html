@@ -14,21 +14,18 @@
 <body>
     <nav class="navbar navbar-expand-xl retro-navbar px-1 py-2">
         <div class="container-fluid">
-            <a class="navbar-brand logo" href="#">רטרו סטרים</a>
+            <a class="navbar-brand logo" href="#" id="homeLink">רטרו סטרים</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="mainNavbar">
                 <ul class="navbar-nav px-2 mb-2 mb-xl-0 gap-xl-1">
-                    <li class="nav-item"><a class="nav-link" href="#">סדרות</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">סרטים</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">ערוץ הילדים</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">ניקולודאון</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">ג'טיקס</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">שנות 90</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">שנות 2000</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">שנות 2010</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">הרשימה שלי</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-category="home">דף הבית</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-category="series">סדרות</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-category="movies">סרטים</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-category="origin">ערוצים</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-category="decade">עשורים</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-category="mylist">הרשימה שלי</a></li>
                 </ul>
             </div>
 
@@ -54,8 +51,9 @@
                 </div>
         </div>
     </nav>  
-    <main class="container-fluid py-5 text-light">
-        <section id="heroSection" class="hero-section mb-5"></section>
+    <main class="container-fluid py-4 text-light">
+        <section id="categoryHeader" class="category-header d-flex justify-content-start mx-5 mt-0 mb-2"></section>
+        <section id="heroSection" class="hero-section mt-0 mb-4"></section>
 
         <section class="mb-4">
             <div id="feedContainer" class="feed-container">
