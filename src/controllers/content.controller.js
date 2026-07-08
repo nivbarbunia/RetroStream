@@ -218,6 +218,16 @@ async function toggleLike(req, res) {
     }
 }
 
+// RETURNS ALL CONTENT LIKED BY THE ACTIVE PROFILE
+async function getLikedContent(req, res) {
+    try {
+        const content = await Content.find({ likedBy: req.session.activeProfileId });
+        res.json({ success: true, content });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
+    }
+}
+
 module.exports = {
     getContent,
     getContentById,
@@ -225,5 +235,6 @@ module.exports = {
     updateContent,
     deleteContent,
     searchContent,
-    toggleLike
+    toggleLike,
+    getLikedContent
 };

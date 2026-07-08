@@ -4,7 +4,8 @@ const contentController = require("../controllers/content.controller");
 const { requireAdmin } = require("../middleware/auth.middleware");
 
 router.get("/", contentController.getContent);
-router.get("/search", contentController.searchContent); 
+router.get("/search", contentController.searchContent);
+router.get("/liked", contentController.getLikedContent);
 router.get("/:id", contentController.getContentById);
 router.post("/", requireAdmin, contentController.createContent);
 router.delete("/:id", requireAdmin, contentController.deleteContent);
