@@ -12,32 +12,24 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 let contentItems = [];
 let activeProfileId = null;
-let currentDetailsItem = null;
-const detailsModal = new bootstrap.Modal(document.getElementById("contentDetailsModal"));
-const detailsVideo = document.getElementById("detailsVideo");
+let currentContentItem = null;
+let sentMilestones = [];
+let hasPlayed = false;
+let continueItems = [];
+let resumeTo = 0;
+const contentModal = new bootstrap.Modal(document.getElementById("contentScreenModal"));
+const contentVideo = document.getElementById("contentVideo");
 const videoPlayBtn = document.getElementById("videoPlayBtn");
 const videoProgress = document.getElementById("videoProgress");
 const videoCurrentTime = document.getElementById("videoCurrentTime");
 const videoDuration = document.getElementById("videoDuration");
 const videoMuteBtn = document.getElementById("videoMuteBtn");
 const videoFullscreenBtn = document.getElementById("videoFullscreenBtn");
-const detailsVideoWrap = document.getElementById("detailsVideoWrap");
+const videoWrap = document.getElementById("videoWrap");
 
 //_______________________________//
 //             API               //
 //_______________________________//
-
-//LOADS ALL CONTENT, PICKS A RANDOM HERO ITEM, RENDERS THE FEED
-function loadContent(){
-   fetch("/api/content")
-   .then(res => res.json())
-   .then(data => {
-      contentItems = data.content;
-      const featuredItem =  contentItems[Math.floor(Math.random() * contentItems.length)];
-      renderHero(featuredItem);
-      renderFeed(contentItems);
-   });
-}
 
 //LOADS THE ACTIVE PROFILE'S NAME/IMAGE INTO THE HEADER
 function loadActiveProfile(){
@@ -51,6 +43,29 @@ function loadActiveProfile(){
          document.getElementById("activeProfileImg").src = data.profile.image;
          document.getElementById("activeProfileName").textContent = data.profile.name;
       }
+   });
+}
+
+//LOADS ALL CONTENT INTO contentItems (NO RENDER)
+function loadContent(){
+   return fetch("/api/content")
+   .then(res => res.json())
+   .then(data => { contentItems = data.content; });
+}
+
+//LOADS THE ACTIVE PROFILE'S CONTINUE-WATCHING LIST INTO continueItems (NO RENDER)
+function loadContinueWatching(){
+   return fetch("/api/watch-history/continue")
+   .then(res => res.json())
+   .then(data => { continueItems = data.success ? data.history : []; });
+}
+
+//INITIAL LOAD: FETCH BOTH, PICK A RANDOM HERO, RENDER THE FEED ONCE
+function initFeed(){
+   Promise.all([loadContent(), loadContinueWatching()]).then(() => {
+      const featuredItem = contentItems[Math.floor(Math.random() * contentItems.length)];
+      renderHero(featuredItem);
+      renderFeed();
    });
 }
 
@@ -89,9 +104,9 @@ function renderCard(item) {
    return `
       <article class="content-card" data-id="${item._id}">
          <img class="content-img" src="${item.image}" alt="${item.title}">
-         <h3 class="content-title">${item.title}</h3>
-         <p class="content-details">${item.year} · ${item.genre[0]}</p>
-    </article>
+         <h5 class="content-title">${item.title}</h5>
+         <p class="content-details mb-1">${item.year} · ${item.genre[0]}</p>
+      </article>
    `;
 }
 
@@ -100,15 +115,15 @@ function renderSection(title, items){
    if(items.length===0) return "";
    return `
       <section class="content-section">
-         <h2 class="section-title">${title}</h2>
+         <h4 class="section-title m-0">${title}</h4>
          <div class="section-wrapper">
-            <button class="scroll-btn scroll-right">
+            <button class="scroll-btn scroll-right title="גלול ימינה"">
                <i class="fa-solid fa-chevron-right"></i>
             </button>    
             <div class="feed-row"> 
                ${items.map(renderCard).join("")}
             </div>
-            <button class="scroll-btn scroll-left">
+            <button class="scroll-btn scroll-left title="גלול שמאלה"">
                <i class="fa-solid fa-chevron-left"></i>
             </button>
          </div>   
@@ -123,8 +138,8 @@ function renderTopCard(item,index){
       <article class="top-card content-card" data-id="${item._id}">
          <span class="rank-number">${index + 1}</span>
          <img class="content-img" src="${item.image}" alt="${item.title}">
-         <h3 class="content-title">${item.title}</h3>
-         <p class="content-details">${item.year} · ${item.genre[0]}</p>
+         <h5 class="content-title m-0">${item.title}</h5>
+         <p class="content-details mb-1">${item.year} · ${item.genre[0]}</p>
       </article>
    `;
 }
@@ -132,15 +147,15 @@ function renderTopCard(item,index){
 function renderTopSection(items){
    return`
       <section class="content-section">
-         <h2 class="section-title">טופ 10 ברטרו סטרים:</h2>
+         <h4 class="section-title m-0">טופ 10 ברטרו סטרים:</h4>
          <div class="section-wrapper">
-            <button class="scroll-btn scroll-right">
+            <button class="scroll-btn scroll-right title="גלול ימינה">
                <i class="fa-solid fa-chevron-right"></i>
             </button>    
             <div class="feed-row top-feed-row">
                ${items.map((item, index) => renderTopCard(item, index)).join("")}
             </div>
-            <button class="scroll-btn scroll-left">
+            <button class="scroll-btn scroll-left" title="גלול שמאלה">
                <i class="fa-solid fa-chevron-left"></i>
             </button>
          </div>
@@ -148,15 +163,53 @@ function renderTopSection(items){
    `
 }
 
+//CONTINUE-WATCHING CARD (CARRIES data-progress SO THE MODAL CAN RESUME)
+function renderContinueCard(record){
+   const item = record.content;
+   if (!item) return "";   // content was deleted
+   const percent = record.duration ? (record.progress / record.duration) * 100 : 0;
+   return `
+      <article class="content-card continue-card" data-id="${item._id}" data-progress="${record.progress}" data-record-id="${record._id}">
+         <button class="remove-card" title="הסר מהמשך צפייה"><i class="fa-solid fa-xmark"></i></button>
+         <img class="content-img" src="${item.image}" alt="${item.title}">
+         <div class="card-progress"><div class="card-progress-fill" style="width:${percent}%"></div></div>
+         <h5 class="content-title">${item.title}</h5>
+         <p class="content-details mb-1">${item.year} · ${item.genre[0]}</p>
+      </article>
+   `;
+}
+
+
+//CONTINUE-WATCHING SECTION
+function renderContinueSection(records){
+   if (records.length === 0) return "";
+   return `
+      <section class="content-section">
+         <h4 class="section-title m-0">המשך צפייה</h4>
+         <div class="section-wrapper">
+            <button class="scroll-btn scroll-right title="גלול ימינה"">
+               <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <div class="feed-row">
+               ${records.map(renderContinueCard).join("")}
+            </div>
+            <button class="scroll-btn scroll-left title="גלול שמאלה"">
+               <i class="fa-solid fa-chevron-left"></i>
+            </button>
+         </div>
+      </section>
+   `;
+}
+
 //FEED RENDER
 function renderFeed(items = contentItems) {
    const top10 = [...contentItems].sort((a,b)=> (b.rating ?? 0) - (a.rating ?? 0)).slice(0,10); //allocate top 10 contents
-   const sorted=[...contentItems].sort((a,b)=>a.title.localeCompare(b.title, 'he'));
+   const sorted=[...contentItems].sort((a,b)=>a.title.localeCompare(b.title, 'he')); //allocate AB order
    feedContainer.innerHTML=`
-      ${renderSection("המשך צפייה", items.slice(0,5))}
-      ${renderTopSection(top10)}
+      ${renderContinueSection(continueItems)}
       ${renderSection("קומדיה", items.filter(item => item.genre.includes("קומדיה")))}
       ${renderSection("דרמה",items.filter(item=>item.genre.includes("דרמה")))}
+      ${renderTopSection(top10)}
       ${renderSection("צפייה קלילה", items.filter(item => item.type==="סדרה" && item.episodeLength<=25))}
       ${renderSection("סדר אלפבטי", sorted)}
    `;
@@ -190,7 +243,7 @@ function renderSearchResults(items, searchText) {
 }
 //LIKE ANIMATION
 function updateLikeUI(item){
-   const btn = document.getElementById("detailsLikeBtn");
+   const btn = document.getElementById("likeBtn");
    const icon = btn.querySelector("i");
    const liked = item.likedBy?.includes(activeProfileId);
    icon.className = liked ? "fa-solid fa-heart" : "fa-regular fa-heart";
@@ -203,7 +256,7 @@ function updateLikeUI(item){
 //_______________________________//
 
 
-loadContent();
+initFeed();
 loadActiveProfile();
 
 // TOGGLE PROFILE DROPDOWN
@@ -253,34 +306,50 @@ document.addEventListener("click", function(e) {
    if(!btn) return;
    //
    const row= btn.parentElement.querySelector(".feed-row");
-   const direction = btn.classList.contains("scroll-right") ? 330 : -330; //if right scroll -330, else 330
+   const direction = btn.classList.contains("scroll-right") ? 500 : -500; //if right scroll -330, else 330
    row.scrollBy({left: direction, behavior:"smooth"});
 });
 
 
-// OPEN CONTENT DETAILS MODAL
+// OPEN CONTENT MODAL
 document.addEventListener("click", function(e){
+   if (e.target.closest(".remove-card")) return;   // X button is handled separately
    const trigger = e.target.closest(".content-card, .hero-btn, .hero-img");
    if (!trigger) return;
-   openDetailsModal(trigger.dataset.id);
+   openContentModal(trigger.dataset.id, trigger.dataset.progress);
 });
 
-//FILLS THE DETAILS MODAL WITH ONE CONTENT ITEM'S DATA AND SHOWS IT
-function openDetailsModal(id){
+// REMOVE A CONTENT FROM THE CONTINUE-WATCHING ROW
+document.addEventListener("click", async function(e){
+   const removeBtn = e.target.closest(".remove-card");
+   if (!removeBtn) return;
+   const card = removeBtn.closest(".continue-card");
+   const recordId = card.dataset.recordId;
+   await fetch(`/api/watch-history/${recordId}`, { method: "DELETE" });
+   continueItems = continueItems.filter(r => r._id !== recordId);
+   renderFeed();
+});
+
+//FILLS THE CONTENT MODAL WITH ONE CONTENT ITEM'S DATA AND SHOWS IT
+function openContentModal(id, progress){
    const item = contentItems.find(i => i._id === id);
-   currentDetailsItem = item;
-   document.getElementById("detailsTitle").textContent = item.title;
-   document.getElementById("detailsMeta").textContent = `${item.year} · ${item.type} · ${item.genre[0]}`;
-   document.getElementById("detailsDescription").textContent = item.description;
+   currentContentItem = item;
+   sentMilestones = [];
+   hasPlayed = false;
+   resumeTo = Number(progress) || 0;
+   videoWrap.classList.toggle("video-loading", resumeTo > 0);
+   document.getElementById("modalTitle").textContent = item.title;
+   document.getElementById("modalDetails").textContent = `${item.year} · ${item.type} · ${item.genre[0]}`;
+   document.getElementById("modalDescription").textContent = item.description;
    const hasVideo = Boolean(item.videoUrl);
-   detailsVideo.src = item.videoUrl || "";
-   detailsVideoWrap.classList.toggle("no-video", !hasVideo);
+   contentVideo.src = item.videoUrl || "";
+   videoWrap.classList.toggle("no-video", !hasVideo);
    videoPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
    videoProgress.value = 0;
    videoCurrentTime.textContent = "0:00";
    videoDuration.textContent = "0:00";
    updateLikeUI(item);
-   detailsModal.show();
+   contentModal.show();
 }
 
 // FORMAT SECONDS AS m:ss
@@ -291,10 +360,28 @@ function formatTime(seconds){
    return `${m}:${s}`;
 }
 
+// SAVES THE CURRENT WATCH PROGRESS FOR THE ACTIVE PROFILE
+async function saveProgress(completed){
+   if (!currentContentItem || !currentContentItem.videoUrl) return;
+   if (!hasPlayed) return;   // opened/resumed but never actually played - don't bump the list
+   if (!contentVideo.currentTime) return;   // nothing watched yet
+   const isCompleted = completed || contentVideo.currentTime >= contentVideo.duration * 0.9;
+   await fetch("/api/watch-history/progress", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+         contentId: currentContentItem._id,
+         progress: contentVideo.currentTime,
+         completed: isCompleted,
+         duration: contentVideo.duration
+      })
+   });
+}
+
 
 // LIKE BUTTON (IN MODAL) - PERSISTED, OPTIMISTIC UPDATE
-document.getElementById("detailsLikeBtn").addEventListener("click", function(){
-   const item = currentDetailsItem;
+document.getElementById("likeBtn").addEventListener("click", function(){
+   const item = currentContentItem;
    const wasLiked = item.likedBy?.includes(activeProfileId);
 
    item.likedBy = item.likedBy || [];
@@ -316,41 +403,63 @@ document.getElementById("detailsLikeBtn").addEventListener("click", function(){
 logoutBtn.addEventListener("click", logout);
 
 // CUSTOM VIDEO CONTROLS
+
 // PLAY/PAUSE BUTTON TOGGLES PLAYBACK
 videoPlayBtn.addEventListener("click", function(){
-   if (detailsVideo.paused) detailsVideo.play();
-   else detailsVideo.pause();
+   if (contentVideo.paused) contentVideo.play();
+   else contentVideo.pause();
 });
 
 // SWAPS THE PLAY ICON TO PAUSE WHEN PLAYBACK STARTS
-detailsVideo.addEventListener("play", () => {
+contentVideo.addEventListener("play", () => {
    videoPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+   hasPlayed = true;
 });
 // SWAPS THE ICON BACK TO PLAY WHEN PLAYBACK STOPS
-detailsVideo.addEventListener("pause", () => {
+contentVideo.addEventListener("pause", () => {
    videoPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+   saveProgress();
 });
 
 // SHOWS THE TOTAL DURATION ONCE THE VIDEO METADATA IS KNOWN
-detailsVideo.addEventListener("loadedmetadata", () => {
-   videoDuration.textContent = formatTime(detailsVideo.duration);
+contentVideo.addEventListener("loadedmetadata", () => {
+   videoDuration.textContent = formatTime(contentVideo.duration);
+   if (resumeTo) { 
+      contentVideo.currentTime = resumeTo; 
+      resumeTo = 0;
+      videoProgress.value = (contentVideo.currentTime / contentVideo.duration) * 100 || 0;
+      videoCurrentTime.textContent = formatTime(contentVideo.currentTime);
+   }
+   videoWrap.classList.remove("video-loading");   // position is ready - reveal controls
 });
 
 // KEEPS THE CURRENT TIME AND PROGRESS BAR IN SYNC WHILE PLAYING
-detailsVideo.addEventListener("timeupdate", () => {
-   videoCurrentTime.textContent = formatTime(detailsVideo.currentTime);
-   videoProgress.value = (detailsVideo.currentTime / detailsVideo.duration) * 100 || 0;
+contentVideo.addEventListener("timeupdate", () => {
+   const progressPercent = (contentVideo.currentTime / contentVideo.duration) * 100;
+
+   videoCurrentTime.textContent = formatTime(contentVideo.currentTime);
+   videoProgress.value = (progressPercent || 0);
+
+   [25, 50, 75].forEach(m => {
+      if (progressPercent >= m && !sentMilestones.includes(m)) {
+         sentMilestones.push(m);
+         saveProgress();
+      }
+   });
 });
+
+// SAVE AS COMPLETED WHEN THE VIDEO FINISHES
+contentVideo.addEventListener("ended", () => saveProgress(true));
 
 // DRAGGING THE PROGRESS BAR SEEKS THE VIDEO
 videoProgress.addEventListener("input", function(){
-   detailsVideo.currentTime = (videoProgress.value / 100) * detailsVideo.duration;
+   contentVideo.currentTime = (videoProgress.value / 100) * contentVideo.duration;
 });
 
 // MUTE BUTTON TOGGLES SOUND AND SWAPS THE ICON
 videoMuteBtn.addEventListener("click", function(){
-   detailsVideo.muted = !detailsVideo.muted;
-   videoMuteBtn.innerHTML = detailsVideo.muted
+   contentVideo.muted = !contentVideo.muted;
+   videoMuteBtn.innerHTML = contentVideo.muted
       ? '<i class="fa-solid fa-volume-xmark"></i>'
       : '<i class="fa-solid fa-volume-high"></i>';
 });
@@ -360,12 +469,15 @@ videoFullscreenBtn.addEventListener("click", function(){
    if (document.fullscreenElement) {
       document.exitFullscreen();
    } else {
-      detailsVideoWrap.requestFullscreen();
+      videoWrap.requestFullscreen();
    }
 });
 
 // STOP PLAYBACK WHEN THE MODAL CLOSES
-document.getElementById("contentDetailsModal").addEventListener("hidden.bs.modal", function(){
-   detailsVideo.pause();
-   detailsVideo.currentTime = 0;
+document.getElementById("contentScreenModal").addEventListener("hidden.bs.modal", function(){
+   if (hasPlayed) {
+      saveProgress().then(() => loadContinueWatching()).then(renderFeed);   // save first, then refresh the row
+   }
+   contentVideo.pause();
+   contentVideo.currentTime = 0;
 });
