@@ -234,20 +234,91 @@ body {
   display: none;
 }
 
-/*hero section /////
-//
-*/
+
+/* CATEGORY HEADER (#categoryHeader / #noHeroHeader) - LAYOUT ONLY.
+   TYPOGRAPHY LIVES ON .category-title BELOW, NOT HERE, BECAUSE BOOTSTRAP
+   SETS font-size/font-weight DIRECTLY ON h1-h6, WHICH BEATS INHERITANCE
+   FROM A PARENT CLASS. */
 .category-header{
-  font-style: oblique;
-  font-weight: bolder;
-  font-size: 3rem;
-  color: rgba(255, 255, 255, 0.9);
   border:none;
   border-radius: 15px;
   text-align: center;
   width: fit-content;
-  text-shadow: 0.1rem 0.15rem 0.1rem rgb(37, 255, 66, 0.5);
+  align-items: center;  
+  gap: 1.5rem;
 }
+
+/* CATEGORY TITLE (THE <h2> INSIDE .category-header) */
+.category-title{
+  font-style: oblique;
+  font-weight: bolder;
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0.1rem 0.15rem 0.1rem rgb(37, 255, 66, 0.5);
+  margin: 0;
+}
+
+
+.sub-filter-dropdown{
+  position: relative;
+}
+
+/* THE BUTTON THAT SHOWS THE CURRENT SELECTION AND OPENS THE PANEL */
+.sub-filter-toggle{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(37, 255, 66, 0.1);
+  color: var(--green);
+  border: 0.12rem solid var(--green);
+  border-radius: 0.6rem;
+  padding: 0.3rem 0.9rem;
+  font-family: 'Varela Round', sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+.sub-filter-toggle:hover{
+  box-shadow: 0 0 0.8rem rgba(37, 255, 66, 0.5);
+}
+
+/* THE OPEN PANEL - MULTI-COLUMN LIST OF VALUES (CSS3 REQUIREMENT) */
+.sub-filter-panel{
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background: var(--black);
+  border: 0.15rem solid var(--green);
+  border-radius: 0.8rem;
+  padding: 1rem 1.2rem;
+  width: 28rem;
+  z-index: 50;
+  box-shadow: 0 0 1.2rem rgba(0, 0, 0, 0.9);
+  column-count: 3;
+  column-gap: 1.5rem;
+}
+.sub-filter-panel.hidden{
+  display: none;
+}
+
+/* ONE VALUE INSIDE THE PANEL (E.G. ONE GENRE OR ONE CHANNEL) */
+.sub-filter-option{
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 0.3rem 0.5rem;
+  border-radius: 0.4rem;
+  white-space: nowrap;
+  break-inside: avoid;   /* stops a single option from splitting across two columns */
+}
+.sub-filter-option:hover,
+.sub-filter-option.active{
+  background: var(--green);
+  color: var(--black);
+}
+
+/*HERO SECTION*/
+
 .hero-section {
   max-width: min(85vw);
   margin-inline: auto;
@@ -399,6 +470,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  animation: card-fade-in 0.4s ease;
 }
 
 .content-card:hover{
@@ -447,7 +519,6 @@ body {
   color: #ccc;
 }
 .continue-card {
-  animation: continue-fade-in 0.4s ease;
   position: relative;
 }
 /* REMOVE-FROM-CONTINUE (X) BUTTON - APPEARS ON HOVER, NETFLIX STYLE */
@@ -473,9 +544,9 @@ body {
   background: red;
   transform: scale(1.2);
 }
-@keyframes continue-fade-in {
-  from { opacity: 0; transform: translateX(3.5rem); }
-  to   { opacity: 1; transform: translateX(0); }
+@keyframes card-fade-in {
+  from { opacity: 0; transform: translateY(1.2rem); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 /* PROGRESS BAR */
 .card-progress {
@@ -507,18 +578,21 @@ body {
   height: clamp(165px, 13vw, 520px);
   top: 1.2rem;
   opacity:0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
-.scroll-right{ 
+.scroll-right{
   right:0;
   background: linear-gradient(to right, rgba(0,0,0,0.5), transparent);
+  transform: translateX(0.6rem);
 }
-.scroll-left{ 
+.scroll-left{
   left:0;
-    background: linear-gradient(to left, rgba(0,0,0,0.5), transparent); 
+    background: linear-gradient(to left, rgba(0,0,0,0.5), transparent);
+  transform: translateX(-0.6rem);
 }
 .section-wrapper:hover .scroll-btn{
   opacity: 1;
+  transform: translateX(0);
 }
 
 
