@@ -15,10 +15,12 @@ const currentPassword  = document.getElementById("currentPassword");
 const newPassword      = document.getElementById("newPassword");
 const confirmPassword  = document.getElementById("confirmPassword");
 
+const back        = document.getElementById("back");
 const deleteBtn   = document.getElementById("deleteAccount");
 const confirmText = document.getElementById("confirmText");
 
 let currentUserId = null;
+let currentUserRole = null;
 
 
 //_______________________________//
@@ -30,8 +32,10 @@ function loadAccount() {
         .then(data => {
             if (data.success) {
                 currentUserId = data.user._id;
+                currentUserRole = data.user.role;
                 nameDisplay.textContent = data.user.name;
                 emailDisplay.textContent = data.user.email;
+
             }
         });
 }
@@ -157,6 +161,13 @@ document.querySelectorAll("input").forEach(input => {
         message.textContent = "";
         this.classList.remove("input-error");
     });
+});
+back.addEventListener("click", function(){
+    if (currentUserRole === "admin") {
+        back.href="/admin";
+        return;
+    }
+    back.href="/main";
 });
 // delete account
 deleteBtn.addEventListener("click", function () {

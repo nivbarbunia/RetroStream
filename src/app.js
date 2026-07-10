@@ -11,6 +11,7 @@ const postRoutes = require("./routes/post.routes");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const watchHistoryRoutes = require("./routes/watch-history.routes");
+const statsRoutes = require("./routes/stats.routes");
 //MODELS
 const User = require("./models/user.model");
 const app = express();
@@ -30,6 +31,7 @@ app.use("/api/posts", postRoutes); //temporary
 app.use("/api/content", requireLogin, contentRoutes);
 app.use("/api/profiles", requireLogin, profileRoutes);
 app.use("/api/watch-history", requireLogin, watchHistoryRoutes);
+app.use("/api/stats", requireLogin, statsRoutes);
 app.use("/api/users", userRoutes);
 
 // PAGE routes
@@ -55,6 +57,7 @@ app.get("/account", requireLogin, (req, res) => res.sendFile(path.join(__dirname
 app.get("/admin", requireLogin, requireAdminPage, (req, res) => res.sendFile(path.join(__dirname, "views", "admin.html")));
 app.get("/admin/users", requireLogin, requireAdminPage, (req, res) => res.sendFile(path.join(__dirname, "views", "admin-users.html")));
 app.get("/admin/content", requireLogin, requireAdminPage, (req, res) => res.sendFile(path.join(__dirname, "views", "admin-content.html")));
+app.get("/admin/stats", requireLogin, requireAdminPage, (req, res) => res.sendFile(path.join(__dirname, "views", "admin-stats.html")));
 
 // auth
 app.use("/api/auth", authRoutes);
