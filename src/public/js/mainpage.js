@@ -4,21 +4,14 @@
 const searchBox = document.querySelector(".search-box");
 const searchToggle = document.getElementById("searchToggle");
 const searchInput = document.getElementById("searchInput");
+const categoryHeader= document.getElementById("categoryHeader");
+const noHeroHeader= document.getElementById("noHeroHeader");
 const heroSection = document.getElementById("heroSection");
 const feedContainer = document.getElementById("feedContainer");
 const profileImg = document.getElementById("profile");
 const profileDropdown = document.getElementById("profileDropdown");
 const logoutBtn = document.getElementById("logoutBtn");
 
-let contentItems = [];
-let activeProfileId = null;
-let currentContentItem = null;
-let sentMilestones = [];
-let hasPlayed = false;
-let continueItems = [];
-let recommendedItems = [];
-let likedItems = [];
-let resumeTo = 0;
 const contentModal = new bootstrap.Modal(document.getElementById("contentScreenModal"));
 const contentVideo = document.getElementById("contentVideo");
 const videoPlayBtn = document.getElementById("videoPlayBtn");
@@ -28,6 +21,18 @@ const videoDuration = document.getElementById("videoDuration");
 const videoMuteBtn = document.getElementById("videoMuteBtn");
 const videoFullscreenBtn = document.getElementById("videoFullscreenBtn");
 const videoWrap = document.getElementById("videoWrap");
+
+let contentItems = [];
+let activeProfileId = null;
+let currentContentItem = null;
+let sentMilestones = [];
+let hasPlayed = false;
+let continueItems = [];
+let recommendedItems = [];
+let likedItems = [];
+let chosenCategory= null;
+let resumeTo = 0;
+
 
 //_______________________________//
 //             API               //
@@ -98,12 +103,12 @@ function logout() {
 //         DOM FUNCTIONS         //
 //_______________________________//
 
-//HERO SECTION
-function renderHero(item) {
+//HERO SECTION (label CHANGES PER CATEGORY)
+function renderHero(item, label = "במיוחד בשבילך") {
    heroSection.innerHTML= `
    <div class="hero-content">
       <div class="hero-text">
-         <p class="hero-label">במיוחד בשבילך</p>
+         <p class="hero-label">${label}</p>
          <div class="hero-heading">
             <h1 class="hero-title">${item.title}</h1>
             <span class="hero-details">${item.year} · ${item.genre[0]} · ${item.origin?.[0] || item.genre[1]}</span>
@@ -232,7 +237,6 @@ function renderFeed(items = contentItems) {
       ${renderSection("סדר אלפבטי", sorted)}
    `;
 }
-
 //SEARCH RESULTS RENDER
 function renderSearchResults(items, searchText) {
    //hide hero section
@@ -268,6 +272,149 @@ function updateLikeUI(item){
    btn.classList.toggle("liked", liked);
 }
 
+//_______________________________//
+//        CATEGORY MODE          //
+//_______________________________//
+
+// EACH CATEGORY = TITLE + HERO LABEL + BASE FILTER + ITS OWN ROW DEFINITIONS
+// BUILT FRESH ON EVERY CALL SO STRINGS/FILTERS ALWAYS REFLECT THE CURRENT chosenCategory
+function getCategories() {
+   return {
+   series: {
+      title: "סדרות",
+      heroLabel: "סדרה במיוחד בשבילך",
+      filter: item => item.type === "סדרה",
+      subFilterField: "genre",
+      rows: [
+         { title: "קומדיות שאסור לפספס", filter: item => item.genre.includes("קומדיה") },
+         { title: "דרמות בשבילך",         filter: item => item.genre.includes("דרמה") },
+         { title: "צפייה קלילה",          filter: item => item.episodeLength <= 25 },
+         { title: "כל הסדרות א-ב",        filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he') }
+      ]
+   },
+   movies: {
+      title: "סרטים",
+      heroLabel: "סרט במיוחד בשבילך",
+      filter: item => item.type === "סרט",
+      subFilterField: "genre",
+      rows: [
+         { title: "קומדיות קולנועיות", filter: item => item.genre.includes("קומדיה") },
+         { title: "סרטי ילדות",         filter: item => item.genre.includes("ילדים") },
+         { title: "כל הסרטים א-ב",      filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he') }
+      ]
+   },
+   origin: {
+      title: "ערוצים",
+      heroLabel: `תכנים מערוצים`,
+      filter: item => item.origin && item.origin.length > 0,
+      subFilterField: "origin",
+      rows: [
+         {title: "קומדיות מהערוצים", filter: item=>item.genre.includes("קומדיה") },
+         {title: "מדע בדיוני מהערוצים", filter: item=>item.genre.includes("מדע בדיוני")},
+         {title: "כל התכנים מהערוצים א-ב", filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he')}
+      ]
+   },
+   nineties: {
+      title: "שנות ה-90",
+      heroLabel: "הילדות שלנו — שנות ה-90",
+      filter: item => item.year < 2000,
+      rows: [
+         { title: "קומדיות שגידלו דור שלם", filter: item => item.genre.includes("קומדיה") },
+         { title: "דרמות שנחרתו בזיכרון",   filter: item => item.genre.includes("דרמה") },
+         { title: "כל הקלאסיקות של שנות ה-90 א-ב", filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he') }
+      ]
+   },
+   y2000s: {
+      title: "שנות ה-2000",
+      heroLabel: "געגועים לשנות ה-2000",
+      filter: item => item.year >= 2000 && item.year < 2010,
+      rows: [
+         { title: "קומדיות שכולנו מכירים בעל פה", filter: item => item.genre.includes("קומדיה") },
+         { title: "דרמות שריגשו את כולם",         filter: item => item.genre.includes("דרמה") },
+         { title: "כל התכנים משנות ה-2000 א-ב", filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he') }
+      ]
+   }
+   };
+}
+
+// BUILDS THE CATEGORY HEADER: TITLE + (IF THE CATEGORY HAS ONE) A MULTI-COLUMN SUB-FILTER MENU BUILT FROM LIVE DATA
+// THE MENU IS A CUSTOM DIV (NOT A NATIVE <select>) SO THE OPTION LIST CAN USE CSS3 column-count
+function renderCategoryHeader(key){
+   const category = getCategories()[key];
+   noHeroHeader.innerHTML = ``;
+   let dropdownHtml = "";
+   if (category.subFilterField) {
+      const baseItems = contentItems.filter(category.filter);
+      const values = [...new Set(baseItems.flatMap(item => item[category.subFilterField] || []))].sort((a,b) => a.localeCompare(b, 'he'));
+      const allLabel = "כל ה" + (key === "origin" ? "ערוצים" : "ז'אנרים");
+      dropdownHtml = `
+         <div class="sub-filter-dropdown" data-key="${key}">
+            <button type="button" class="sub-filter-toggle">
+               <span>${chosenCategory || allLabel}</span>
+               <i class="fa-solid fa-caret-down"></i>
+            </button>
+            <div class="sub-filter-panel hidden">
+               <a href="#" class="sub-filter-option ${!chosenCategory ? "active" : ""}" data-value="">${allLabel}</a>
+               ${values.map(v => `<a href="#" class="sub-filter-option ${v === chosenCategory ? "active" : ""}" data-value="${v}">${v}</a>`).join("")}
+            </div>
+         </div>`;
+   }
+   categoryHeader.innerHTML = `<h2 class="category-title mb-0">${category.title}</h2>${dropdownHtml}`;
+}
+
+// RENDERS THE FEED IN CATEGORY MODE: CATEGORY HERO + THE CATEGORY'S OWN ROWS
+function renderCategoryFeed(key){
+   const category = getCategories()[key];
+   const items = contentItems.filter(category.filter);
+   renderCategoryHeader(key);
+   heroSection.style.display = "block";
+   renderHero(items[Math.floor(Math.random() * items.length)], category.heroLabel);
+   feedContainer.innerHTML = `
+      ${category.rows.map(row => {
+         let rowItems = items.filter(row.filter);
+         if (row.sort) rowItems = [...rowItems].sort(row.sort);
+         return renderSection(row.title, rowItems);
+      }).join("")}
+   `;
+}
+
+// SECONDARY-FILTER VIEW (E.G. ONE GENRE/CHANNEL): FLAT GRID, NO HERO, categoryHeader STAYS VISIBLE
+function renderSubFilteredGrid(key){
+   const category = getCategories()[key];
+   renderCategoryHeader(key);
+   heroSection.style.display = "none";
+   const baseItems = contentItems.filter(category.filter);
+   const filtered = baseItems.filter(item => item[category.subFilterField]?.includes(chosenCategory));
+   feedContainer.innerHTML = `
+      <section class="content-section">
+         <div class="feed-row">${filtered.map(renderCard).join("")}</div>
+      </section>
+   `;
+}
+
+// RETURNS TO THE DEFAULT HOME FEED (RANDOM HERO + FULL ROWS)
+function goHome(){
+   chosenCategory = null;
+   categoryHeader.innerHTML= ``;
+   noHeroHeader.innerHTML=``;
+   heroSection.style.display = "block";
+   renderHero(contentItems[Math.floor(Math.random() * contentItems.length)]);
+   renderFeed();
+}
+
+// RENDERS "MY LIST": CONTINUE WATCHING + LIKED + TOP 10 - NO HERO
+function renderMyList(){
+   const top10 = [...contentItems].sort((a,b)=> (b.rating ?? 0) - (a.rating ?? 0)).slice(0,10);
+   categoryHeader.innerHTML= ``;
+   noHeroHeader.innerHTML = `<h1 class="category-title mb-0">הרשימה שלי</h2>`;
+   heroSection.style.display = "none";
+   feedContainer.innerHTML = `
+      ${renderContinueSection(continueItems)}
+      ${renderSection("כותרים שאהבת", likedItems)}
+      ${renderTopSection(top10)}
+   `;
+}
+
 
 //_______________________________//
 //        EVENT LISTENERS        //
@@ -276,6 +423,24 @@ function updateLikeUI(item){
 
 initFeed();
 loadActiveProfile();
+
+// NAVBAR CATEGORY CLICKS (home = default feed, the rest = category mode)
+document.querySelectorAll(".nav-link[data-category]").forEach(link => {
+   link.addEventListener("click", function(e){
+      e.preventDefault();
+      const key = link.dataset.category;
+      chosenCategory = null;
+      if (key === "home") return goHome();
+      if (key === "mylist") return renderMyList();
+      if (getCategories()[key]) renderCategoryFeed(key);   // channel-switching dropdown for origin not built yet
+   });
+});
+
+// LOGO ALSO GOES HOME
+document.getElementById("homeLink").addEventListener("click", function(e){
+   e.preventDefault();
+   goHome();
+});
 
 // TOGGLE PROFILE DROPDOWN
 profileImg.addEventListener("click", function (e) {
@@ -326,6 +491,29 @@ document.addEventListener("click", function(e) {
    const row= btn.parentElement.querySelector(".feed-row");
    const direction = btn.classList.contains("scroll-right") ? 500 : -500; //if right scroll -330, else 330
    row.scrollBy({left: direction, behavior:"smooth"});
+});
+
+// SUB-FILTER DROPDOWN (GENRE/CHANNEL MULTI-COLUMN MENU): TOGGLE OPEN, PICK A VALUE, CLOSE ON OUTSIDE CLICK
+// DELEGATED (NOT ATTACHED INSIDE renderCategoryHeader) BECAUSE THE PANEL IS REBUILT ON EVERY RENDER
+document.addEventListener("click", function(e){
+   const toggle = e.target.closest(".sub-filter-toggle");
+   if (toggle) {
+      toggle.nextElementSibling.classList.toggle("hidden");
+      return;
+   }
+
+   const option = e.target.closest(".sub-filter-option");
+   if (option) {
+      e.preventDefault();
+      const key = option.closest(".sub-filter-dropdown").dataset.key;
+      chosenCategory = option.dataset.value || null;
+      if (chosenCategory) renderSubFilteredGrid(key);
+      else renderCategoryFeed(key);
+      return;
+   }
+
+   // clicked elsewhere - close any open panel
+   document.querySelectorAll(".sub-filter-panel").forEach(p => p.classList.add("hidden"));
 });
 
 

@@ -200,7 +200,11 @@ input:focus, textarea:focus {
 .delete-content { color: #ff4444; }
 
 /* MODAL */
-.edit-modal { background: var(--black); color: white; border: 2px solid var(--green); }
+.edit-modal { 
+  background: var(--black); 
+  color: white; 
+  border: 2px solid var(--green);
+}
 .edit-modal .modal-header,
 .edit-modal .modal-footer { border-color: rgba(37, 255, 66, 0.3); }
 .edit-modal label { color: var(--green); font-weight: bold; display: block; margin-bottom: 0.3rem; }
