@@ -16,7 +16,6 @@ html {
   box-shadow: 0.1rem 0.1rem 0.1rem 0.1rem var(--green);
   text-align: center;
   text-shadow: 0.1rem 0.1rem 0.1rem var(--green);
-  margin: 0 0 50px 0;
 }
 
 body {
@@ -102,7 +101,7 @@ body {
   background: transparent;
   cursor: pointer;
   position: absolute;
-  left: -30px;
+  left: -2rem;
   transition: opacity 0.3s ease;
   opacity: 0;
   pointer-events: none; 

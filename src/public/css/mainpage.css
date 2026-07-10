@@ -109,7 +109,7 @@ body {
 }
 
 .search-box.open #searchInput {
-  width: 180px;
+  width: 10rem;
   opacity: 1;
   padding: 6px 14px;
   border: 2px solid var(--green);

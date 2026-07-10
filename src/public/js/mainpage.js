@@ -10,6 +10,16 @@ const profileImg = document.getElementById("profile");
 const profileDropdown = document.getElementById("profileDropdown");
 const logoutBtn = document.getElementById("logoutBtn");
 
+const contentModal = new bootstrap.Modal(document.getElementById("contentScreenModal"));
+const contentVideo = document.getElementById("contentVideo");
+const videoPlayBtn = document.getElementById("videoPlayBtn");
+const videoProgress = document.getElementById("videoProgress");
+const videoCurrentTime = document.getElementById("videoCurrentTime");
+const videoDuration = document.getElementById("videoDuration");
+const videoMuteBtn = document.getElementById("videoMuteBtn");
+const videoFullscreenBtn = document.getElementById("videoFullscreenBtn");
+const videoWrap = document.getElementById("videoWrap");
+
 let contentItems = [];
 let activeProfileId = null;
 let currentContentItem = null;
@@ -20,15 +30,7 @@ let recommendedItems = [];
 let likedItems = [];
 let chosenCategory= null;
 let resumeTo = 0;
-const contentModal = new bootstrap.Modal(document.getElementById("contentScreenModal"));
-const contentVideo = document.getElementById("contentVideo");
-const videoPlayBtn = document.getElementById("videoPlayBtn");
-const videoProgress = document.getElementById("videoProgress");
-const videoCurrentTime = document.getElementById("videoCurrentTime");
-const videoDuration = document.getElementById("videoDuration");
-const videoMuteBtn = document.getElementById("videoMuteBtn");
-const videoFullscreenBtn = document.getElementById("videoFullscreenBtn");
-const videoWrap = document.getElementById("videoWrap");
+
 
 //_______________________________//
 //             API               //
