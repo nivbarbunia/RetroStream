@@ -1,5 +1,6 @@
 //REQUEST HANDLER
 const Review = require("../models/review.model");
+const logger = require("../utils/logger");
 
 // RETURNS ALL REVIEWS FOR A CONTENT ITEM, NEWEST FIRST, WITH PROFILE NAME/IMAGE POPULATED
 async function getReviews(req, res) {
@@ -9,6 +10,7 @@ async function getReviews(req, res) {
             .sort({ createdAt: -1 });
         res.json({ success: true, reviews });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -31,6 +33,7 @@ async function createReview(req, res) {
         if (err.name === "ValidationError") {
             return res.status(400).json({ success: false, message: "נתוני ביקורת לא תקינים", error: err.message });
         }
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -49,6 +52,7 @@ async function editReview(req, res) {
         if (err.name === "ValidationError") {
             return res.status(400).json({ success: false, message: "נתוני ביקורת לא תקינים", error: err.message });
         }
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -60,6 +64,7 @@ async function deleteReview(req, res) {
         if (!review) return res.status(404).json({ success: false, message: "ביקורת לא נמצאה" });
         res.json({ success: true, message: "הביקורת נמחקה בהצלחה" });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }

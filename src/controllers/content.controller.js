@@ -1,5 +1,6 @@
 //REQUEST HANDLER
 const Content = require("../models/content.model");
+const logger = require("../utils/logger");
 
 // RETURNS ALL CONTENT FROM DATABASE
 async function getContent(req, res) {
@@ -7,6 +8,7 @@ async function getContent(req, res) {
         const content = await Content.find();
         res.json({success:true , content});
     } catch(err){
+        logger.logError(req.originalUrl, err);
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
@@ -20,6 +22,7 @@ async function getContentById(req, res) {
         }
         res.json({success:true , content});
     } catch(err){
+        logger.logError(req.originalUrl, err);
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
@@ -64,6 +67,7 @@ async function createContent(req, res) {
         if(err.name==="ValidationError"){
             return res.status(400).json({success: false, message: "נתוני התוכן לא תקינים", error: err.message}); 
         }
+        logger.logError(req.originalUrl, err);
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
@@ -77,6 +81,7 @@ async function deleteContent(req, res) {
         }
         res.json({success: true, message: "התוכן נמחק בהצלחה"});
     } catch(err){
+        logger.logError(req.originalUrl, err);
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
@@ -147,6 +152,7 @@ async function updateContent(req, res) {
         if (err.name==="ValidationError"){
             return res.status(400).json({success: false, message: "נתוני תוכן לא תקינים", error: err.message});
         }
+        logger.logError(req.originalUrl, err);
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
@@ -200,6 +206,7 @@ async function searchContent(req, res) {
 
         res.json({ success: true, content });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -223,6 +230,7 @@ async function discoverContent(req, res) {
         const content = await Content.find(filter);
         res.json({ success: true, content });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -241,6 +249,7 @@ async function toggleLike(req, res) {
         await content.save();
         res.json({ success: true, liked: index === -1 });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
@@ -251,6 +260,7 @@ async function getLikedContent(req, res) {
         const content = await Content.find({ likedBy: req.session.activeProfileId });
         res.json({ success: true, content });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
@@ -271,6 +281,7 @@ async function getYoutubeClip(req, res) {
             thumbnail: video.snippet.thumbnails?.medium?.url
         }});
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }

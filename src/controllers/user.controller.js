@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user.model");
+const logger = require("../utils/logger");
 
 // LIST all users (admin)
 async function getUsers(req, res) {
@@ -7,6 +8,7 @@ async function getUsers(req, res) {
         const users = await User.find().select("-password");
         res.json({ success: true, users });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -33,6 +35,7 @@ async function searchUsers(req, res) {
         }
         res.json({ success: true, users });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -46,6 +49,7 @@ async function getMe(req, res) {
         }
         res.json({ success: true, user });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -92,6 +96,7 @@ async function updateUser(req, res) {
         if (err.name === "ValidationError") {
             return res.status(400).json({ success: false, message: "נתוני משתמש לא תקינים", error: err.message });
         }
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -119,6 +124,7 @@ async function deleteUser(req, res) {
         }
         res.json({ success: true });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }

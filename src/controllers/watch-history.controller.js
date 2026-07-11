@@ -1,5 +1,6 @@
 const WatchHistory = require("../models/watch-history.model");
 const Content = require("../models/content.model");
+const logger = require("../utils/logger");
 
 // RETURNS ALL WATCH HISTORY ENTRIES
 async function getWatchHistory(req, res) {
@@ -7,6 +8,7 @@ async function getWatchHistory(req, res) {
         const history = await WatchHistory.find().populate("content").populate("profile");
         res.json({ success: true, history });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
@@ -18,6 +20,7 @@ async function getWatchHistoryById(req, res) {
         if (!entry) return res.status(404).json({ success: false, message: "רשומה לא נמצאה" });
         res.json({ success: true, entry });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
@@ -32,6 +35,7 @@ async function createWatchHistory(req, res) {
         if (err.name === "ValidationError") {
             return res.status(400).json({ success: false, message: "נתונים לא תקינים", error: err.message });
         }
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
@@ -51,6 +55,7 @@ async function updateWatchHistory(req, res) {
         if (err.name === "ValidationError") {
             return res.status(400).json({ success: false, message: "נתונים לא תקינים", error: err.message });
         }
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
@@ -63,6 +68,7 @@ async function deleteWatchHistory(req, res) {
         if (!entry) return res.status(404).json({ success: false, message: "רשומה לא נמצאה" });
         res.json({ success: true, message: "הרשומה נמחקה בהצלחה" });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
@@ -83,6 +89,7 @@ async function searchWatchHistory(req, res) {
         }
         res.json({ success: true, history });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -107,6 +114,7 @@ async function upsertProgress(req, res) {
         if (err.name === "ValidationError") {
             return res.status(400).json({ success: false, message: "נתונים לא תקינים", error: err.message });
         }
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
@@ -120,6 +128,7 @@ async function getContinueWatching(req, res) {
         
         res.json({ success: true, history });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
@@ -162,6 +171,7 @@ async function getRecommendations(req, res) {
 
         res.json({ success: true, content });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
