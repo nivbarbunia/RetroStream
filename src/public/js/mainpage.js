@@ -24,6 +24,7 @@ const videoWrap = document.getElementById("videoWrap");
 
 let contentItems = [];
 let activeProfileId = null;
+let myProfileIds = [];   // ALL PROFILE IDs BELONGING TO THE LOGGED-IN USER (FOR "YOUR REVIEWS" FILTER)
 let currentContentItem = null;
 let sentMilestones = [];
 let hasPlayed = false;
@@ -51,6 +52,13 @@ function loadActiveProfile(){
          document.getElementById("activeProfileName").textContent = data.profile.name;
       }
    });
+}
+
+//LOADS ALL OF THE LOGGED-IN USER'S PROFILE IDs (NO RENDER) - USED FOR THE "YOUR REVIEWS" FILTER
+function loadMyProfileIds(){
+   return fetch("/api/profiles")
+   .then(res => res.json())
+   .then(data => { myProfileIds = data.success ? data.profile.map(p => p._id) : []; });
 }
 
 //LOADS ALL CONTENT INTO contentItems (NO RENDER)
@@ -237,6 +245,15 @@ function renderFeed(items = contentItems) {
       ${renderSection("סדר אלפבטי", sorted)}
    `;
 }
+//LIKE ANIMATION
+function updateLikeUI(item){
+   const btn = document.getElementById("likeBtn");
+   const icon = btn.querySelector("i");
+   const liked = item.likedBy?.includes(activeProfileId);
+   icon.className = liked ? "fa-solid fa-heart" : "fa-regular fa-heart";
+   btn.classList.toggle("liked", liked);
+}
+
 //SEARCH RESULTS RENDER
 function renderSearchResults(items, searchText) {
    //hide hero section
@@ -263,14 +280,7 @@ function renderSearchResults(items, searchText) {
          ${innerContent} 
       </section>`;
 }
-//LIKE ANIMATION
-function updateLikeUI(item){
-   const btn = document.getElementById("likeBtn");
-   const icon = btn.querySelector("i");
-   const liked = item.likedBy?.includes(activeProfileId);
-   icon.className = liked ? "fa-solid fa-heart" : "fa-regular fa-heart";
-   btn.classList.toggle("liked", liked);
-}
+
 
 //_______________________________//
 //        CATEGORY MODE          //
@@ -309,9 +319,9 @@ function getCategories() {
       filter: item => item.origin && item.origin.length > 0,
       subFilterField: "origin",
       rows: [
-         {title: "קומדיות מהערוצים", filter: item=>item.genre.includes("קומדיה") },
-         {title: "מדע בדיוני מהערוצים", filter: item=>item.genre.includes("מדע בדיוני")},
-         {title: "כל התכנים מהערוצים א-ב", filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he')}
+         {title: "קומדיות מערוצים", filter: item=>item.genre.includes("קומדיה") },
+         {title: "מדע בדיוני מערוצים", filter: item=>item.genre.includes("מדע בדיוני")},
+         {title: "כל התכנים מערוצים א-ב", filter: () => true, sort: (a,b) => a.title.localeCompare(b.title, 'he')}
       ]
    },
    nineties: {
@@ -423,6 +433,7 @@ function renderMyList(){
 
 initFeed();
 loadActiveProfile();
+loadMyProfileIds();
 
 // NAVBAR CATEGORY CLICKS (home = default feed, the rest = category mode)
 document.querySelectorAll(".nav-link[data-category]").forEach(link => {
@@ -572,6 +583,7 @@ function switchContentTab(tab){
    document.querySelectorAll(".content-tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
    document.querySelectorAll(".content-tab").forEach(section => section.classList.toggle("active", section.id === `tab${tab.charAt(0).toUpperCase()}${tab.slice(1)}`));
    if (tab === "details") loadDetailsTab(currentContentItem);
+   if (tab === "reviews") { resetReviewControls(); loadReviewsTab(currentContentItem); }
 }
 
 document.querySelectorAll(".content-tab-btn").forEach(btn => {
@@ -664,6 +676,191 @@ function loadDetailsTab(item){
       showYoutubeClip(cachedYoutubeVideo);
    }
 }
+
+//_______________________________//
+//   REVIEWS TAB - STARS + CRUD  //
+//_______________________________//
+let reviewsLoadedForId = null;
+let currentReviews = [];
+let myReview = null;
+let selectedRating = 0;
+let reviewSort = "date";   // "date" (NEWEST FIRST, SERVER DEFAULT) OR "rating" (HIGHEST FIRST)
+let showOnlyMine = false;  // "הביקורות שלכם" FILTER - LIMITS THE LIST TO THIS USER'S OWN PROFILES
+
+const reviewForm         = document.getElementById("reviewForm");
+const reviewStars        = document.querySelectorAll("#reviewStars .star-btn");
+const reviewText         = document.getElementById("reviewText");
+const reviewSubmitBtn    = document.getElementById("reviewSubmitBtn");
+const reviewFormMessage  = document.getElementById("reviewFormMessage");
+const reviewCountAll     = document.getElementById("reviewCountAll");
+const reviewCountMine    = document.getElementById("reviewCountMine");
+const reviewAllToggle    = document.getElementById("reviewAllToggle");
+const reviewMineToggle   = document.getElementById("reviewMineToggle");
+const sortDateToggle     = document.getElementById("sortDateToggle");
+const sortRatingToggle     = document.getElementById("sortRatingToggle");
+const reviewsList        = document.getElementById("reviewsList");
+const reviewsEmpty       = document.getElementById("reviewsEmpty");
+const deleteReviewModal  = new bootstrap.Modal(document.getElementById("deleteReviewModal"));
+
+// RESETS THE SORT/FILTER CONTROLS TO THEIR DEFAULTS - CALLED EVERY TIME THE TAB IS OPENED
+function resetReviewControls(){
+   reviewSort = "date";
+   showOnlyMine = false;
+   sortDateToggle.classList.add("active");
+   sortRatingToggle.classList.remove("active");
+   reviewAllToggle.classList.add("active");
+   reviewMineToggle.classList.remove("active");
+}
+
+// LAZY-LOADS REVIEWS THE FIRST TIME THE TAB IS OPENED FOR THIS ITEM, RE-RENDERS (RESET CONTROLS) OTHERWISE
+function loadReviewsTab(item){
+   if (!item) return;
+   if (reviewsLoadedForId !== item._id) {
+      reviewsLoadedForId = item._id;
+      fetchReviews(item);
+   } else {
+      renderReviewsList();
+   }
+}
+
+// FETCHES ALL REVIEWS FOR THE ITEM AND RE-RENDERS THE FORM + LIST
+function fetchReviews(item){
+   fetch(`/api/reviews/content/${item._id}`)
+      .then(res => res.json())
+      .then(data => {
+         currentReviews = data.success ? data.reviews : [];
+         myReview = currentReviews.find(r => r.profile?._id === activeProfileId) || null;
+         renderReviewForm();
+         renderReviewsList();
+      });
+}
+
+// PAINTS STARS 1..value AS FILLED (SOLID), THE REST AS OUTLINE
+function paintStars(value){
+   reviewStars.forEach(btn => {
+      const filled = Number(btn.dataset.value) <= value;
+      btn.classList.toggle("filled", filled);
+      btn.querySelector("i").className = filled ? "fa-solid fa-star" : "fa-regular fa-star";
+   });
+}
+
+reviewStars.forEach(btn => {
+   btn.addEventListener("click", () => {
+      selectedRating = Number(btn.dataset.value);
+      paintStars(selectedRating);
+   });
+   btn.addEventListener("mouseenter", () => paintStars(Number(btn.dataset.value)));
+});
+document.getElementById("reviewStars").addEventListener("mouseleave", () => paintStars(selectedRating));
+
+// FILLS THE FORM WITH THE ACTIVE PROFILE'S EXISTING REVIEW, OR RESETS IT FOR A NEW ONE
+function renderReviewForm(){
+   reviewFormMessage.textContent = "";
+   selectedRating = myReview ? myReview.rating : 0;
+   paintStars(selectedRating);
+   reviewText.value = myReview ? myReview.text : "";
+   reviewSubmitBtn.textContent = myReview ? "עדכן ביקורת" : "פרסם ביקורת";
+}
+
+// RENDERS ALL REVIEWS FOR THE CONTENT, OWN REVIEW HIGHLIGHTED, FILTERED/SORTED PER showOnlyMine/reviewSort
+function renderReviewsList(){
+   const mineCount = currentReviews.filter(r => myProfileIds.includes(r.profile?._id)).length;
+   reviewCountAll.textContent = currentReviews.length;
+   reviewCountMine.textContent = mineCount;
+
+   const filtered = showOnlyMine
+      ? currentReviews.filter(r => myProfileIds.includes(r.profile?._id))
+      : currentReviews;
+   reviewsEmpty.classList.toggle("hidden", filtered.length > 0);
+   const sorted = [...filtered].sort((a, b) =>
+      reviewSort === "rating" ? b.rating - a.rating : new Date(b.createdAt) - new Date(a.createdAt)
+   );
+   reviewsList.innerHTML = sorted.map(reviewCardHtml).join("");
+}
+
+// SWITCHES THE SORT MODE FOR THE REVIEWS LIST
+sortDateToggle.addEventListener("click", function(){
+   reviewSort = "date";
+   sortDateToggle.classList.add("active");
+   sortRatingToggle.classList.remove("active");
+   renderReviewsList();
+});
+sortRatingToggle.addEventListener("click", function(){
+   reviewSort = "rating";
+   sortRatingToggle.classList.add("active");
+   sortDateToggle.classList.remove("active");
+   renderReviewsList();
+});
+
+// SWITCHES BETWEEN "כל הביקורות" AND "הביקורות שלכם" (ALL PROFILES UNDER THE LOGGED-IN USER, NOT JUST THE ACTIVE ONE)
+reviewAllToggle.addEventListener("click", function(){
+   showOnlyMine = false;
+   reviewAllToggle.classList.add("active");
+   reviewMineToggle.classList.remove("active");
+   renderReviewsList();
+});
+reviewMineToggle.addEventListener("click", function(){
+   showOnlyMine = true;
+   reviewMineToggle.classList.add("active");
+   reviewAllToggle.classList.remove("active");
+   renderReviewsList();
+});
+
+function reviewCardHtml(review){
+   const isOwn = review.profile?._id === activeProfileId;
+   const stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
+   const dateStr = new Date(review.createdAt).toLocaleDateString("he-IL");
+   return `
+      <div class="review-card${isOwn ? " own-review" : ""}">
+         <div class="review-card-header">
+            <span class="review-card-profile">
+               ${review.profile?.image ? `<img src="/${review.profile.image}" alt="">` : ""}
+               ${review.profile?.name || "פרופיל שנמחק"}
+            </span>
+            <span class="review-card-meta">
+               <span class="review-card-date">${dateStr}</span>
+               ${isOwn ? `<button type="button" class="review-delete-icon" data-review-id="${review._id}" title="מחק ביקורת"><i class="fa-solid fa-trash-can"></i></button>` : ""}
+            </span>
+         </div>
+         <div class="review-card-stars">${stars}</div>
+         ${review.text ? `<p class="review-card-text">${review.text}</p>` : ""}
+      </div>`;
+}
+
+// SUBMIT - CREATES A NEW REVIEW, OR UPDATES THE ACTIVE PROFILE'S EXISTING ONE
+reviewForm.addEventListener("submit", function(e){
+   e.preventDefault();
+   if (!selectedRating) { reviewFormMessage.textContent = "נא לבחור דירוג"; return; }
+   const body = { rating: selectedRating, text: reviewText.value.trim() };
+   const isEdit = Boolean(myReview);
+   const url = isEdit ? `/api/reviews/${myReview._id}` : `/api/reviews/content/${currentContentItem._id}`;
+   const method = isEdit ? "PUT" : "POST";
+
+   fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+   })
+   .then(res => res.json())
+   .then(data => {
+      if (!data.success) { reviewFormMessage.textContent = data.message; return; }
+      fetchReviews(currentContentItem);
+   });
+});
+
+// DELETE FLOW - CLICKING THE TRASH ICON ON YOUR OWN REVIEW CARD OPENS THE CONFIRMATION MODAL
+reviewsList.addEventListener("click", function(e){
+   if (e.target.closest(".review-delete-icon")) deleteReviewModal.show();
+});
+document.getElementById("confirmDeleteReview").addEventListener("click", function(){
+   if (!myReview) return;
+   fetch(`/api/reviews/${myReview._id}`, { method: "DELETE" })
+      .then(res => res.json())
+      .then(data => {
+         deleteReviewModal.hide();
+         if (data.success) fetchReviews(currentContentItem);
+      });
+});
 
 // FORMAT SECONDS AS m:ss
 function formatTime(seconds){
@@ -799,6 +996,9 @@ document.getElementById("contentScreenModal").addEventListener("hidden.bs.modal"
    stopYoutubeClip();
    detailsLoadedForId = null;
    cachedYoutubeVideo = null;
+   reviewsLoadedForId = null;
+   currentReviews = [];
+   myReview = null;
    contentVideo.pause();
    contentVideo.currentTime = 0;
 });
