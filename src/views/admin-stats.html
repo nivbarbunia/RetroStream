@@ -1,0 +1,73 @@
+<!doctype html>
+<html dir="rtl" lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>רטרו סטרים - סטטיסטיקות</title>
+    <link rel="icon" href="/Assets/favicon.png" type="image/png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin-stats.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  </head>
+
+  <body class="p-4">
+    <header class="d-flex justify-content-between align-items-center mb-4">
+      <h1 id="headline" class="m-0">סטטיסטיקות</h1>
+      <nav class="d-flex gap-3 align-items-center">
+        <a href="/admin" class="admin-link">חזרה למרכז בקרה</a>
+        <button id="logoutBtn" class="btn-logout">התנתק<i id="logoutIcon" class="fa-solid fa-right-from-bracket me-2"></i></button>
+      </nav>
+    </header>
+
+    <section class="kpi-strip mb-4">
+      <div class="kpi-card">
+        <span class="kpi-value" id="kpiContentCount">-</span>
+        <span class="kpi-label">תכנים בקטלוג</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-value" id="kpiWatchHours">-</span>
+        <span class="kpi-label">שעות צפייה</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-value" id="kpiTopOrigin">-</span>
+        <span class="kpi-label">הערוץ המוביל</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-value" id="kpiTopGenre">-</span>
+        <span class="kpi-label">הז'אנר המוביל</span>
+      </div>
+    </section>
+
+    <section class="chart-section mb-4">
+      <h2 class="chart-title d-flex justify-content-center">ערוצים</h2>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-swatch catalog"></span>תכנים בקטלוג</span>
+        <span class="legend-item"><span class="legend-swatch watches"></span>צפיות</span>
+      </div>
+      <div id="originChart" class="chart-container"></div>
+    </section>
+
+    <section class="chart-section mb-4">
+      <h2 class="chart-title d-flex justify-content-center">ז'אנרים</h2>
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-swatch catalog"></span>תכנים בקטלוג</span>
+        <span class="legend-item"><span class="legend-swatch watches"></span>צפיות</span>
+      </div>
+      <div id="genreChart" class="chart-container"></div>
+    </section>
+
+    <section class="chart-section mb-4">
+      <h2 class="chart-title">הכי נצפה ברטרו סטרים</h2>
+      <div id="leaderboardChart" class="chart-container"></div>
+    </section>
+
+    <section class="chart-section mb-4">
+      <h2 class="chart-title">התכנים האהובים ביותר</h2>
+      <div id="likedChart" class="chart-container"></div>
+    </section>
+
+    <script src="/js/admin-stats.js"></script>
+  </body>
+</html>
