@@ -1,24 +1,3 @@
-:root {
-  --green: rgb(37, 255, 66);
-  --black: rgb(15, 14, 14);
-}
-
-html {
-  font-size: clamp(12px, 1vw + 3px, 40px);
-}
-
-body {
-  min-height: 100vh;
-  font-family: 'Varela Round', sans-serif;
-  color: white;
-  background:
-    repeating-linear-gradient(to bottom,
-      rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px,
-      transparent 8px, transparent 6px),
-    radial-gradient(circle at top, rgba(37,255,66,0.15), transparent 60%),
-    var(--black);
-}
-
 /* HEADER - SAME PATTERN AS admin-content.css */
 #headline {
   color: white;
@@ -26,19 +5,7 @@ body {
   font-weight: bold;
   text-shadow: 0 0 0.8rem rgba(37, 255, 66, 0.5);
 }
-.admin-link { color: var(--green); font-weight: bold; text-decoration: none; }
 .admin-link:hover { text-shadow: 0 0 0.6rem rgba(37, 255, 66, 0.6); }
-.btn-logout {
-  background: #cc0000;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.4rem 1rem;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.2s ease;
-}
-.btn-logout:hover { background: #ff0000; }
 
 /* KPI STRIP */
 .kpi-strip {

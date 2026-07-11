@@ -1,9 +1,7 @@
 html {
   font-size: clamp(16px, 1vw + 6px, 40px);
 }
-:root{ 
-  --green: rgb(37, 255, 66);
-  --black: rgb(15,14,14);
+:root{
   --avatar-size: clamp(120px, 12vw, 400px);
 }
 #headline {
@@ -33,7 +31,6 @@ body {
         black 100%
     ),
     var(--black);
-  font-family: 'Varela Round', sans-serif;
   font-size: larger;
   font-weight: 700;
   color: rgb(0, 0, 0);
@@ -122,8 +119,6 @@ body {
   align-items: center;
   z-index: 100;
 }
-
-.hidden { display: none; }
 
 .panel-box {
   background: #1a1a1a;

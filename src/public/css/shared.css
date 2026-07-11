@@ -1,0 +1,13 @@
+/* SHARED BRAND COLORS + BASE UTILITY - LOADED ON EVERY PAGE, BEFORE THE PAGE-SPECIFIC STYLESHEET */
+:root {
+  --green: rgb(37, 255, 66);
+  --black: rgb(15, 14, 14);
+}
+
+.hidden {
+  display: none !important;
+}
+
+body {
+  font-family: 'Varela Round', sans-serif;
+}

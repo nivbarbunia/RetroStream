@@ -1,8 +1,3 @@
-/* BRAND COLORS - USED THROUGHOUT THE PAGE */
-:root{
-  --green: rgb(37, 255, 66);
-  --black: rgb(15,14,14);
-}
 html {
   font-size: clamp(16px, 1vw + 6px, 50px);
 }
@@ -22,9 +17,7 @@ body {
       transparent 60%
     ),
     black;
-  font-family: 'Varela Round', sans-serif;
 }
-.hidden{ display: none;}
 
 /* NAVBAR */
 .retro-navbar {
@@ -162,9 +155,6 @@ body {
   color: white;
   font-family: 'Varela Round', sans-serif;
 }
-.adv-search-row .searchInput.hidden {
-  display: none;
-}
 .adv-search-row .searchRowBtn {
   background-color: var(--black);
   color: var(--green);
@@ -178,9 +168,6 @@ body {
 .adv-search-row .searchRowBtn:hover {
   background-color: var(--green);
   color: var(--black);
-}
-.adv-search-row .searchRowBtn.hidden {
-  display: none;
 }
 .adv-search-row .filter-chip {
   display: inline-flex;
@@ -321,9 +308,6 @@ body {
   color: #ff5c5c;
 }
 
-.profile-dropdown.hidden {
-  display: none;
-}
 
 
 /* CATEGORY HEADER (#categoryHeader / #noHeroHeader) - LAYOUT ONLY.
@@ -387,9 +371,6 @@ body {
   box-shadow: 0 0 1.2rem rgba(0, 0, 0, 0.9);
   column-count: 3;
   column-gap: 1.5rem;
-}
-.sub-filter-panel.hidden{
-  display: none;
 }
 
 /* ONE VALUE INSIDE THE PANEL (E.G. ONE GENRE OR ONE CHANNEL) */
@@ -825,11 +806,6 @@ body {
 }
 .content-tab.active {
   display: block;
-}
-.tab-placeholder.hidden,
-.filming-map.hidden,
-.youtube-clip-wrap.hidden {
-  display: none;
 }
 .tab-placeholder {
   color: #888;

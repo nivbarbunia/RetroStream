@@ -34,6 +34,7 @@ const contentModal    = new bootstrap.Modal(document.getElementById("contentModa
 let baseContent = []; // הרשימה הנוכחית מהשרת (כל התוכן או תוצאות חיפוש)
 let editingId = null;
 let activeFilters = []; // { field, value } - צ'יפי חיפוש פעילים, כולם AND ביניהם
+let currentSort = { field: null, dir: 1 };   // dir: 1=עולה, -1=יורד - מיון לפי כותרת עמודה בטבלה
 
 const placeholders = {
     title: "חפש לפי כותרת...",
@@ -181,7 +182,19 @@ function renderFiltered() { //LIVE TYPE RENDER
     const filtered = typeValue
         ? baseContent.filter(item => item.type === typeValue)
         : baseContent;
-    renderContent(filtered);
+    renderContent(sortItems(filtered));
+}
+
+// SORTS A COPY OF THE ITEMS BY currentSort.field, IF SET. genre USES THE FIRST VALUE (IT'S AN ARRAY).
+function sortItems(items){
+    if (!currentSort.field) return items;
+    const { field, dir } = currentSort;
+    return [...items].sort((a, b) => {
+        const valA = field === "genre" ? (a.genre?.[0] || "") : a[field];
+        const valB = field === "genre" ? (b.genre?.[0] || "") : b[field];
+        if (typeof valA === "number" || typeof valB === "number") return ((valA ?? 0) - (valB ?? 0)) * dir;
+        return String(valA ?? "").localeCompare(String(valB ?? ""), 'he') * dir;
+    });
 }
 
 function renderContent(items) {
@@ -324,5 +337,17 @@ contentBody.addEventListener("click", function (event) {
 });
 
 document.getElementById("saveContent").addEventListener("click", saveContent);
+
+// SORT BY COLUMN - CLICKING THE SAME COLUMN AGAIN FLIPS ASCENDING/DESCENDING
+document.querySelectorAll(".sortable").forEach(th => {
+    th.addEventListener("click", function(){
+        const field = th.dataset.sort;
+        currentSort.dir = (currentSort.field === field) ? -currentSort.dir : 1;
+        currentSort.field = field;
+        document.querySelectorAll(".sort-arrow").forEach(a => a.textContent = "");
+        th.querySelector(".sort-arrow").textContent = currentSort.dir === 1 ? "▲" : "▼";
+        renderFiltered();
+    });
+});
 
 logoutBtn.addEventListener("click", logout);

@@ -1,0 +1,36 @@
+/* SHARED BASE FOR ALL ADMIN PAGES (admin / admin-users / admin-content / admin-stats)
+   LOADED AFTER shared.css, BEFORE THE PAGE-SPECIFIC STYLESHEET */
+
+html {
+  font-size: clamp(12px, 1vw + 3px, 40px);
+}
+
+body {
+  min-height: 100vh;
+  font-family: 'Varela Round', sans-serif;
+  color: white;
+  background:
+    repeating-linear-gradient(to bottom,
+      rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px,
+      transparent 8px, transparent 6px),
+    radial-gradient(circle at top, rgba(37,255,66,0.15), transparent 60%),
+    var(--black);
+}
+
+.admin-link {
+  font-weight: bold;
+  color: var(--green);
+  text-decoration: none;
+}
+
+.btn-logout {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.4rem 1rem;
+  font-family: inherit;
+  color: white;
+  background: #cc0000;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.btn-logout:hover { background: #ff0000; }

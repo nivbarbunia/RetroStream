@@ -1,13 +1,8 @@
   html {
     font-size: clamp(16px, 1vw + 6px, 40px);
   }
-  :root{ 
-    --green: rgb(37, 255, 66);
-    --black: rgb(15,14,14);
-  }
 
   body {
-    font-family: 'Varela Round', sans-serif;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -27,7 +22,6 @@
       transparent 60%
     ),
     black;
-  font-family: 'Varela Round', sans-serif;
   }
 
   #headline {

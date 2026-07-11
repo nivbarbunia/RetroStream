@@ -22,6 +22,28 @@ const videoMuteBtn = document.getElementById("videoMuteBtn");
 const videoFullscreenBtn = document.getElementById("videoFullscreenBtn");
 const videoWrap = document.getElementById("videoWrap");
 
+// ADVANCED SEARCH #2
+const advSearchToggle = document.getElementById("advSearchToggle");
+
+// REVIEWS TAB
+const reviewForm         = document.getElementById("reviewForm");
+const reviewStars        = document.querySelectorAll("#reviewStars .star-btn");
+const reviewText         = document.getElementById("reviewText");
+const reviewSubmitBtn    = document.getElementById("reviewSubmitBtn");
+const reviewFormMessage  = document.getElementById("reviewFormMessage");
+const reviewCountAll     = document.getElementById("reviewCountAll");
+const reviewCountMine    = document.getElementById("reviewCountMine");
+const reviewAllToggle    = document.getElementById("reviewAllToggle");
+const reviewMineToggle   = document.getElementById("reviewMineToggle");
+const sortDateToggle     = document.getElementById("sortDateToggle");
+const sortRatingToggle   = document.getElementById("sortRatingToggle");
+const reviewsList        = document.getElementById("reviewsList");
+const reviewsEmpty       = document.getElementById("reviewsEmpty");
+const deleteReviewModal  = new bootstrap.Modal(document.getElementById("deleteReviewModal"));
+
+//_______________________________//
+//             STATE              //
+//_______________________________//
 let contentItems = [];
 let activeProfileId = null;
 let myProfileIds = [];   // ALL PROFILE IDs BELONGING TO THE LOGGED-IN USER (FOR "YOUR REVIEWS" FILTER)
@@ -33,6 +55,22 @@ let recommendedItems = [];
 let likedItems = [];
 let chosenCategory= null;
 let resumeTo = 0;
+
+// ADVANCED SEARCH #2
+let advSearchFilters = [];   // { field, value, label } - ONE PER FIELD, AND'ED TOGETHER (SAME PATTERN AS admin-content activeFilters)
+
+// DETAILS TAB - MAP + YOUTUBE
+let mapsApiPromise = null;
+let detailsLoadedForId = null;
+let cachedYoutubeVideo = null;   // {videoId, title} FOR THE CURRENTLY LOADED ITEM, OR null IF NONE FOUND
+
+// REVIEWS TAB
+let reviewsLoadedForId = null;
+let currentReviews = [];
+let myReview = null;
+let selectedRating = 0;
+let reviewSort = "date";   // "date" (NEWEST FIRST, SERVER DEFAULT) OR "rating" (HIGHEST FIRST)
+let showOnlyMine = false;  // "הביקורות שלכם" FILTER - LIMITS THE LIST TO THIS USER'S OWN PROFILES
 
 
 //_______________________________//
@@ -107,6 +145,24 @@ function logout() {
         });
 }
 
+// SAVES THE CURRENT WATCH PROGRESS FOR THE ACTIVE PROFILE
+async function saveProgress(completed){
+   if (!currentContentItem || !currentContentItem.videoUrl) return;
+   if (!hasPlayed) return;   // opened/resumed but never actually played - don't bump the list
+   if (!contentVideo.currentTime) return;   // nothing watched yet
+   const isCompleted = completed || contentVideo.currentTime >= contentVideo.duration * 0.9;
+   await fetch("/api/watch-history/progress", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+         contentId: currentContentItem._id,
+         progress: contentVideo.currentTime,
+         completed: isCompleted,
+         duration: contentVideo.duration
+      })
+   });
+}
+
 //_______________________________//
 //         DOM FUNCTIONS         //
 //_______________________________//
@@ -120,7 +176,7 @@ function renderHero(item, label = "במיוחד בשבילך") {
          <div class="hero-heading">
             <h1 class="hero-title">${item.title}</h1>
             <span class="hero-details">${item.year} · ${item.genre[0]} · ${item.origin?.[0] || item.genre[1]}</span>
-         </div>   
+         </div>
          <p class="hero-desc">${item.description}</p>
          <button class="hero-btn" data-id="${item._id}">צפה עכשיו ▶</button>
       </div>
@@ -155,8 +211,8 @@ function renderSection(title, items){
             <button class="scroll-btn scroll-left" title="גלול שמאלה">
                <i class="fa-solid fa-chevron-left"></i>
             </button>
-         </div>   
-      </section>      
+         </div>
+      </section>
    `;
 }
 
@@ -216,13 +272,13 @@ function renderContinueSection(records){
       <section class="content-section">
          <h4 class="section-title m-0">המשך צפייה</h4>
          <div class="section-wrapper">
-            <button class="scroll-btn scroll-right title="גלול ימינה"">
+            <button class="scroll-btn scroll-right" title="גלול ימינה">
                <i class="fa-solid fa-chevron-right"></i>
             </button>
             <div class="feed-row">
                ${records.map(renderContinueCard).join("")}
             </div>
-            <button class="scroll-btn scroll-left title="גלול שמאלה"">
+            <button class="scroll-btn scroll-left" title="גלול שמאלה">
                <i class="fa-solid fa-chevron-left"></i>
             </button>
          </div>
@@ -256,6 +312,9 @@ function updateLikeUI(item){
 
 //SEARCH RESULTS RENDER
 function renderSearchResults(items, searchText) {
+   //clear any leftover category/mylist header from before the search started
+   categoryHeader.innerHTML = "";
+   noHeroHeader.innerHTML = "";
    //hide hero section
    heroSection.style.display = "none";
    //adaptable html content according to results/!results
@@ -266,7 +325,7 @@ function renderSearchResults(items, searchText) {
             <i class="fa-solid fa-satellite-dish"></i>
             <h1> לא נמצאו תוצאות </h1>
             <i class="fa-solid fa-satellite-dish"></i>
-         </div>`;      
+         </div>`;
    } else{
       innerContent=`
          <div class="feed-row">
@@ -277,8 +336,25 @@ function renderSearchResults(items, searchText) {
    feedContainer.innerHTML = `
       <section class="content-section">
          <h2 class="section-title">תוצאות חיפוש עבור: ${searchText}</h2>
-         ${innerContent} 
+         ${innerContent}
       </section>`;
+}
+
+// FORMAT SECONDS AS m:ss
+function formatTime(seconds){
+   if (!isFinite(seconds)) return "0:00";
+   const m = Math.floor(seconds / 60);
+   const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+   return `${m}:${s}`;
+}
+
+// RESETS THE SEARCH-RELATED UI (LIVE SEARCH BOX + ADVANCED SEARCH TOGGLE) TO ITS DEFAULT STATE
+// CALLED FROM BOTH goHome() AND THE NAVBAR CATEGORY LISTENER, SO IT'S A SHARED HELPER RATHER THAN DUPLICATED INLINE
+function resetSearchUI(){
+   searchBox.classList.remove("open");
+   advSearchToggle.classList.remove("selected");
+   advSearchToggle.classList.add("hidden");
+   searchToggle.classList.remove("hidden");
 }
 
 
@@ -404,9 +480,7 @@ function renderSubFilteredGrid(key){
 
 // RETURNS TO THE DEFAULT HOME FEED (RANDOM HERO + FULL ROWS)
 function goHome(){
-   advSearchToggle.classList.remove("selected");
-   advSearchToggle.classList.add("hidden");
-   searchToggle.classList.remove("hidden");
+   resetSearchUI();
    chosenCategory = null;
    categoryHeader.innerHTML= ``;
    noHeroHeader.innerHTML=``;
@@ -419,7 +493,7 @@ function goHome(){
 function renderMyList(){
    const top10 = [...contentItems].sort((a,b)=> (b.rating ?? 0) - (a.rating ?? 0)).slice(0,10);
    categoryHeader.innerHTML= ``;
-   noHeroHeader.innerHTML = `<h1 class="category-title mb-0">הרשימה שלי</h2>`;
+   noHeroHeader.innerHTML = `<h2 class="category-title mb-0">הרשימה שלי</h2>`;
    heroSection.style.display = "none";
    feedContainer.innerHTML = `
       ${renderContinueSection(continueItems)}
@@ -430,133 +504,9 @@ function renderMyList(){
 
 
 //_______________________________//
-//        EVENT LISTENERS        //
-//_______________________________//
-
-
-initFeed();
-loadActiveProfile();
-loadMyProfileIds();
-
-// NAVBAR CATEGORY CLICKS (home = default feed, the rest = category mode)
-document.querySelectorAll(".nav-link[data-category]").forEach(link => {
-   link.addEventListener("click", function(e){
-      e.preventDefault();
-      const key = link.dataset.category;
-      advSearchToggle.classList.remove("selected");
-      advSearchToggle.classList.add("hidden");
-      searchToggle.classList.remove("hidden");
-      chosenCategory = null;
-      if (key === "home") return goHome();
-      if (key === "mylist") return renderMyList();
-      if (getCategories()[key]) renderCategoryFeed(key);   // channel-switching dropdown for origin not built yet
-   });
-});
-
-// LOGO ALSO GOES HOME
-document.getElementById("homeLink").addEventListener("click", function(e){
-   e.preventDefault();
-   goHome();
-});
-
-// TOGGLE PROFILE DROPDOWN
-profileImg.addEventListener("click", function (e) {
-    e.stopPropagation();
-    profileDropdown.classList.toggle("hidden");
-});
-
-// close dropdown when clicking outside
-document.addEventListener("click", function () {
-    profileDropdown.classList.add("hidden");
-});
-
-// OPEN/CLOSE SEARCH BOX
-searchToggle.addEventListener("click", function () {
-   if (searchBox.classList.contains("open")) {
-      searchBox.classList.remove("open");
-      advSearchToggle.classList.add("hidden");
-      return
-   }
-   searchBox.classList.add("open");
-   advSearchToggle.classList.remove("hidden");
-});
-
-
-
-//LIVE SEARCH - CLIENT SIDE
-searchInput.addEventListener("input", function(){
-   const searchText= searchInput.value.trim();
-   if (searchText==="") {
-     heroSection.style.display ="block";
-     renderFeed();
-     return;
-   }
-   const filteredItems = contentItems.filter(item=>
-      item.title.includes(searchText) ||
-      item.genre.some(genre=>genre.includes(searchText)) ||
-      item.origin?.some(origin=> origin.includes(searchText))
-   );
-   renderSearchResults(filteredItems, searchText);
-});
-
-//_______________________________//
 //  ADVANCED SEARCH #2 - GENRE + DECADE + MIN RATING, FULL PAGE MODE (LIKE A CATEGORY), CHIP-BASED LIKE admin-content //
 //_______________________________//
-let advSearchFilters = [];   // { field, value, label } - ONE PER FIELD, AND'ED TOGETHER (SAME PATTERN AS admin-content activeFilters)
-
-const advSearchToggle = document.getElementById("advSearchToggle");
 const advFieldLabels = { genre: "ז'אנר", origin:"ערוץ", decade: "עשור", minRating: "דירוג מינימלי" };
-
-// RENDERS THE ADVANCED-SEARCH MODE INTO feedContainer, SAME PATTERN AS renderCategoryFeed/renderMyList
-advSearchToggle.addEventListener("click", function(){
-   if(advSearchToggle.classList.contains("selected")){
-      goHome();
-      return
-   }
-   searchBox.classList.remove("open");
-   searchToggle.classList.add("hidden");
-   advSearchToggle.classList.add("selected");
-   chosenCategory = null;
-   advSearchFilters = [];
-   heroSection.style.display = "none";
-   categoryHeader.innerHTML = "";
-   noHeroHeader.innerHTML = `<h1 class="category-title mb-0">חיפוש מתקדם</h1>`;
-   feedContainer.innerHTML = `
-      <div class="adv-search-row d-flex flex-column gap-2 mb-3">
-         <div class="d-flex align-items-center gap-3 flex-wrap">
-            <label for="advSearchMode" class="searchModeLabel">חפש לפי:</label>
-            <select id="advSearchMode" class="searchSelect">          
-               <option value="genre">ז'אנר</option>
-               <option value="origin">ערוץ</option>
-               <option value="decade">עשור</option>
-               <option value="minRating">דירוג מינימלי</option>
-            </select>
-            <button type="button" id="advSearchResetBtn" class="searchRowBtn hidden d-flex align-items-center gap-2">אפס חיפוש<i class="fa-solid fa-filter-circle-xmark"></i></button>
-         </div>
-         <div class="d-flex flex-wrap gap-2 align-items-center">
-            <select id="advSearchValueSelect" class="searchInput"></select>
-            <input type="number" id="advSearchValueNumber" class="searchInput hidden" min="0" max="10" step="0.5" placeholder="0-10" />
-            <button type="button" id="advSearchAddBtn" class="searchRowBtn d-flex align-items-center gap-2">חפש<i class="fa-solid fa-magnifying-glass"></i></button>
-            <p id="advSearchMessage" class="adv-search-message"></p>
-         </div>
-         <div id="advSearchChips" class="d-flex flex-wrap gap-2"></div>
-      </div>
-      <section class="content-section">
-         <div id="advSearchResultsGrid" class="feed-row"></div>
-      </section>
-   `;
-   populateAdvSearchValueOptions();
-});
-
-// SWAPS THE VALUE INPUT BETWEEN A <select> (GENRE/DECADE) AND A NUMBER INPUT (MIN RATING)
-// DELEGATED BECAUSE THE ROW IS REBUILT EVERY TIME advSearchToggle IS CLICKED
-document.addEventListener("change", function(e){
-   if (e.target.id !== "advSearchMode") return;
-   const isRating = e.target.value === "minRating";
-   document.getElementById("advSearchValueSelect").classList.toggle("hidden", isRating);
-   document.getElementById("advSearchValueNumber").classList.toggle("hidden", !isRating);
-   populateAdvSearchValueOptions();
-});
 
 // BUILDS GENRE/DECADE <option>s FROM contentItems - NOT HARDCODED, SAME APPROACH AS THE NAVBAR SUB-FILTERS
 function populateAdvSearchValueOptions(){
@@ -573,40 +523,6 @@ function populateAdvSearchValueOptions(){
       valueSelect.innerHTML = decades.map(d => `<option value="${d}">${d}-${d + 9}</option>`).join("");
    }
 }
-
-// ADD CHIP / RESET / REMOVE CHIP - ALL DELEGATED (SAME REASON AS ABOVE)
-document.addEventListener("click", function(e){
-   if (e.target.closest("#advSearchAddBtn")) {
-      const mode = document.getElementById("advSearchMode");
-      const field = mode.value;
-      const valueNumber = document.getElementById("advSearchValueNumber");
-      const value = field === "minRating" ? valueNumber.value.trim() : document.getElementById("advSearchValueSelect").value;
-      const message = document.getElementById("advSearchMessage");
-      if (!value) { message.textContent = "נא לבחור ערך"; return; }
-      message.textContent = "";
-      advSearchFilters = advSearchFilters.filter(f => f.field !== field);
-      advSearchFilters.push({ field, value, label: advFieldLabels[field] });
-      valueNumber.value = "";
-      renderAdvSearchChips();
-      runAdvSearch();
-      return;
-   }
-
-   if (e.target.closest("#advSearchResetBtn")) {
-      advSearchFilters = [];
-      renderAdvSearchChips();
-      document.getElementById("advSearchResultsGrid").innerHTML = "";
-      return;
-   }
-
-   const removeBtn = e.target.closest("#advSearchChips .chip-remove");
-   if (removeBtn) {
-      advSearchFilters.splice(Number(removeBtn.dataset.index), 1);
-      renderAdvSearchChips();
-      if (advSearchFilters.length) runAdvSearch();
-      else document.getElementById("advSearchResultsGrid").innerHTML = "";
-   }
-});
 
 function renderAdvSearchChips(){
    document.getElementById("advSearchChips").innerHTML = advSearchFilters.map((f, i) => `
@@ -634,59 +550,10 @@ function renderAdvSearchResults(items){
       : `<p class="tab-placeholder">לא נמצאו תוצאות</p>`;
 }
 
-//SCROLL FUNCTION
-document.addEventListener("click", function(e) {
-   //is scroll button?
-   const btn = e.target.closest(".scroll-btn");
-   if(!btn) return;
-   //
-   const row= btn.parentElement.querySelector(".feed-row");
-   const direction = btn.classList.contains("scroll-right") ? 500 : -500; //if right scroll -330, else 330
-   row.scrollBy({left: direction, behavior:"smooth"});
-});
 
-// SUB-FILTER DROPDOWN (GENRE/CHANNEL MULTI-COLUMN MENU): TOGGLE OPEN, PICK A VALUE, CLOSE ON OUTSIDE CLICK
-// DELEGATED (NOT ATTACHED INSIDE renderCategoryHeader) BECAUSE THE PANEL IS REBUILT ON EVERY RENDER
-document.addEventListener("click", function(e){
-   const toggle = e.target.closest(".sub-filter-toggle");
-   if (toggle) {
-      toggle.nextElementSibling.classList.toggle("hidden");
-      return;
-   }
-
-   const option = e.target.closest(".sub-filter-option");
-   if (option) {
-      e.preventDefault();
-      const key = option.closest(".sub-filter-dropdown").dataset.key;
-      chosenCategory = option.dataset.value || null;
-      if (chosenCategory) renderSubFilteredGrid(key);
-      else renderCategoryFeed(key);
-      return;
-   }
-
-   // clicked elsewhere - close any open panel
-   document.querySelectorAll(".sub-filter-panel").forEach(p => p.classList.add("hidden"));
-});
-
-
-// OPEN CONTENT MODAL
-document.addEventListener("click", function(e){
-   if (e.target.closest(".remove-card")) return;   // X button is handled separately
-   const trigger = e.target.closest(".content-card, .hero-btn, .hero-img");
-   if (!trigger) return;
-   openContentModal(trigger.dataset.id, trigger.dataset.progress);
-});
-
-// REMOVE A CONTENT FROM THE CONTINUE-WATCHING ROW
-document.addEventListener("click", async function(e){
-   const removeBtn = e.target.closest(".remove-card");
-   if (!removeBtn) return;
-   const card = removeBtn.closest(".continue-card");
-   const recordId = card.dataset.recordId;
-   await fetch(`/api/watch-history/${recordId}`, { method: "DELETE" });
-   continueItems = continueItems.filter(r => r._id !== recordId);
-   renderFeed();
-});
+//_______________________________//
+//     CONTENT MODAL - PLAYER    //
+//_______________________________//
 
 //FILLS THE CONTENT MODAL WITH ONE CONTENT ITEM'S DATA AND SHOWS IT
 function openContentModal(id, progress){
@@ -727,16 +594,10 @@ function switchContentTab(tab){
    if (tab === "reviews") { resetReviewControls(); loadReviewsTab(currentContentItem); }
 }
 
-document.querySelectorAll(".content-tab-btn").forEach(btn => {
-   btn.addEventListener("click", () => switchContentTab(btn.dataset.tab));
-});
 
 //_______________________________//
 //   DETAILS TAB - MAP + YOUTUBE //
 //_______________________________//
-let mapsApiPromise = null;
-let detailsLoadedForId = null;
-let cachedYoutubeVideo = null;   // {videoId, title} FOR THE CURRENTLY LOADED ITEM, OR null IF NONE FOUND
 
 // LOADS THE GOOGLE MAPS JS API ONCE, USING A KEY FETCHED FROM THE SERVER (STATIC HTML CAN'T READ .env)
 function loadGoogleMapsApi(){
@@ -818,30 +679,10 @@ function loadDetailsTab(item){
    }
 }
 
+
 //_______________________________//
 //   REVIEWS TAB - STARS + CRUD  //
 //_______________________________//
-let reviewsLoadedForId = null;
-let currentReviews = [];
-let myReview = null;
-let selectedRating = 0;
-let reviewSort = "date";   // "date" (NEWEST FIRST, SERVER DEFAULT) OR "rating" (HIGHEST FIRST)
-let showOnlyMine = false;  // "הביקורות שלכם" FILTER - LIMITS THE LIST TO THIS USER'S OWN PROFILES
-
-const reviewForm         = document.getElementById("reviewForm");
-const reviewStars        = document.querySelectorAll("#reviewStars .star-btn");
-const reviewText         = document.getElementById("reviewText");
-const reviewSubmitBtn    = document.getElementById("reviewSubmitBtn");
-const reviewFormMessage  = document.getElementById("reviewFormMessage");
-const reviewCountAll     = document.getElementById("reviewCountAll");
-const reviewCountMine    = document.getElementById("reviewCountMine");
-const reviewAllToggle    = document.getElementById("reviewAllToggle");
-const reviewMineToggle   = document.getElementById("reviewMineToggle");
-const sortDateToggle     = document.getElementById("sortDateToggle");
-const sortRatingToggle     = document.getElementById("sortRatingToggle");
-const reviewsList        = document.getElementById("reviewsList");
-const reviewsEmpty       = document.getElementById("reviewsEmpty");
-const deleteReviewModal  = new bootstrap.Modal(document.getElementById("deleteReviewModal"));
 
 // RESETS THE SORT/FILTER CONTROLS TO THEIR DEFAULTS - CALLED EVERY TIME THE TAB IS OPENED
 function resetReviewControls(){
@@ -885,15 +726,6 @@ function paintStars(value){
    });
 }
 
-reviewStars.forEach(btn => {
-   btn.addEventListener("click", () => {
-      selectedRating = Number(btn.dataset.value);
-      paintStars(selectedRating);
-   });
-   btn.addEventListener("mouseenter", () => paintStars(Number(btn.dataset.value)));
-});
-document.getElementById("reviewStars").addEventListener("mouseleave", () => paintStars(selectedRating));
-
 // FILLS THE FORM WITH THE ACTIVE PROFILE'S EXISTING REVIEW, OR RESETS IT FOR A NEW ONE
 function renderReviewForm(){
    reviewFormMessage.textContent = "";
@@ -919,34 +751,6 @@ function renderReviewsList(){
    reviewsList.innerHTML = sorted.map(reviewCardHtml).join("");
 }
 
-// SWITCHES THE SORT MODE FOR THE REVIEWS LIST
-sortDateToggle.addEventListener("click", function(){
-   reviewSort = "date";
-   sortDateToggle.classList.add("active");
-   sortRatingToggle.classList.remove("active");
-   renderReviewsList();
-});
-sortRatingToggle.addEventListener("click", function(){
-   reviewSort = "rating";
-   sortRatingToggle.classList.add("active");
-   sortDateToggle.classList.remove("active");
-   renderReviewsList();
-});
-
-// SWITCHES BETWEEN "כל הביקורות" AND "הביקורות שלכם" (ALL PROFILES UNDER THE LOGGED-IN USER, NOT JUST THE ACTIVE ONE)
-reviewAllToggle.addEventListener("click", function(){
-   showOnlyMine = false;
-   reviewAllToggle.classList.add("active");
-   reviewMineToggle.classList.remove("active");
-   renderReviewsList();
-});
-reviewMineToggle.addEventListener("click", function(){
-   showOnlyMine = true;
-   reviewMineToggle.classList.add("active");
-   reviewAllToggle.classList.remove("active");
-   renderReviewsList();
-});
-
 function reviewCardHtml(review){
    const isOwn = review.profile?._id === activeProfileId;
    const stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
@@ -968,7 +772,256 @@ function reviewCardHtml(review){
       </div>`;
 }
 
-// SUBMIT - CREATES A NEW REVIEW, OR UPDATES THE ACTIVE PROFILE'S EXISTING ONE
+
+//_______________________________//
+//        EVENT LISTENERS        //
+//_______________________________//
+
+initFeed();
+loadActiveProfile();
+loadMyProfileIds();
+
+// NAVBAR CATEGORY CLICKS (home = default feed, the rest = category mode)
+document.querySelectorAll(".nav-link[data-category]").forEach(link => {
+   link.addEventListener("click", function(e){
+      e.preventDefault();
+      const key = link.dataset.category;
+      resetSearchUI();
+      chosenCategory = null;
+      if (key === "home") return goHome();
+      if (key === "mylist") return renderMyList();
+      if (getCategories()[key]) renderCategoryFeed(key);   // channel-switching dropdown for origin not built yet
+   });
+});
+
+// LOGO ALSO GOES HOME
+document.getElementById("homeLink").addEventListener("click", function(e){
+   e.preventDefault();
+   goHome();
+});
+
+// TOGGLE PROFILE DROPDOWN
+profileImg.addEventListener("click", function (e) {
+    e.stopPropagation();
+    profileDropdown.classList.toggle("hidden");
+});
+
+// close dropdown when clicking outside
+document.addEventListener("click", function () {
+    profileDropdown.classList.add("hidden");
+});
+
+// OPEN/CLOSE SEARCH BOX
+searchToggle.addEventListener("click", function () {
+   if (searchBox.classList.contains("open")) {
+      searchBox.classList.remove("open");
+      advSearchToggle.classList.add("hidden");
+      return
+   }
+   searchBox.classList.add("open");
+   advSearchToggle.classList.remove("hidden");
+});
+
+//LIVE SEARCH - CLIENT SIDE
+searchInput.addEventListener("input", function(){
+   const searchText= searchInput.value.trim();
+   if (searchText==="") {
+     categoryHeader.innerHTML = "";
+     noHeroHeader.innerHTML = "";
+     heroSection.style.display ="block";
+     renderFeed();
+     return;
+   }
+   const filteredItems = contentItems.filter(item=>
+      item.title.includes(searchText) ||
+      item.genre.some(genre=>genre.includes(searchText)) ||
+      item.origin?.some(origin=> origin.includes(searchText))
+   );
+   renderSearchResults(filteredItems, searchText);
+});
+
+// RENDERS THE ADVANCED-SEARCH MODE INTO feedContainer, SAME PATTERN AS renderCategoryFeed/renderMyList
+advSearchToggle.addEventListener("click", function(){
+   if(advSearchToggle.classList.contains("selected")){
+      goHome();
+      return
+   }
+   searchBox.classList.remove("open");
+   searchToggle.classList.add("hidden");
+   advSearchToggle.classList.add("selected");
+   chosenCategory = null;
+   advSearchFilters = [];
+   heroSection.style.display = "none";
+   categoryHeader.innerHTML = "";
+   noHeroHeader.innerHTML = `<h1 class="category-title mb-0">חיפוש מתקדם</h1>`;
+   feedContainer.innerHTML = `
+      <div class="adv-search-row d-flex flex-column gap-2 mb-3">
+         <div class="d-flex align-items-center gap-3 flex-wrap">
+            <label for="advSearchMode" class="searchModeLabel">חפש לפי:</label>
+            <select id="advSearchMode" class="searchSelect">
+               <option value="genre">ז'אנר</option>
+               <option value="origin">ערוץ</option>
+               <option value="decade">עשור</option>
+               <option value="minRating">דירוג מינימלי</option>
+            </select>
+            <button type="button" id="advSearchResetBtn" class="searchRowBtn hidden d-flex align-items-center gap-2">אפס חיפוש<i class="fa-solid fa-filter-circle-xmark"></i></button>
+         </div>
+         <div class="d-flex flex-wrap gap-2 align-items-center">
+            <select id="advSearchValueSelect" class="searchInput"></select>
+            <input type="number" id="advSearchValueNumber" class="searchInput hidden" min="0" max="10" step="0.5" placeholder="0-10" />
+            <button type="button" id="advSearchAddBtn" class="searchRowBtn d-flex align-items-center gap-2">חפש<i class="fa-solid fa-magnifying-glass"></i></button>
+            <p id="advSearchMessage" class="adv-search-message"></p>
+         </div>
+         <div id="advSearchChips" class="d-flex flex-wrap gap-2"></div>
+      </div>
+      <section class="content-section">
+         <div id="advSearchResultsGrid" class="feed-row"></div>
+      </section>
+   `;
+   populateAdvSearchValueOptions();
+});
+
+// SWAPS THE VALUE INPUT BETWEEN A <select> (GENRE/DECADE) AND A NUMBER INPUT (MIN RATING)
+// DELEGATED BECAUSE THE ROW IS REBUILT EVERY TIME advSearchToggle IS CLICKED
+document.addEventListener("change", function(e){
+   if (e.target.id !== "advSearchMode") return;
+   const isRating = e.target.value === "minRating";
+   document.getElementById("advSearchValueSelect").classList.toggle("hidden", isRating);
+   document.getElementById("advSearchValueNumber").classList.toggle("hidden", !isRating);
+   populateAdvSearchValueOptions();
+});
+
+// ADD CHIP / RESET / REMOVE CHIP - ALL DELEGATED (SAME REASON AS ABOVE)
+document.addEventListener("click", function(e){
+   if (e.target.closest("#advSearchAddBtn")) {
+      const mode = document.getElementById("advSearchMode");
+      const field = mode.value;
+      const valueNumber = document.getElementById("advSearchValueNumber");
+      const value = field === "minRating" ? valueNumber.value.trim() : document.getElementById("advSearchValueSelect").value;
+      const message = document.getElementById("advSearchMessage");
+      if (!value) { message.textContent = "נא לבחור ערך"; return; }
+      message.textContent = "";
+      advSearchFilters = advSearchFilters.filter(f => f.field !== field);
+      advSearchFilters.push({ field, value, label: advFieldLabels[field] });
+      valueNumber.value = "";
+      renderAdvSearchChips();
+      runAdvSearch();
+      return;
+   }
+
+   if (e.target.closest("#advSearchResetBtn")) {
+      advSearchFilters = [];
+      renderAdvSearchChips();
+      document.getElementById("advSearchResultsGrid").innerHTML = "";
+      return;
+   }
+
+   const removeBtn = e.target.closest("#advSearchChips .chip-remove");
+   if (removeBtn) {
+      advSearchFilters.splice(Number(removeBtn.dataset.index), 1);
+      renderAdvSearchChips();
+      if (advSearchFilters.length) runAdvSearch();
+      else document.getElementById("advSearchResultsGrid").innerHTML = "";
+   }
+});
+
+//SCROLL FUNCTION
+document.addEventListener("click", function(e) {
+   //is scroll button?
+   const btn = e.target.closest(".scroll-btn");
+   if(!btn) return;
+   //
+   const row= btn.parentElement.querySelector(".feed-row");
+   const direction = btn.classList.contains("scroll-right") ? 500 : -500; //if right scroll -330, else 330
+   row.scrollBy({left: direction, behavior:"smooth"});
+});
+
+// SUB-FILTER DROPDOWN (GENRE/CHANNEL MULTI-COLUMN MENU): TOGGLE OPEN, PICK A VALUE, CLOSE ON OUTSIDE CLICK
+// DELEGATED (NOT ATTACHED INSIDE renderCategoryHeader) BECAUSE THE PANEL IS REBUILT ON EVERY RENDER
+document.addEventListener("click", function(e){
+   const toggle = e.target.closest(".sub-filter-toggle");
+   if (toggle) {
+      toggle.nextElementSibling.classList.toggle("hidden");
+      return;
+   }
+
+   const option = e.target.closest(".sub-filter-option");
+   if (option) {
+      e.preventDefault();
+      const key = option.closest(".sub-filter-dropdown").dataset.key;
+      chosenCategory = option.dataset.value || null;
+      if (chosenCategory) renderSubFilteredGrid(key);
+      else renderCategoryFeed(key);
+      return;
+   }
+
+   // clicked elsewhere - close any open panel
+   document.querySelectorAll(".sub-filter-panel").forEach(p => p.classList.add("hidden"));
+});
+
+// OPEN CONTENT MODAL
+document.addEventListener("click", function(e){
+   if (e.target.closest(".remove-card")) return;   // X button is handled separately
+   const trigger = e.target.closest(".content-card, .hero-btn, .hero-img");
+   if (!trigger) return;
+   openContentModal(trigger.dataset.id, trigger.dataset.progress);
+});
+
+// REMOVE A CONTENT FROM THE CONTINUE-WATCHING ROW
+document.addEventListener("click", async function(e){
+   const removeBtn = e.target.closest(".remove-card");
+   if (!removeBtn) return;
+   const card = removeBtn.closest(".continue-card");
+   const recordId = card.dataset.recordId;
+   await fetch(`/api/watch-history/${recordId}`, { method: "DELETE" });
+   continueItems = continueItems.filter(r => r._id !== recordId);
+   renderFeed();
+});
+
+// CONTENT MODAL TAB BUTTONS
+document.querySelectorAll(".content-tab-btn").forEach(btn => {
+   btn.addEventListener("click", () => switchContentTab(btn.dataset.tab));
+});
+
+// REVIEWS TAB - STAR PICKER (CLICK TO SELECT, HOVER TO PREVIEW)
+reviewStars.forEach(btn => {
+   btn.addEventListener("click", () => {
+      selectedRating = Number(btn.dataset.value);
+      paintStars(selectedRating);
+   });
+   btn.addEventListener("mouseenter", () => paintStars(Number(btn.dataset.value)));
+});
+document.getElementById("reviewStars").addEventListener("mouseleave", () => paintStars(selectedRating));
+
+// REVIEWS TAB - SWITCHES THE SORT MODE FOR THE REVIEWS LIST
+sortDateToggle.addEventListener("click", function(){
+   reviewSort = "date";
+   sortDateToggle.classList.add("active");
+   sortRatingToggle.classList.remove("active");
+   renderReviewsList();
+});
+sortRatingToggle.addEventListener("click", function(){
+   reviewSort = "rating";
+   sortRatingToggle.classList.add("active");
+   sortDateToggle.classList.remove("active");
+   renderReviewsList();
+});
+
+// REVIEWS TAB - SWITCHES BETWEEN "כל הביקורות" AND "הביקורות שלכם" (ALL PROFILES UNDER THE LOGGED-IN USER, NOT JUST THE ACTIVE ONE)
+reviewAllToggle.addEventListener("click", function(){
+   showOnlyMine = false;
+   reviewAllToggle.classList.add("active");
+   reviewMineToggle.classList.remove("active");
+   renderReviewsList();
+});
+reviewMineToggle.addEventListener("click", function(){
+   showOnlyMine = true;
+   reviewMineToggle.classList.add("active");
+   reviewAllToggle.classList.remove("active");
+   renderReviewsList();
+});
+
+// REVIEWS TAB - SUBMIT: CREATES A NEW REVIEW, OR UPDATES THE ACTIVE PROFILE'S EXISTING ONE
 reviewForm.addEventListener("submit", function(e){
    e.preventDefault();
    if (!selectedRating) { reviewFormMessage.textContent = "נא לבחור דירוג"; return; }
@@ -989,7 +1042,7 @@ reviewForm.addEventListener("submit", function(e){
    });
 });
 
-// DELETE FLOW - CLICKING THE TRASH ICON ON YOUR OWN REVIEW CARD OPENS THE CONFIRMATION MODAL
+// REVIEWS TAB - DELETE FLOW: CLICKING THE TRASH ICON ON YOUR OWN REVIEW CARD OPENS THE CONFIRMATION MODAL
 reviewsList.addEventListener("click", function(e){
    if (e.target.closest(".review-delete-icon")) deleteReviewModal.show();
 });
@@ -1002,33 +1055,6 @@ document.getElementById("confirmDeleteReview").addEventListener("click", functio
          if (data.success) fetchReviews(currentContentItem);
       });
 });
-
-// FORMAT SECONDS AS m:ss
-function formatTime(seconds){
-   if (!isFinite(seconds)) return "0:00";
-   const m = Math.floor(seconds / 60);
-   const s = Math.floor(seconds % 60).toString().padStart(2, "0");
-   return `${m}:${s}`;
-}
-
-// SAVES THE CURRENT WATCH PROGRESS FOR THE ACTIVE PROFILE
-async function saveProgress(completed){
-   if (!currentContentItem || !currentContentItem.videoUrl) return;
-   if (!hasPlayed) return;   // opened/resumed but never actually played - don't bump the list
-   if (!contentVideo.currentTime) return;   // nothing watched yet
-   const isCompleted = completed || contentVideo.currentTime >= contentVideo.duration * 0.9;
-   await fetch("/api/watch-history/progress", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-         contentId: currentContentItem._id,
-         progress: contentVideo.currentTime,
-         completed: isCompleted,
-         duration: contentVideo.duration
-      })
-   });
-}
-
 
 // LIKE BUTTON (IN MODAL) - PERSISTED, OPTIMISTIC UPDATE
 document.getElementById("likeBtn").addEventListener("click", function(){
@@ -1075,8 +1101,8 @@ contentVideo.addEventListener("pause", () => {
 // SHOWS THE TOTAL DURATION ONCE THE VIDEO METADATA IS KNOWN
 contentVideo.addEventListener("loadedmetadata", () => {
    videoDuration.textContent = formatTime(contentVideo.duration);
-   if (resumeTo) { 
-      contentVideo.currentTime = resumeTo; 
+   if (resumeTo) {
+      contentVideo.currentTime = resumeTo;
       resumeTo = 0;
       videoProgress.value = (contentVideo.currentTime / contentVideo.duration) * 100 || 0;
       videoCurrentTime.textContent = formatTime(contentVideo.currentTime);
@@ -1124,12 +1150,12 @@ videoFullscreenBtn.addEventListener("click", function(){
    }
 });
 
-// STOP PLAYBACK WHEN THE MODAL CLOSES
 // DROPS FOCUS FROM THE CLOSE BUTTON BEFORE BOOTSTRAP MARKS THE MODAL aria-hidden, AVOIDING A CONSOLE A11Y WARNING
 document.getElementById("contentScreenModal").addEventListener("hide.bs.modal", function(){
    document.activeElement?.blur();
 });
 
+// STOP PLAYBACK + RESET ALL TAB STATE WHEN THE MODAL CLOSES
 document.getElementById("contentScreenModal").addEventListener("hidden.bs.modal", function(){
    if (hasPlayed) {
       saveProgress().then(() => loadContinueWatching()).then(renderFeed);   // save first, then refresh the row

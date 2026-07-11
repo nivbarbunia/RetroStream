@@ -1,14 +1,8 @@
-:root {
-  --green: rgb(37, 255, 66);
-  --black: rgb(15, 14, 14);
-}
-
 html {
   font-size: clamp(16px, 1vw + 6px, 40px);
 }
 
 body {
-  font-family: 'Varela Round', sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,6 +175,3 @@ button:hover {
   min-height: 1.2rem;
 }
 
-.hidden {
-  display: none;
-}
