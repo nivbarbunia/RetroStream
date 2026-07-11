@@ -1,5 +1,6 @@
 const Content = require("../models/content.model");
 const WatchHistory = require("../models/watch-history.model");
+const logger = require("../utils/logger");
 
 // COUNTS CATALOG ITEMS AND WATCHES PER CHANNEL
 async function getStatsByOrigin(req, res) {
@@ -20,6 +21,7 @@ async function getStatsByOrigin(req, res) {
         ]);
         res.json({ success: true, catalog, watches });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -41,6 +43,7 @@ async function getStatsByGenre(req, res) {
         ]);
         res.json({ success: true, catalog, watches });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -57,6 +60,7 @@ async function getTopWatched(req, res) {
         ]);
         res.json({ success: true, top });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -72,6 +76,7 @@ async function getTopLiked(req, res) {
         ]);
         res.json({ success: true, top });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -85,6 +90,7 @@ async function getTotals(req, res) {
         ]);
         res.json({ success: true, contentCount, totalSeconds: result[0]?.totalSeconds || 0 });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }

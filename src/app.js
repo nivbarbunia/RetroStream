@@ -4,6 +4,8 @@ const path = require("path");
 const session = require("express-session");
 //MIDDLEWARE
 const { requireLogin, requireAdminPage } = require("./middleware/auth.middleware");
+//LOGGING
+const logger = require("./utils/logger");
 //ROUTES
 const contentRoutes = require("./routes/content.routes");
 const profileRoutes = require("./routes/profile.routes");
@@ -26,6 +28,14 @@ app.use(session({
     saveUninitialized: false,
     cookie: { maxAge: 1000 * 60 * 60 } // one hour
 }));
+
+// LOGS EVERY REQUEST (METHOD + PATH + STATUS) ONCE THE RESPONSE FINISHES
+app.use((req, res, next) => {
+    res.on("finish", () => {
+        logger.logAccess(`${req.method} ${req.originalUrl} ${res.statusCode}`);
+    });
+    next();
+});
 
 // API routes
 app.use("/api/content", requireLogin, contentRoutes);

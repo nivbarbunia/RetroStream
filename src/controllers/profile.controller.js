@@ -1,5 +1,6 @@
 //REQUEST HANDLER
 const Profile = require("../models/profile.model");
+const logger = require("../utils/logger");
 
 // RETURNS ALL PROFILES OF ALL USERS (ADMIN ONLY) 
 async function getAllProfiles(req, res) {
@@ -7,6 +8,7 @@ async function getAllProfiles(req, res) {
         const profiles = await Profile.find().populate("user", "name email");
         res.json({ success: true, profiles });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
@@ -17,6 +19,7 @@ async function getProfile(req, res) {
         const profile = await Profile.find({ user: req.session.userId });
         res.json({success:true , profile});
     } catch(err){
+        logger.logError(req.originalUrl, err);
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
@@ -52,6 +55,7 @@ async function createProfile(req, res) {
         if(err.name==="ValidationError"){
             return res.status(400).json({success: false, message: "נתוני הפרופיל לא תקינים", error: err.message});
         }
+        logger.logError(req.originalUrl, err);
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
@@ -61,6 +65,7 @@ async function deleteProfile(req, res) {
         await req.ownedProfile.deleteOne();
         res.json({success: true, message: "הפרופיל נמחק בהצלחה"});
     } catch(err){
+        logger.logError(req.originalUrl, err);
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
@@ -96,6 +101,7 @@ async function updateProfile(req, res) {
         if (err.name==="ValidationError"){
             return res.status(400).json({success: false, message: "נתוני פרופיל לא תקינים", error: err.message});
         }
+        logger.logError(req.originalUrl, err);
         res.status(500).json({success: false, message: 'שגיאת שרת', error: err.message});
     }
 }
@@ -119,6 +125,7 @@ async function searchProfiles(req, res) {
         res.json({ success: true, profiles });
 
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
     }
 }
@@ -139,6 +146,7 @@ async function getActiveProfile(req, res) {
         }
         res.json({ success: true, profile });
     } catch (err) {
+        logger.logError(req.originalUrl, err);
         res.status(500).json({ success: false, message: 'שגיאת שרת', error: err.message });
     }
 }
