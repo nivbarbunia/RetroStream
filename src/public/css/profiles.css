@@ -1,22 +1,16 @@
+/* GLOBAL SIZING */
 html {
   font-size: clamp(16px, 1vw + 6px, 40px);
 }
 :root{
   --avatar-size: clamp(120px, 12vw, 400px);
 }
-#headline {
-  font-style: oblique;
-  font-size: 3rem;
-  color: var(--black);
-  padding: 6px;
-  border: 0.2rem solid var(--black);
-  border-radius: 15px;
-  box-shadow: 0.1rem 0.1rem 0.1rem 0.1rem var(--green);
-  text-align: center;
-  text-shadow: 0.1rem 0.1rem 0.1rem var(--green);
-}
 
+/* PAGE BACKGROUND */
 body {
+  font-size: larger;
+  font-weight: 700;
+  color: rgb(0, 0, 0);
   background:
     repeating-linear-gradient(
       to bottom,
@@ -31,46 +25,52 @@ body {
         black 100%
     ),
     var(--black);
-  font-size: larger;
-  font-weight: 700;
-  color: rgb(0, 0, 0);
 
-} 
+}
 
+/* HEADLINE */
+#headline {
+  padding: 6px;
+  border: 0.2rem solid var(--black);
+  border-radius: 15px;
+  font-style: oblique;
+  font-size: 3rem;
+  color: var(--black);
+  text-align: center;
+  text-shadow: 0.1rem 0.1rem 0.1rem var(--green);
+  box-shadow: 0.1rem 0.1rem 0.1rem 0.1rem var(--green);
+}
+
+/* PROFILE / ADD-PROFILE TILES */
+.profile, .add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--avatar-size);
+  text-align: center;
+}
+
+/* AVATAR IMAGE (EXISTING PROFILES ONLY) */
 .profile img {
   width: var(--avatar-size);
   height: var(--avatar-size);
-  border-radius: 50%;
   border: 0.2rem solid var(--black);
+  border-radius: 50%;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
 
-.name-section, .add-user {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 10px;
-  min-height: 40px;
-  position: relative;
-}
-.name {
-  margin: 0;
-  text-align: center;
-}
-
-
 .profile img:hover {
+  border: 4px solid var(--green);
   transform: scale(1.1);
   box-shadow: 0 0 10px rgb(15,14,14);
-  border: 4px solid var(--green);
 }
 
+/* "+" ADD-PROFILE BUTTON (ADD TILE ONLY) */
 .plus {
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   width: var(--avatar-size);
   height: var(--avatar-size);
   border-radius: 10px;
@@ -81,27 +81,34 @@ body {
 }
 
 .plus:hover {
-  transform: translateY(-10px) scale(1.5); 
+  transform: translateY(-10px) scale(1.5);
 }
 
-.profile, .add {
-  width: var(--avatar-size);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
+/* NAME LABEL ROW (BELOW EACH TILE) */
+.name-section, .add-user {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
   align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  min-height: 40px;
+}
+.name {
+  margin: 0;
+  text-align: center;
 }
 
 /*EDIT BUTTON*/
 .edit-btn {
+  position: absolute;
+  left: -2rem;
   border: none;
   background: transparent;
   cursor: pointer;
-  position: absolute;
-  left: -2rem;
   transition: opacity 0.3s ease;
   opacity: 0;
-  pointer-events: none; 
+  pointer-events: none;
 }
 .profile:hover .edit-btn {
   opacity: 1;
@@ -113,34 +120,44 @@ body {
 .panel-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.7);
+  z-index: 100;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
+  background: rgba(0,0,0,0.7);
 }
 
 .panel-box {
-  background: #1a1a1a;
-  padding: 2rem;
-  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  padding: 2rem;
+  border-radius: 12px;
   color: white;
+  background: #1a1a1a;
 }
+/* PANEL NAME/BIRTHDATE INPUTS */
 .panel-box input {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 2px solid var(--green);
-  background: #0f0e0e;
-  color: white;
-  font-size: 1rem;
-  outline: none;
   width: 200px;
+  padding: 8px 12px;
+  border: 2px solid var(--green);
+  border-radius: 8px;
+  outline: none;
+  font-size: 1rem;
+  color: white;
+  background: #0f0e0e;
   text-align: center;
 }
+#newProfileName.input-error , #newProfileBirthDate.input-error {
+  border-color: #ff4444;
+}
+.panel-error {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #ff4444;
+}
+/* AVATAR PICKER GRID */
 .avatar-grid {
   display: flex;
   gap: 1rem;
@@ -148,9 +165,9 @@ body {
 .avatar-option {
   width: 5rem;
   aspect-ratio: 1/1;
+  border: 0.2rem solid transparent;
   border-radius: 50%;
   cursor: pointer;
-  border: 0.2rem solid transparent;
   transition: border-color 0.2s ease;
 }
 .avatar-option:hover {
@@ -159,34 +176,35 @@ body {
 .avatar-option.selected {
   border-color: var(--green);
 }
+/* PANEL ACTION BUTTONS (CONFIRM / CANCEL / DELETE) */
 .panel-buttons {
   display: flex;
   gap: 1rem;
 }
 .panel-buttons button {
+  border: none;
   padding: 8px 20px;
   border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
   font-family: 'Varela Round', sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
 }
 #confirmProfile {
-  background: var(--green);
-  color: var(--black);
   font-weight: 700;
+  color: var(--black);
+  background: var(--green);
 }
 #cancelProfile {
-  background: #444;
   color: white;
+  background: #444;
 }
 #deleteProfile {
-  background: #cc0000;
   color: white;
+  background: #cc0000;
 }
 #deleteProfile.confirm-mode {
-  background: #ff0000;
   font-weight: 700;
+  background: #ff0000;
 }
 .confirm-text {
   opacity: 0;
@@ -195,12 +213,3 @@ body {
 .confirm-text.visible {
   opacity: 1;
 }
-.panel-error {
-  color: #ff4444;
-  font-size: 0.9rem;
-  margin: 0;
-}
-#newProfileName.input-error , #newProfileBirthDate.input-error {
-  border-color: #ff4444;
-}
-

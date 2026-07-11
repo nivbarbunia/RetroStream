@@ -1,6 +1,7 @@
 /* SHARED BASE FOR ALL ADMIN PAGES (admin / admin-users / admin-content / admin-stats)
    LOADED AFTER shared.css, BEFORE THE PAGE-SPECIFIC STYLESHEET */
 
+/* GLOBAL SIZING + BACKGROUND */
 html {
   font-size: clamp(12px, 1vw + 3px, 40px);
 }
@@ -17,12 +18,14 @@ body {
     var(--black);
 }
 
+/* HEADER "BACK" LINK (SHARED BY ALL ADMIN PAGES) */
 .admin-link {
   font-weight: bold;
   color: var(--green);
   text-decoration: none;
 }
 
+/* HEADER LOGOUT BUTTON */
 .btn-logout {
   border: none;
   border-radius: 0.5rem;

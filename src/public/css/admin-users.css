@@ -7,6 +7,7 @@
 }
 .admin-link:hover { text-shadow: 0 0 10px rgba(37, 255, 66, 0.6); }
 
+/* PAGE CONTENT WRAPPER */
 .admin-content{
     width: 80%;
 }

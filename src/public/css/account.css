@@ -1,13 +1,15 @@
+/* GLOBAL SIZING */
 html {
   font-size: clamp(16px, 1vw + 6px, 40px);
 }
 
+/* PAGE BACKGROUND */
 body {
   display: flex;
-  align-items: center;
   justify-content: center;
-  text-align: center;
+  align-items: center;
   min-height: 80vh;
+  text-align: center;
     background:
     repeating-linear-gradient(
       to bottom,
@@ -24,13 +26,7 @@ body {
     black;
 }
 
-#headline {
-  font-style: oblique;
-  font-size: 2rem;
-  color: var(--green);
-  margin-bottom: 1.5rem;
-}
-
+/* CARD WRAPPER */
 .wrapper {
   width: clamp(320px, 60vw, 1500px);
   height: auto;
@@ -38,12 +34,12 @@ body {
   padding: 2rem 2.5rem;
   border: 5px solid var(--green);
   border-radius: 40px;
+  box-sizing: border-box;
+  font-size: 1.3rem;
+  color: rgb(249, 249, 249);
   background: transparent;
   backdrop-filter: blur(17px);
-  color: rgb(249, 249, 249);
-  box-sizing: border-box;
   animation: fadeIn 0.4s ease;
-  font-size: 1.3rem;
 }
 
 @keyframes fadeIn {
@@ -51,19 +47,27 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* HEADLINE */
+#headline {
+  margin-bottom: 1.5rem;
+  font-style: oblique;
+  font-size: 2rem;
+  color: var(--green);
+}
+
 /* FIELD ROW — label + value + edit button */
 .field-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.75rem;
   padding: 0.75rem 0;
   border-bottom: 1px solid rgba(37, 255, 66, 0.3);
-  flex-wrap: wrap;
 }
 .field-label {
-  color: var(--green);
-  font-weight: bold;
   min-width: 4rem;
+  font-weight: bold;
+  color: var(--green);
   text-align: right;
 }
 .field-value {
@@ -74,37 +78,24 @@ body {
 /* EDIT MODE (inline for name/email) */
 .field-edit {
   display: flex;
-  gap: 0.5rem;
   flex: 1;
   flex-wrap: wrap;
+  gap: 0.5rem;
 }
 .field-edit input {
   flex: 1;
   min-width: 8rem;
 }
 
-/* PASSWORD EDIT (stacked inputs) */
-.password-edit {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 1rem 0;
-}
-.password-buttons {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
 /* INPUTS */
 input {
-  border-radius: 10px;
   border: 2px solid rgb(58, 253, 84);
+  border-radius: 10px;
   padding: 0.4rem 0.6rem;
-  background-color: var(--black);
-  color: white;
   outline: none;
   font-family: 'Varela Round', sans-serif;
+  color: white;
+  background-color: var(--black);
 }
 input:focus {
   border-color: rgb(124, 255, 142);
@@ -116,29 +107,49 @@ input.input-error {
 
 /* BUTTONS */
 button {
-  border-radius: 8px;
   border: none;
+  border-radius: 8px;
   padding: 0.4rem 0.9rem;
-  cursor: pointer;
   font-family: 'Varela Round', sans-serif;
   font-size: 0.9rem;
-  background-color: var(--black);
   color: var(--green);
+  background-color: var(--black);
+  cursor: pointer;
 }
 button:hover {
-  background-color: var(--green);
   color: var(--black);
+  background-color: var(--green);
 }
 .edit-btn {
-  background: transparent;
-  color: var(--green);
-  font-size: 1.1rem;
   padding: 0.3rem;
+  font-size: 1.1rem;
+  color: var(--green);
+  background: transparent;
 }
 .edit-btn:hover {
+  color: rgb(124, 255, 142);
   background: transparent;
   transform: scale(1.15);
-  color: rgb(124, 255, 142);
+}
+
+/* PASSWORD EDIT (stacked inputs) */
+.password-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+.password-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* STATUS MESSAGE */
+#message {
+  margin-top: 1rem;
+  min-height: 1.2rem;
+  font-weight: bold;
 }
 
 /* ACTIONS */
@@ -146,20 +157,20 @@ button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 1.5rem;
   gap: 1rem;
+  margin-top: 1.5rem;
 }
 .back {
   font-weight: bold;
   color: white;
 }
 #deleteAccount {
-  background: #cc0000;
   color: white;
+  background: #cc0000;
 }
 #deleteAccount.confirm-mode {
-  background: #ff0000;
   font-weight: 700;
+  background: #ff0000;
 }
 .confirm-text {
   opacity: 0;
@@ -168,10 +179,3 @@ button:hover {
 .confirm-text.visible {
   opacity: 1;
 }
-
-#message {
-  margin-top: 1rem;
-  font-weight: bold;
-  min-height: 1.2rem;
-}
-

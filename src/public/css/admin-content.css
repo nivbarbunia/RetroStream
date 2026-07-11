@@ -76,6 +76,7 @@ input:focus, textarea:focus {
   background: var(--green);
 }
 
+/* RESULT COUNT / ERROR MESSAGE */
 .message {
   display: flex;
   justify-content: center;
@@ -87,6 +88,7 @@ input:focus, textarea:focus {
 
 #addBtn{margin-inline-start: auto;}
 
+/* ACTIVE FILTER CHIPS */
 .filter-chip {
   display: inline-flex;
   align-items: center;
