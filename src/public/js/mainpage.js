@@ -555,8 +555,25 @@ function openContentModal(id, progress){
    videoCurrentTime.textContent = "0:00";
    videoDuration.textContent = "0:00";
    updateLikeUI(item);
+   switchContentTab("watch");
    contentModal.show();
 }
+
+// SWITCHES BETWEEN THE 3 CONTENT MODAL TABS (WATCH / REVIEWS / DETAILS)
+// LEAVING THE WATCH TAB WHILE PLAYING MUST STOP THE VIDEO AND SAVE PROGRESS, SAME AS CLOSING THE MODAL
+function switchContentTab(tab){
+   const leavingWatch = document.getElementById("tabWatch").classList.contains("active") && tab !== "watch";
+   if (leavingWatch && hasPlayed) {
+      contentVideo.pause();
+      saveProgress();
+   }
+   document.querySelectorAll(".content-tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
+   document.querySelectorAll(".content-tab").forEach(section => section.classList.toggle("active", section.id === `tab${tab.charAt(0).toUpperCase()}${tab.slice(1)}`));
+}
+
+document.querySelectorAll(".content-tab-btn").forEach(btn => {
+   btn.addEventListener("click", () => switchContentTab(btn.dataset.tab));
+});
 
 // FORMAT SECONDS AS m:ss
 function formatTime(seconds){
