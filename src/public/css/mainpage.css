@@ -710,7 +710,7 @@ body {
 }
 .content-tab-btn {
   background: transparent;
-  border: 1px solid rgba(37,255,66,0.4);
+  border: 0.1rem solid rgba(37,255,66,0.4);
   border-radius: 2rem;
   color: #ccc;
   padding: 0.35rem 1rem;
@@ -752,6 +752,187 @@ body {
 }
 .details-subheading:not(:first-child) {
   margin-top: 1.5rem;
+}
+
+/* REVIEWS TAB - STAR RATING WIDGET */
+.star-rating {
+  display: flex;
+  gap: 0.3rem;
+  font-size: 1.4rem;
+}
+.star-btn {
+  background: transparent;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.star-btn:hover {
+  transform: scale(1.15);
+}
+.star-btn.filled {
+  color: var(--green);
+}
+
+/* REVIEWS TAB - FORM */
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.review-textarea-wrap {
+  position: relative;
+}
+.review-textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 0.1rem solid rgba(37,255,66,0.5);
+  border-radius: 0.5rem;
+  color: white;
+  outline: none;
+  padding: 0.5rem 0.75rem 2.6rem;   /* EXTRA BOTTOM PADDING SO TEXT DOESN'T RUN UNDER THE INLINE SUBMIT BUTTON */
+  resize: vertical;
+}
+.review-textarea:focus{
+  border-color: white !important;
+  box-shadow: 0.125rem 0.3rem 0.3rem var(--green);
+}
+.review-submit-inline {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.8rem;
+  font-size: 0.8rem;
+  padding: 0.5rem 1.5rem;
+}
+.review-btn {
+  background: transparent;
+  border: 0.1rem solid var(--green);
+  border-radius: 2rem;
+  color: var(--green);
+  padding: 0.35rem 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.review-btn:hover {
+  background: var(--green);
+  color: black;
+}
+.review-btn-danger {
+  border-color: #ff4d4d;
+  color: #ff4d4d;
+}
+.review-btn-danger:hover {
+  background: #ff4d4d;
+  color: black;
+}
+.review-form-message {
+  color: #ff8080;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+/* REVIEWS TAB - SORT CONTROLS */
+.reviews-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+.review-sort-group {
+  display: flex;
+  gap: 0.4rem;
+}
+.review-sort-btn {
+  background: transparent;
+  border: 0.1rem solid rgba(37,255,66,0.3);
+  border-radius: 1rem;
+  color: #ccc;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.review-sort-btn:hover {
+  border-color: var(--green);
+  color: white;
+}
+.review-sort-btn.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: black;
+  font-weight: 700;
+}
+
+/* REVIEWS TAB - LIST */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.review-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 0.6rem;
+  padding: 0.75rem 1rem;
+}
+.review-card.own-review {
+  border-color: var(--green);
+}
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+.review-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.review-delete-icon {
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.review-delete-icon:hover {
+  color: #ff4d4d;
+}
+.review-card-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+.review-card-profile img {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.review-card-stars {
+  color: var(--green);
+  font-size: 0.85rem;
+}
+.review-card-date {
+  color: #888;
+  font-size: 0.75rem;
+}
+.review-card-text {
+  color: #ccc;
+  margin: 0;
+}
+
+/* STACKED MODAL FIX - THE DELETE CONFIRMATION OPENS ON TOP OF THE ALREADY-OPEN CONTENT MODAL */
+#deleteReviewModal {
+  z-index: 1060;
+}
+.modal-backdrop + .modal-backdrop {
+  z-index: 1055;
 }
 .filming-map {
   width: 100%;

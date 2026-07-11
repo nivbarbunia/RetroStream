@@ -80,6 +80,7 @@
                     <button type="button" class="content-tab-btn" data-tab="details">פרטים נוספים</button>
                 </div>
 
+                <!--WATCH CONTENT-->
                 <div class="content-tab active" id="tabWatch">
                     <div class="video-wrap" id="videoWrap">
                         <video id="contentVideo" class="content-video" preload="metadata"></video>
@@ -109,12 +110,41 @@
                     </div>
                 </div>
 
+                <!--REVIEW CONTENT-->
                 <div class="content-tab" id="tabReviews">
                     <div class="content-modal-body">
-                        <p class="tab-placeholder">בקרוב: תגובות ודירוגים</p>
+                        <h3 class="details-subheading">הביקורת שלי</h3>
+                        <form id="reviewForm" class="review-form">
+                            <div id="reviewStars" class="star-rating">
+                                <button type="button" class="star-btn" data-value="1"><i class="fa-regular fa-star"></i></button>
+                                <button type="button" class="star-btn" data-value="2"><i class="fa-regular fa-star"></i></button>
+                                <button type="button" class="star-btn" data-value="3"><i class="fa-regular fa-star"></i></button>
+                                <button type="button" class="star-btn" data-value="4"><i class="fa-regular fa-star"></i></button>
+                                <button type="button" class="star-btn" data-value="5"><i class="fa-regular fa-star"></i></button>
+                            </div>
+                            <div class="review-textarea-wrap">
+                                <textarea id="reviewText" class="review-textarea" placeholder="מה דעתך על התוכן? (אופציונלי)" rows="2"></textarea>
+                                <button type="submit" id="reviewSubmitBtn" class="review-btn review-submit-inline">פרסם ביקורת</button>
+                            </div>
+                            <p id="reviewFormMessage" class="review-form-message"></p>
+                        </form>
+
+                        <div class="reviews-list-header">
+                            <div class="review-sort-group">
+                                <button type="button" id="reviewAllToggle" class="review-sort-btn active">כל הביקורות (<span id="reviewCountAll">0</span>)</button>
+                                <button type="button" id="reviewMineToggle" class="review-sort-btn">הביקורות שלכם (<span id="reviewCountMine">0</span>)</button>
+                            </div>
+                            <div class="review-sort-group">
+                                <button type="button" id="sortDateToggle" class="review-sort-btn active" data-sort="date">חדש ביותר</button>
+                                <button type="button" id="sortRatingToggle" class="review-sort-btn" data-sort="rating">דירוג גבוה</button>
+                            </div>
+                        </div>
+                        <div id="reviewsList" class="reviews-list"></div>
+                        <p id="reviewsEmpty" class="tab-placeholder hidden">אין עדיין ביקורות לתוכן זה</p>
                     </div>
                 </div>
 
+                <!--MORE DETAILS-->
                 <div class="content-tab" id="tabDetails">
                     <div class="content-modal-body details-tab-body">
                         <h3 class="details-subheading">מיקום צילומים</h3>
@@ -125,6 +155,23 @@
                         <div id="youtubeClipWrap" class="youtube-clip-wrap"></div>
                         <p id="youtubeClipEmpty" class="tab-placeholder hidden">לא נמצא קליפ רלוונטי</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE REVIEW CONFIRMATION - KEPT AS A SIBLING OF #contentScreenModal, NOT NESTED INSIDE IT -->
+    <!-- (a modal nested inside another modal's DOM inherits its ancestor's CSS transform, which breaks position:fixed and traps clicks behind the backdrop) -->
+    <div class="modal fade" id="deleteReviewModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content content-modal">
+                <div class="modal-body content-modal-body">
+                    <h5 class="text-danger mb-2">מחיקת ביקורת</h5>
+                    <p class="mb-0">האם למחוק את הביקורת שלך על תוכן זה?</p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="review-btn" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="review-btn review-btn-danger" id="confirmDeleteReview">מחק</button>
                 </div>
             </div>
         </div>
