@@ -131,7 +131,6 @@ submitBtn.addEventListener("click", function () {
         return;
     }
     else {
-        console.log(q);
         searchUsers(q);
     }
 });

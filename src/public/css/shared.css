@@ -1,0 +1,22 @@
+/* SHARED BRAND COLORS + BASE UTILITY - LOADED ON EVERY PAGE, BEFORE THE PAGE-SPECIFIC STYLESHEET */
+/* GOLBAL FONT SIZING */
+html {
+  font-size: clamp(16px, 1vw + 6px, 40px);
+}
+
+/* BRAND COLORS */
+:root {
+  --green: rgb(37, 255, 66);
+  --black: rgb(15, 14, 14);
+}
+
+
+/* VISIBILITY UTILITY - !important SO IT ALWAYS WINS OVER PAGE-SPECIFIC display RULES REGARDLESS OF CASCADE ORDER */
+.hidden {
+  display: none !important;
+}
+
+/* BASE FONT */
+body {
+  font-family: 'Varela Round', sans-serif;
+}

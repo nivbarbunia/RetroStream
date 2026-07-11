@@ -1,62 +1,29 @@
-:root {
-  --green: rgb(37, 255, 66);
-  --black: rgb(15, 14, 14);
-}
-
-html {
-  font-size: clamp(12px, 1vw + 3px, 40px);
-}
-
-body {
-  min-height: 100vh;
-  font-family: 'Varela Round', sans-serif;
-  color: white;
-  background:
-    repeating-linear-gradient(to bottom,
-      rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px,
-      transparent 8px, transparent 6px),
-    radial-gradient(circle at top, rgba(37,255,66,0.15), transparent 60%),
-    var(--black);
-}
-
 /* HEADER - SAME PATTERN AS admin-content.css */
 #headline {
-  color: white;
   font-style: oblique;
   font-weight: bold;
+  color: white;
   text-shadow: 0 0 0.8rem rgba(37, 255, 66, 0.5);
 }
-.admin-link { color: var(--green); font-weight: bold; text-decoration: none; }
 .admin-link:hover { text-shadow: 0 0 0.6rem rgba(37, 255, 66, 0.6); }
-.btn-logout {
-  background: #cc0000;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.4rem 1rem;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.2s ease;
-}
-.btn-logout:hover { background: #ff0000; }
 
 /* KPI STRIP */
 .kpi-strip {
   display: flex;
-  gap: 1.5rem;
   flex-wrap: wrap;
+  gap: 1.5rem;
 }
 .kpi-card {
-  flex: 1;
-  min-width: 10rem;
-  background: rgba(0,0,0,0.5);
-  border: 0.1rem solid var(--green);
-  border-radius: 0.8rem;
-  padding: 1rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1;
   gap: 0.3rem;
+  min-width: 10rem;
+  border: 0.1rem solid var(--green);
+  border-radius: 0.8rem;
+  padding: 1rem 1.5rem;
+  background: rgba(0,0,0,0.5);
 }
 .kpi-value {
   font-size: 2.2rem;
@@ -68,24 +35,26 @@ body {
 
 /* CHART SECTIONS */
 .chart-section {
-  background: rgba(0,0,0,0.4);
   border: 0.1rem solid rgba(37, 255, 66, 0.4);
   border-radius: 1rem;
   padding: 1.5rem;
+  background: rgba(0,0,0,0.4);
 }
 .chart-title {
+  margin: 0 0 1rem 0;
   font-size: 1.4rem;
   font-weight: bold;
   color: white;
-  margin: 0 0 1rem 0;
 }
-.chart-container { width: 100%; }
-.chart-container svg { width: 100%; height: auto; }
-.chart-container text { font-size: 0.9rem; }
 
 /* LEGEND (CATALOG VS WATCHES) FOR THE GROUPED BAR CHARTS */
 .chart-legend { display: flex; gap: 1.5rem; margin-bottom: 0.75rem; }
 .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.9rem; color: rgba(255,255,255,0.8); }
-.legend-swatch { width: 0.9rem; height: 0.9rem; border-radius: 0.2rem; display: inline-block; }
+.legend-swatch { display: inline-block; width: 0.9rem; height: 0.9rem; border-radius: 0.2rem; }
 .legend-swatch.catalog { background: #25ff42; }
 .legend-swatch.watches { background: rgba(255,255,255,0.5); }
+
+/* D3 CHART CONTAINER (SVG INJECTED BY admin-stats.js) */
+.chart-container { width: 100%; }
+.chart-container svg { width: 100%; height: auto; }
+.chart-container text { font-size: 0.9rem; }

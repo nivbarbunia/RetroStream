@@ -1,39 +1,11 @@
-:root {
-  --green: rgb(37, 255, 66);
-  --black: rgb(15, 14, 14);
-}
-html {
-  font-size: clamp(12px, 1vw + 3px, 40px);
-}
-
-body {
-  min-height: 100vh;
-  font-family: 'Varela Round', sans-serif;
-  color: white;
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.05) 0px,
-      rgba(255, 255, 255, 0.05) 1px,
-      transparent 8px,
-      transparent 6px
-    ),
-    radial-gradient(circle at top, rgba(37, 255, 66, 0.15), transparent 60%),
-    var(--black);
-}
-
+/* HEADER */
 #headline {
-  color: var(--green);
   font-style: oblique;
   font-weight: bold;
+  color: var(--green);
   text-shadow: 0 0 12px rgba(37, 255, 66, 0.5);
 }
 
-.admin-link {
-  color: var(--green);
-  font-weight: bold;
-  text-decoration: none;
-}
 .admin-link:hover {
   text-shadow: 0 0 10px rgba(37, 255, 66, 0.6);
 }
@@ -43,18 +15,18 @@ body {
 .dash-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: 1rem;
-  aspect-ratio: 10/9;   
+  aspect-ratio: 10/9;
   padding: 1rem;
   border: 0.2rem solid var(--green);
   border-radius: 1.5rem;
-  background: rgba(0, 0, 0, 0.4);
-  color: white;
-  text-decoration: none;
   font-size: 1.5rem;
   font-weight: bold;
+  color: white;
+  background: rgba(0, 0, 0, 0.4);
+  text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
@@ -64,28 +36,28 @@ body {
   transition: transform 0.2s ease;
 }
 .dash-details{
-    transition: 0.3s ease;
-    text-align: center;
-    opacity: 0;
+    overflow:hidden;
     margin-top: 0.3rem;
     max-height:0;
-    overflow:hidden;
     font-size: 1rem;
     color: #ccc;
+    text-align: center;
+    transition: 0.3s ease;
+    opacity: 0;
 }
 
 .dash-card:hover {
+  color: white;
+  background: rgba(37, 255, 66, 0.08);
   transform: translateY(-3px) scale(1.02);
   box-shadow: 0 0 30px rgba(37, 255, 66, 0.4);
-  background: rgba(37, 255, 66, 0.08);
-  color: white;
 
   i{
     transform: scale(1.15);
   }
   .dash-details{
-    opacity: 1;
     max-height: 5rem;
+    opacity: 1;
     transform: translateY(-1px);
   }
 }

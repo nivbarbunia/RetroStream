@@ -1,18 +1,11 @@
-  html {
-    font-size: clamp(16px, 1vw + 6px, 40px);
-  }
-  :root{ 
-    --green: rgb(37, 255, 66);
-    --black: rgb(15,14,14);
-  }
+  /* BACKGROUND */
 
   body {
-    font-family: 'Varela Round', sans-serif;
     display: flex;
-    align-items: center;
     justify-content: center;
-    text-align: center;
+    align-items: center;
     min-height: 80vh;
+    text-align: center;
     background:
     repeating-linear-gradient(
       to bottom,
@@ -27,26 +20,20 @@
       transparent 60%
     ),
     black;
-  font-family: 'Varela Round', sans-serif;
   }
 
-  #headline {
-    font-style: oblique;
-    font-size: 2rem;
-    color: var(--green);
-  }
-
+  /* FORM CARD */
   .wrapper {
     width: clamp(320px, 39vw, 1800px);
     aspect-ratio: 16/9;
     padding: 1.5rem 2rem;
     border: 5px solid var(--green);
     border-radius: 80px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    color: rgb(249, 249, 249);
     background: transparent;
     backdrop-filter: blur(17px);
-    color: rgb(249, 249, 249);
-    font-size: 1rem;
-    box-sizing: border-box;
     animation: fadeIn 0.8s ease;
   }
 
@@ -55,74 +42,75 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+  /* HEADLINE */
+  #headline {
+    font-style: oblique;
+    font-size: 2rem;
+    color: var(--green);
+  }
+
+  /* FORM INPUTS (EMAIL/PASSWORD/NAME) */
   .wrapper input {
-    border-radius: 10px;
-    font-size: 0.8rem;
-    border-color: rgb(58, 253, 84);
     margin: 0.2rem;
     padding: 0.4rem;
-    background-color: rgb(15, 14, 14);
+    border: 0.1rem solid rgb(58, 253, 84);
+    border-radius: 0.6rem;
+    font-size: 0.8rem;
     color: white;
+    background-color: rgb(15, 14, 14);
   }
 
   .wrapper input:-webkit-autofill,
   .wrapper input:-webkit-autofill:hover,
   .wrapper input:-webkit-autofill:focus {
-    -webkit-text-fill-color: white;
+    border: 0.1rem solid rgb(58, 253, 84);
     box-shadow: 0 0 0 1000px rgb(15, 14, 14) inset;
     caret-color: white;
-    border: 2px solid rgb(58, 253, 84);
+    -webkit-text-fill-color: white;
   }
 
   .wrapper input:focus {
+    border-color: white !important;
+    box-shadow: 0.1rem 0.1rem 0.15rem var(--green);
     outline: none;
-    border: 3px solid rgb(124, 255, 142);
   }
 
-  .wrapper button {
-    font-size: 0.8rem;
-    padding: 0.5rem 1rem;
-    margin-top: 0.8rem;
-    background-color: rgb(15, 14, 14);
-    color: var(--green);
-    cursor: pointer;
-
+  .wrapper input.input-error {
+    border: 0.1rem solid #ff5c5c;
+    outline: none;
+    box-shadow: 0 0 8px rgba(255, 92, 92, 0.4);
   }
 
+  /* ERROR MESSAGE */
+  #message {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #ff5c5c;
+    margin: 0.5rem;
+  }
+
+  /* "SIGN UP" / "LOG IN" SWITCH LINK */
   .formlink {
     font-weight: bold;
     color: var(--green);
   }
 
-  .remember-forget {
-    display: flex;
-    justify-content: center;
-    gap: 5rem;
-    align-items: center;
+  /* SUBMIT BUTTON */
+  .wrapper button {
+    margin-top: 0.2rem;
+    padding: 0.5rem 1rem;
     font-size: 0.8rem;
+    color: var(--green);
+    background-color: rgb(15, 14, 14);
+    cursor: pointer;
+
   }
 
   #submit {
-    transition: all 0.2s ease;
     border-radius: 0.4rem;
+    transition: all 0.2s ease;
   }
   #submit:hover {
-    background-color: var(--green);
     color: var(--black);
-  }
-
-  #checkbox {
-    cursor: pointer;
-  }
-
-  .wrapper input.input-error {
-    border: 2px solid #ff5c5c;
-    box-shadow: 0 0 8px rgba(255, 92, 92, 0.4);
-    outline: none;
-  }
-
-  #message {
-    color: #ff5c5c;
-    font-size: 0.9rem;
-    font-weight: bold;
+    background-color: var(--green);
   }
