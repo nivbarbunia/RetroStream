@@ -16,6 +16,7 @@ const contentSchema = new mongoose.Schema({
     franchise:     { type: [String] },
     rating:        { type: Number, min: 0, max: 10 },
     videoUrl:      { type: String },
+    filmingLocation: { type: String, trim: true },
     likedBy:       [{ type: mongoose.Schema.Types.ObjectId, ref: "Profile" }]
 }, { timestamps: true });
 
