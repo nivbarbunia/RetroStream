@@ -23,6 +23,7 @@ const formOrigin         = document.getElementById("formOrigin");
 const formImage          = document.getElementById("formImage");
 const formVideoUrl       = document.getElementById("formVideoUrl");
 const formFranchise      = document.getElementById("formFranchise");
+const formFilmingLocation = document.getElementById("formFilmingLocation");
 const formDescription    = document.getElementById("formDescription");
 const episodeLengthWrap = document.getElementById("episodeLengthWrap");
 const durationWrap      = document.getElementById("durationWrap");
@@ -121,6 +122,7 @@ function saveContent() {
         image: formImage.value.trim(),
         videoUrl: formVideoUrl.value.trim(),
         franchise: formFranchise.value.split(",").map(franchise => franchise.trim()).filter(Boolean),
+        filmingLocation: formFilmingLocation.value.trim(),
         description: formDescription.value.trim(),
         rating: formRating.value ? Number(formRating.value) : undefined
     };
@@ -227,6 +229,7 @@ function openCreateModal() {
     formImage.value = "";
     formVideoUrl.value = "";
     formFranchise.value = "";
+    formFilmingLocation.value = "";
     formDescription.value = "";
     toggleTypeFields();
     contentModal.show();
@@ -248,6 +251,7 @@ function openEditModal(id) {
     formImage.value = content.image ?? "";
     formVideoUrl.value = content.videoUrl ?? "";
     formFranchise.value = (content.franchise || []).join(", ");
+    formFilmingLocation.value = content.filmingLocation ?? "";
     formDescription.value = content.description ?? "";
     toggleTypeFields();
     contentModal.show();

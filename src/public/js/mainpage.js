@@ -567,13 +567,103 @@ function switchContentTab(tab){
       contentVideo.pause();
       saveProgress();
    }
+   const leavingDetails = document.getElementById("tabDetails").classList.contains("active") && tab !== "details";
+   if (leavingDetails) stopYoutubeClip();   // REMOVING THE IFRAME IS THE ONLY WAY TO STOP A YOUTUBE EMBED WITHOUT ITS JS API
    document.querySelectorAll(".content-tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
    document.querySelectorAll(".content-tab").forEach(section => section.classList.toggle("active", section.id === `tab${tab.charAt(0).toUpperCase()}${tab.slice(1)}`));
+   if (tab === "details") loadDetailsTab(currentContentItem);
 }
 
 document.querySelectorAll(".content-tab-btn").forEach(btn => {
    btn.addEventListener("click", () => switchContentTab(btn.dataset.tab));
 });
+
+//_______________________________//
+//   DETAILS TAB - MAP + YOUTUBE //
+//_______________________________//
+let mapsApiPromise = null;
+let detailsLoadedForId = null;
+let cachedYoutubeVideo = null;   // {videoId, title} FOR THE CURRENTLY LOADED ITEM, OR null IF NONE FOUND
+
+// LOADS THE GOOGLE MAPS JS API ONCE, USING A KEY FETCHED FROM THE SERVER (STATIC HTML CAN'T READ .env)
+function loadGoogleMapsApi(){
+   if (!mapsApiPromise) {
+      mapsApiPromise = fetch("/api/config/maps-key")
+         .then(res => res.json())
+         .then(data => new Promise((resolve, reject) => {
+            window.__onGoogleMapsLoaded = resolve;
+            const script = document.createElement("script");
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${data.key}&loading=async&callback=__onGoogleMapsLoaded`;
+            script.onerror = reject;
+            document.head.appendChild(script);
+         }));
+   }
+   return mapsApiPromise;
+}
+
+// GEOCODES item.filmingLocation AND DROPS A PIN, OR SHOWS "NO DATA" IF MISSING/NOT FOUND
+function renderFilmingMap(item){
+   const mapEl = document.getElementById("filmingMap");
+   const emptyEl = document.getElementById("filmingMapEmpty");
+   if (!item.filmingLocation) {
+      mapEl.classList.add("hidden");
+      emptyEl.classList.remove("hidden");
+      return;
+   }
+   mapEl.classList.remove("hidden");
+   emptyEl.classList.add("hidden");
+   loadGoogleMapsApi().then(() => {
+      new google.maps.Geocoder().geocode({ address: item.filmingLocation }, (results, status) => {
+         if (status !== "OK" || !results[0]) {
+            mapEl.classList.add("hidden");
+            emptyEl.classList.remove("hidden");
+            return;
+         }
+         const location = results[0].geometry.location;
+         const map = new google.maps.Map(mapEl, { center: location, zoom: 12 });
+         new google.maps.Marker({ position: location, map });
+      });
+   });
+}
+
+// REMOVES THE YOUTUBE IFRAME - THE ONLY WAY TO STOP AN EMBEDDED VIDEO WITHOUT ITS JS API
+function stopYoutubeClip(){
+   document.getElementById("youtubeClipWrap").innerHTML = "";
+}
+
+// INSERTS THE IFRAME FOR AN ALREADY-FETCHED VIDEO
+function showYoutubeClip(video){
+   document.getElementById("youtubeClipWrap").innerHTML =
+      `<iframe src="https://www.youtube.com/embed/${video.videoId}" title="${video.title}" allowfullscreen></iframe>`;
+}
+
+// FETCHES A RELEVANT YOUTUBE CLIP FOR THIS CONTENT AND EMBEDS IT, OR SHOWS "NOT FOUND"
+function renderYoutubeClip(item){
+   const emptyEl = document.getElementById("youtubeClipEmpty");
+   stopYoutubeClip();
+   emptyEl.classList.add("hidden");
+   fetch(`/api/content/${item._id}/youtube`)
+      .then(res => res.json())
+      .then(data => {
+         if (!data.success || !data.video) { cachedYoutubeVideo = null; emptyEl.classList.remove("hidden"); return; }
+         cachedYoutubeVideo = data.video;
+         showYoutubeClip(data.video);
+      })
+      .catch(() => { cachedYoutubeVideo = null; emptyEl.classList.remove("hidden"); });
+}
+
+// LAZY-LOADS THE MAP + YOUTUBE CLIP THE FIRST TIME THE DETAILS TAB IS OPENED FOR THIS ITEM
+// RETURNING TO THE TAB FOR THE SAME ITEM JUST RE-INSERTS THE CACHED CLIP INSTEAD OF RE-FETCHING
+function loadDetailsTab(item){
+   if (!item) return;
+   if (detailsLoadedForId !== item._id) {
+      detailsLoadedForId = item._id;
+      renderFilmingMap(item);
+      renderYoutubeClip(item);
+   } else if (cachedYoutubeVideo) {
+      showYoutubeClip(cachedYoutubeVideo);
+   }
+}
 
 // FORMAT SECONDS AS m:ss
 function formatTime(seconds){
@@ -697,10 +787,18 @@ videoFullscreenBtn.addEventListener("click", function(){
 });
 
 // STOP PLAYBACK WHEN THE MODAL CLOSES
+// DROPS FOCUS FROM THE CLOSE BUTTON BEFORE BOOTSTRAP MARKS THE MODAL aria-hidden, AVOIDING A CONSOLE A11Y WARNING
+document.getElementById("contentScreenModal").addEventListener("hide.bs.modal", function(){
+   document.activeElement?.blur();
+});
+
 document.getElementById("contentScreenModal").addEventListener("hidden.bs.modal", function(){
    if (hasPlayed) {
       saveProgress().then(() => loadContinueWatching()).then(renderFeed);   // save first, then refresh the row
    }
+   stopYoutubeClip();
+   detailsLoadedForId = null;
+   cachedYoutubeVideo = null;
    contentVideo.pause();
    contentVideo.currentTime = 0;
 });

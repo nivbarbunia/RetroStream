@@ -12,6 +12,7 @@ const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const watchHistoryRoutes = require("./routes/watch-history.routes");
 const statsRoutes = require("./routes/stats.routes");
+const configRoutes = require("./routes/config.routes");
 //MODELS
 const User = require("./models/user.model");
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api/content", requireLogin, contentRoutes);
 app.use("/api/profiles", requireLogin, profileRoutes);
 app.use("/api/watch-history", requireLogin, watchHistoryRoutes);
 app.use("/api/stats", requireLogin, statsRoutes);
+app.use("/api/config", requireLogin, configRoutes);
 app.use("/api/users", userRoutes);
 
 // PAGE routes

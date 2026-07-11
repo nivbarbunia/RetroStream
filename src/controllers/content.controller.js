@@ -39,7 +39,8 @@ async function createContent(req, res) {
             origin,
             franchise,
             rating,
-            videoUrl
+            videoUrl,
+            filmingLocation
         } = req.body;
 
         const content = await Content.create({
@@ -54,7 +55,8 @@ async function createContent(req, res) {
             origin,
             franchise,
             rating,
-            videoUrl
+            videoUrl,
+            filmingLocation
         });
 
         res.status(201).json({success: true,content});
@@ -94,7 +96,8 @@ async function updateContent(req, res) {
             origin,
             franchise,
             rating,
-            videoUrl
+            videoUrl,
+            filmingLocation
         } = req.body;
 
         const contentData = {
@@ -107,7 +110,8 @@ async function updateContent(req, res) {
             origin,
             franchise,
             rating,
-            videoUrl
+            videoUrl,
+            filmingLocation
         };
 
         const updatedContent = {
@@ -228,6 +232,26 @@ async function getLikedContent(req, res) {
     }
 }
 
+// FETCHES A RELEVANT YOUTUBE CLIP FOR THIS CONTENT'S OPENING/INTRO
+async function getYoutubeClip(req, res) {
+    try {
+        const content = await Content.findById(req.params.id);
+        if (!content) return res.status(404).json({ success: false, message: "תוכן לא נמצא" });
+        const query = encodeURIComponent(`${content.title} פתיחה`);
+        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&videoDuration=short&relevanceLanguage=he&regionCode=IL&q=${query}&key=${process.env.YOUTUBE_API_KEY}`;
+        const ytRes = await fetch(url);
+        const data = await ytRes.json();
+        const video = data.items?.[0];
+        if (!video) return res.json({ success: true, video: null });
+        res.json({ success: true, video: {
+            videoId: video.id.videoId, title: video.snippet.title,
+            thumbnail: video.snippet.thumbnails?.medium?.url
+        }});
+    } catch (err) {
+        res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
+    }
+}
+
 module.exports = {
     getContent,
     getContentById,
@@ -236,5 +260,6 @@ module.exports = {
     deleteContent,
     searchContent,
     toggleLike,
-    getLikedContent
+    getLikedContent,
+    getYoutubeClip
 };
