@@ -204,6 +204,29 @@ async function searchContent(req, res) {
     }
 }
 
+// ADVANCED SEARCH #2 (MAINPAGE) - GENRE + DECADE + MINIMUM RATING
+// A DECADE (E.G. "1990") IS TRANSLATED TO A YEAR RANGE SERVER-SIDE, KEEPING THE LOGIC SEPARATE FROM searchContent
+async function discoverContent(req, res) {
+    try {
+        const { genre, origin, decade, minRating } = req.query;
+        const conditions = [];
+
+        if (genre) conditions.push({ genre: genre });
+        if (origin) conditions.push({ origin: origin });
+        if (decade) {
+            const start = Number(decade);
+            conditions.push({ year: { $gte: start, $lte: start + 9 } });
+        }
+        if (minRating) conditions.push({ rating: { $gte: Number(minRating) } });
+
+        const filter = conditions.length ? { $and: conditions } : {};
+        const content = await Content.find(filter);
+        res.json({ success: true, content });
+    } catch (err) {
+        res.status(500).json({ success: false, message: "שגיאת שרת", error: err.message });
+    }
+}
+
 // TOGGLES A LIKE FROM THE ACTIVE PROFILE ON THIS CONTENT
 async function toggleLike(req, res) {
     try {
@@ -259,6 +282,7 @@ module.exports = {
     updateContent,
     deleteContent,
     searchContent,
+    discoverContent,
     toggleLike,
     getLikedContent,
     getYoutubeClip
