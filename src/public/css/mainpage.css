@@ -702,6 +702,45 @@ body {
   display: none;
 }
 
+/* CONTENT MODAL - 3-TAB NAVIGATION (WATCH / REVIEWS / DETAILS) */
+.content-modal-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.9rem 1.5rem 0;
+}
+.content-tab-btn {
+  background: transparent;
+  border: 1px solid rgba(37,255,66,0.4);
+  border-radius: 2rem;
+  color: #ccc;
+  padding: 0.35rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.content-tab-btn:hover {
+  border-color: var(--green);
+  color: white;
+}
+.content-tab-btn.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: black;
+  font-weight: 700;
+}
+.content-tab {
+  display: none;
+  min-height: 34rem;
+}
+.content-tab.active {
+  display: block;
+}
+.tab-placeholder {
+  color: #888;
+  text-align: center;
+  padding: 2rem 0;
+}
+
 /* MODAL TEXT CONTENT BELOW THE VIDEO (TITLE, LIKE BUTTON, META, DESCRIPTION) */
 .content-modal-body {
   padding: 1.25rem 1.5rem;

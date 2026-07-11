@@ -73,31 +73,52 @@
                 <button type="button" class="modal-close" data-bs-dismiss="modal">
                 <i class="fa-solid fa-xmark"></i>
                 </button>
-                <div class="video-wrap" id="videoWrap">
-                    <video id="contentVideo" class="content-video" preload="metadata"></video>
-                    <div class="video-unavailable">
-                        <i class="fa-solid fa-satellite-dish"></i>
-                        <h2> אין וידיאו זמין לתוכן זה</h2>
-                        <i class="fa-solid fa-satellite-dish"></i>
+
+                <div class="content-modal-tabs">
+                    <button type="button" class="content-tab-btn active" data-tab="watch">צפה בתוכן</button>
+                    <button type="button" class="content-tab-btn" data-tab="reviews">תגובות ודירוגים</button>
+                    <button type="button" class="content-tab-btn" data-tab="details">פרטים נוספים</button>
+                </div>
+
+                <div class="content-tab active" id="tabWatch">
+                    <div class="video-wrap" id="videoWrap">
+                        <video id="contentVideo" class="content-video" preload="metadata"></video>
+                        <div class="video-unavailable">
+                            <i class="fa-solid fa-satellite-dish"></i>
+                            <h2> אין וידיאו זמין לתוכן זה</h2>
+                            <i class="fa-solid fa-satellite-dish"></i>
+                        </div>
+                        <div class="video-controls">
+                            <button id="videoFullscreenBtn" class="video-ctrl-btn" type="button"><i class="fa-solid fa-expand"></i></button>
+                            <span id="videoCurrentTime" class="video-time">0:00</span>
+                            <input type="range" id="videoProgress" class="video-progress" value="0" min="0" max="100" step="0.1">
+                            <span id="videoDuration" class="video-time">0:00</span>
+                            <button id="videoMuteBtn" class="video-ctrl-btn" type="button"><i class="fa-solid fa-volume-high"></i></button>
+                            <button id="videoPlayBtn" class="video-ctrl-btn" type="button"><i class="fa-solid fa-play"></i></button>
+                        </div>
                     </div>
-                    <div class="video-controls">
-                        <button id="videoFullscreenBtn" class="video-ctrl-btn" type="button"><i class="fa-solid fa-expand"></i></button>
-                        <span id="videoCurrentTime" class="video-time">0:00</span>
-                        <input type="range" id="videoProgress" class="video-progress" value="0" min="0" max="100" step="0.1">
-                        <span id="videoDuration" class="video-time">0:00</span>
-                        <button id="videoMuteBtn" class="video-ctrl-btn" type="button"><i class="fa-solid fa-volume-high"></i></button>
-                        <button id="videoPlayBtn" class="video-ctrl-btn" type="button"><i class="fa-solid fa-play"></i></button>
+                    <div class="modal-body content-modal-body">
+                        <div class="modal-title-row">
+                            <h2 id="modalTitle" class="modal-title"></h2>
+                            <button id="likeBtn" class="like-btn">
+                            <i class="fa-regular fa-heart"></i>
+                            </button>
+                        </div>
+                        <p id="modalDetails" class="modal-details"></p>
+                        <p id="modalDescription" class="modal-description"></p>
                     </div>
                 </div>
-                <div class="modal-body content-modal-body">
-                    <div class="modal-title-row">
-                        <h2 id="modalTitle" class="modal-title"></h2>
-                        <button id="likeBtn" class="like-btn">
-                        <i class="fa-regular fa-heart"></i>
-                        </button>
+
+                <div class="content-tab" id="tabReviews">
+                    <div class="content-modal-body">
+                        <p class="tab-placeholder">בקרוב: תגובות ודירוגים</p>
                     </div>
-                    <p id="modalDetails" class="modal-details"></p>
-                    <p id="modalDescription" class="modal-description"></p>
+                </div>
+
+                <div class="content-tab" id="tabDetails">
+                    <div class="content-modal-body">
+                        <p class="tab-placeholder">בקרוב: מפה + קליפ YouTube</p>
+                    </div>
                 </div>
             </div>
         </div>
