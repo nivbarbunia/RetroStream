@@ -31,25 +31,28 @@
             </div>
 
             <div class="navbar-icons d-flex align-items-center gap-2 me">
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="חפש תוכן..." />
-                        <button id="searchToggle" class="icon-btn">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
-                    </div>
-                    <div class="profile-menu">
-                        <span class="dropdown"><img id="profile" src="" alt="current user"><i class="fa-solid fa-caret-down"></i></span>
-                        <div id="profileDropdown" class="profile-dropdown hidden">
-                            <span class="profile-name-row">
-                                <img id="activeProfileImg" class="profile-name-img" alt="">
-                                <p id="activeProfileName" class="profile-name m-0"></p>
-                            </span>
-                            <span class="drop-row"><i class="fa-solid fa-shuffle"></i><a href="/profiles">החלף פרופיל</a></span>
-                            <span class="drop-row"><i class="fa-solid fa-user-pen"></i><a href="/account">נהל חשבון</a></span>
-                            <span id="logoutBtn" class="drop-row"><i id="logoutIcon" class="fa-solid fa-right-from-bracket"></i><button>התנתק</button></span>
-                        </div>
+                <button id="advSearchToggle" class="icon-btn mx-1 hidden" title="חיפוש מתקדם">
+                    <i class="fa-solid fa-sliders"></i>
+                </button>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="חיפוש חופשי..." />
+                    <button id="searchToggle" class="icon-btn">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+                <div class="profile-menu">
+                    <span class="dropdown"><img id="profile" src="" alt="current user"><i class="fa-solid fa-caret-down"></i></span>
+                    <div id="profileDropdown" class="profile-dropdown hidden">
+                        <span class="profile-name-row">
+                            <img id="activeProfileImg" class="profile-name-img" alt="">
+                            <p id="activeProfileName" class="profile-name m-0"></p>
+                        </span>
+                        <span class="drop-row"><i class="fa-solid fa-shuffle"></i><a href="/profiles">החלף פרופיל</a></span>
+                        <span class="drop-row"><i class="fa-solid fa-user-pen"></i><a href="/account">נהל חשבון</a></span>
+                        <span id="logoutBtn" class="drop-row"><i id="logoutIcon" class="fa-solid fa-right-from-bracket"></i><button>התנתק</button></span>
                     </div>
                 </div>
+            </div>
         </div>
     </nav>  
     <main class="container-fluid py-4 text-light">
