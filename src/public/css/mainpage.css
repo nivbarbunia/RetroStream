@@ -24,6 +24,7 @@ body {
     black;
   font-family: 'Varela Round', sans-serif;
 }
+.hidden{ display: none;}
 
 /* NAVBAR */
 .retro-navbar {
@@ -116,6 +117,96 @@ body {
 }
 
 
+
+/* ADVANCED SEARCH #2 - GENRE/DECADE/MIN-RATING, RENDERED AS A FULL PAGE MODE (LIKE A CATEGORY), CHIP-BASED LIKE admin-content SEARCH */
+.advanced-search-wrap {
+  position: relative;
+}
+#advSearchToggle{
+  aspect-ratio: 1/1;
+  width: 2.3rem;
+  height: 2.3rem;
+  transition: color 0.4 ease;
+}
+#advSearchToggle:hover{
+  border-radius: 50%;
+  background-color: rgb(37, 255, 66);
+}
+#advSearchToggle.selected{
+  border-radius: 50%;
+  background-color: var(--black);
+  color: var(--green);
+}
+.adv-search-row {
+  width: 100%;
+}
+.searchModeLabel {
+  color: var(--green);
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+.searchSelect {
+  background: var(--black);
+  color: white;
+  border: 0.1rem solid var(--green);
+  border-radius: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  font-family: 'Varela Round', sans-serif;
+}
+.adv-search-row .searchInput {
+  min-width: 12rem;
+  padding: 0.35rem 0.6rem;
+  border: 0.1rem solid var(--green);
+  border-radius: 0.5rem;
+  background: var(--black);
+  color: white;
+  font-family: 'Varela Round', sans-serif;
+}
+.adv-search-row .searchInput.hidden {
+  display: none;
+}
+.adv-search-row .searchRowBtn {
+  background-color: var(--black);
+  color: var(--green);
+  border: 0.1rem solid var(--green);
+  border-radius: 2rem;
+  padding: 0.35rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.adv-search-row .searchRowBtn:hover {
+  background-color: var(--green);
+  color: var(--black);
+}
+.adv-search-row .searchRowBtn.hidden {
+  display: none;
+}
+.adv-search-row .filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.8rem;
+  border: 0.1rem solid var(--green);
+  border-radius: 2rem;
+  color: white;
+  font-size: 0.8rem;
+}
+.adv-search-row .chip-remove {
+  background: transparent;
+  border: none;
+  color: var(--green);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.adv-search-row .chip-remove:hover {
+  color: #ff5c5c;
+}
+.adv-search-message {
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0;
+}
 
 /* PROFILE DROPDOWN */
 .profile-menu {

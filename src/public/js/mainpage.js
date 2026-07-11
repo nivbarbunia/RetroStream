@@ -404,6 +404,9 @@ function renderSubFilteredGrid(key){
 
 // RETURNS TO THE DEFAULT HOME FEED (RANDOM HERO + FULL ROWS)
 function goHome(){
+   advSearchToggle.classList.remove("selected");
+   advSearchToggle.classList.add("hidden");
+   searchToggle.classList.remove("hidden");
    chosenCategory = null;
    categoryHeader.innerHTML= ``;
    noHeroHeader.innerHTML=``;
@@ -440,6 +443,9 @@ document.querySelectorAll(".nav-link[data-category]").forEach(link => {
    link.addEventListener("click", function(e){
       e.preventDefault();
       const key = link.dataset.category;
+      advSearchToggle.classList.remove("selected");
+      advSearchToggle.classList.add("hidden");
+      searchToggle.classList.remove("hidden");
       chosenCategory = null;
       if (key === "home") return goHome();
       if (key === "mylist") return renderMyList();
@@ -464,18 +470,18 @@ document.addEventListener("click", function () {
     profileDropdown.classList.add("hidden");
 });
 
-// OPEN SEARCH BOX
+// OPEN/CLOSE SEARCH BOX
 searchToggle.addEventListener("click", function () {
-   searchBox.classList.add("open");
    if (searchBox.classList.contains("open")) {
-      searchInput.focus();
+      searchBox.classList.remove("open");
+      advSearchToggle.classList.add("hidden");
+      return
    }
+   searchBox.classList.add("open");
+   advSearchToggle.classList.remove("hidden");
 });
 
-// CLOSE SEARCH BOX
-searchInput.addEventListener("blur", function () {
-   searchBox.classList.remove("open");
-});
+
 
 //LIVE SEARCH - CLIENT SIDE
 searchInput.addEventListener("input", function(){
@@ -492,6 +498,141 @@ searchInput.addEventListener("input", function(){
    );
    renderSearchResults(filteredItems, searchText);
 });
+
+//_______________________________//
+//  ADVANCED SEARCH #2 - GENRE + DECADE + MIN RATING, FULL PAGE MODE (LIKE A CATEGORY), CHIP-BASED LIKE admin-content //
+//_______________________________//
+let advSearchFilters = [];   // { field, value, label } - ONE PER FIELD, AND'ED TOGETHER (SAME PATTERN AS admin-content activeFilters)
+
+const advSearchToggle = document.getElementById("advSearchToggle");
+const advFieldLabels = { genre: "ז'אנר", origin:"ערוץ", decade: "עשור", minRating: "דירוג מינימלי" };
+
+// RENDERS THE ADVANCED-SEARCH MODE INTO feedContainer, SAME PATTERN AS renderCategoryFeed/renderMyList
+advSearchToggle.addEventListener("click", function(){
+   if(advSearchToggle.classList.contains("selected")){
+      goHome();
+      return
+   }
+   searchBox.classList.remove("open");
+   searchToggle.classList.add("hidden");
+   advSearchToggle.classList.add("selected");
+   chosenCategory = null;
+   advSearchFilters = [];
+   heroSection.style.display = "none";
+   categoryHeader.innerHTML = "";
+   noHeroHeader.innerHTML = `<h1 class="category-title mb-0">חיפוש מתקדם</h1>`;
+   feedContainer.innerHTML = `
+      <div class="adv-search-row d-flex flex-column gap-2 mb-3">
+         <div class="d-flex align-items-center gap-3 flex-wrap">
+            <label for="advSearchMode" class="searchModeLabel">חפש לפי:</label>
+            <select id="advSearchMode" class="searchSelect">          
+               <option value="genre">ז'אנר</option>
+               <option value="origin">ערוץ</option>
+               <option value="decade">עשור</option>
+               <option value="minRating">דירוג מינימלי</option>
+            </select>
+            <button type="button" id="advSearchResetBtn" class="searchRowBtn hidden d-flex align-items-center gap-2">אפס חיפוש<i class="fa-solid fa-filter-circle-xmark"></i></button>
+         </div>
+         <div class="d-flex flex-wrap gap-2 align-items-center">
+            <select id="advSearchValueSelect" class="searchInput"></select>
+            <input type="number" id="advSearchValueNumber" class="searchInput hidden" min="0" max="10" step="0.5" placeholder="0-10" />
+            <button type="button" id="advSearchAddBtn" class="searchRowBtn d-flex align-items-center gap-2">חפש<i class="fa-solid fa-magnifying-glass"></i></button>
+            <p id="advSearchMessage" class="adv-search-message"></p>
+         </div>
+         <div id="advSearchChips" class="d-flex flex-wrap gap-2"></div>
+      </div>
+      <section class="content-section">
+         <div id="advSearchResultsGrid" class="feed-row"></div>
+      </section>
+   `;
+   populateAdvSearchValueOptions();
+});
+
+// SWAPS THE VALUE INPUT BETWEEN A <select> (GENRE/DECADE) AND A NUMBER INPUT (MIN RATING)
+// DELEGATED BECAUSE THE ROW IS REBUILT EVERY TIME advSearchToggle IS CLICKED
+document.addEventListener("change", function(e){
+   if (e.target.id !== "advSearchMode") return;
+   const isRating = e.target.value === "minRating";
+   document.getElementById("advSearchValueSelect").classList.toggle("hidden", isRating);
+   document.getElementById("advSearchValueNumber").classList.toggle("hidden", !isRating);
+   populateAdvSearchValueOptions();
+});
+
+// BUILDS GENRE/DECADE <option>s FROM contentItems - NOT HARDCODED, SAME APPROACH AS THE NAVBAR SUB-FILTERS
+function populateAdvSearchValueOptions(){
+   const mode = document.getElementById("advSearchMode").value;
+   const valueSelect = document.getElementById("advSearchValueSelect");
+   if (mode === "genre") {
+      const genres = [...new Set(contentItems.flatMap(item => item.genre || []))].sort((a,b) => a.localeCompare(b, 'he'));
+      valueSelect.innerHTML = genres.map(g => `<option value="${g}">${g}</option>`).join("");
+   } else if (mode === "origin") {
+      const origins = [...new Set(contentItems.flatMap(item => item.origin || []))].sort((a,b) => a.localeCompare(b, 'he'));
+      valueSelect.innerHTML = origins.map(o => `<option value="${o}">${o}</option>`).join("");
+   } else if (mode === "decade") {
+      const decades = [...new Set(contentItems.map(item => Math.floor(item.year / 10) * 10))].sort((a,b) => b - a);
+      valueSelect.innerHTML = decades.map(d => `<option value="${d}">${d}-${d + 9}</option>`).join("");
+   }
+}
+
+// ADD CHIP / RESET / REMOVE CHIP - ALL DELEGATED (SAME REASON AS ABOVE)
+document.addEventListener("click", function(e){
+   if (e.target.closest("#advSearchAddBtn")) {
+      const mode = document.getElementById("advSearchMode");
+      const field = mode.value;
+      const valueNumber = document.getElementById("advSearchValueNumber");
+      const value = field === "minRating" ? valueNumber.value.trim() : document.getElementById("advSearchValueSelect").value;
+      const message = document.getElementById("advSearchMessage");
+      if (!value) { message.textContent = "נא לבחור ערך"; return; }
+      message.textContent = "";
+      advSearchFilters = advSearchFilters.filter(f => f.field !== field);
+      advSearchFilters.push({ field, value, label: advFieldLabels[field] });
+      valueNumber.value = "";
+      renderAdvSearchChips();
+      runAdvSearch();
+      return;
+   }
+
+   if (e.target.closest("#advSearchResetBtn")) {
+      advSearchFilters = [];
+      renderAdvSearchChips();
+      document.getElementById("advSearchResultsGrid").innerHTML = "";
+      return;
+   }
+
+   const removeBtn = e.target.closest("#advSearchChips .chip-remove");
+   if (removeBtn) {
+      advSearchFilters.splice(Number(removeBtn.dataset.index), 1);
+      renderAdvSearchChips();
+      if (advSearchFilters.length) runAdvSearch();
+      else document.getElementById("advSearchResultsGrid").innerHTML = "";
+   }
+});
+
+function renderAdvSearchChips(){
+   document.getElementById("advSearchChips").innerHTML = advSearchFilters.map((f, i) => `
+      <span class="filter-chip">
+         ${f.label}: ${f.value}
+         <button type="button" class="chip-remove" data-index="${i}">✕</button>
+      </span>`).join("");
+   document.getElementById("advSearchResetBtn").classList.toggle("hidden", advSearchFilters.length === 0);
+}
+
+// QUERIES /api/content/discover WITH THE ACCUMULATED FILTERS, RESULTS RENDER BELOW THE SEARCH ROW
+function runAdvSearch(){
+   const params = new URLSearchParams();
+   advSearchFilters.forEach(f => params.set(f.field, f.value));
+   fetch(`/api/content/discover?${params.toString()}`)
+      .then(res => res.json())
+      .then(data => renderAdvSearchResults(data.success ? data.content : []));
+}
+
+function renderAdvSearchResults(items){
+   const grid = document.getElementById("advSearchResultsGrid");
+   if (!grid) return;   // USER NAVIGATED AWAY BEFORE THE RESPONSE CAME BACK
+   grid.innerHTML = items.length
+      ? items.map(renderCard).join("")
+      : `<p class="tab-placeholder">לא נמצאו תוצאות</p>`;
+}
 
 //SCROLL FUNCTION
 document.addEventListener("click", function(e) {

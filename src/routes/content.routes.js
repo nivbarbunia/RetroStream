@@ -5,6 +5,7 @@ const { requireAdmin } = require("../middleware/auth.middleware");
 
 router.get("/", contentController.getContent);
 router.get("/search", contentController.searchContent);
+router.get("/discover", contentController.discoverContent);
 router.get("/liked", contentController.getLikedContent);
 router.get("/:id/youtube", contentController.getYoutubeClip);
 router.get("/:id", contentController.getContentById);
