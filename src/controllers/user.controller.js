@@ -70,7 +70,7 @@ async function updateUser(req, res) {
         const update = {};
         if (name)  update.name = name;
         if (email) update.email = email;
-        if (role)  update.role = role;
+        if (role && isAdmin)  update.role = role;
         // if password is being changed, verify current password (unless admin)
         if (password){
             if (isSelf) {
