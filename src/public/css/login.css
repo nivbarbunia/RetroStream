@@ -1,7 +1,4 @@
-  /* GLOBAL SIZING + BACKGROUND */
-  html {
-    font-size: clamp(16px, 1vw + 6px, 40px);
-  }
+  /* BACKGROUND */
 
   body {
     display: flex;
@@ -56,8 +53,8 @@
   .wrapper input {
     margin: 0.2rem;
     padding: 0.4rem;
-    border-color: rgb(58, 253, 84);
-    border-radius: 10px;
+    border: 0.1rem solid rgb(58, 253, 84);
+    border-radius: 0.6rem;
     font-size: 0.8rem;
     color: white;
     background-color: rgb(15, 14, 14);
@@ -66,19 +63,20 @@
   .wrapper input:-webkit-autofill,
   .wrapper input:-webkit-autofill:hover,
   .wrapper input:-webkit-autofill:focus {
-    border: 2px solid rgb(58, 253, 84);
+    border: 0.1rem solid rgb(58, 253, 84);
     box-shadow: 0 0 0 1000px rgb(15, 14, 14) inset;
     caret-color: white;
     -webkit-text-fill-color: white;
   }
 
   .wrapper input:focus {
-    border: 3px solid rgb(124, 255, 142);
+    border-color: white !important;
+    box-shadow: 0.1rem 0.1rem 0.15rem var(--green);
     outline: none;
   }
 
   .wrapper input.input-error {
-    border: 2px solid #ff5c5c;
+    border: 0.1rem solid #ff5c5c;
     outline: none;
     box-shadow: 0 0 8px rgba(255, 92, 92, 0.4);
   }
@@ -88,19 +86,7 @@
     font-size: 0.9rem;
     font-weight: bold;
     color: #ff5c5c;
-  }
-
-  /* REMEMBER ME / FORGOT PASSWORD ROW (LOGIN ONLY) */
-  .remember-forget {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5rem;
-    font-size: 0.8rem;
-  }
-
-  #checkbox {
-    cursor: pointer;
+    margin: 0.5rem;
   }
 
   /* "SIGN UP" / "LOG IN" SWITCH LINK */
@@ -111,7 +97,7 @@
 
   /* SUBMIT BUTTON */
   .wrapper button {
-    margin-top: 0.8rem;
+    margin-top: 0.2rem;
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
     color: var(--green);

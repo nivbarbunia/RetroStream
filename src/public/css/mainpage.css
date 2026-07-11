@@ -1,6 +1,4 @@
-html {
-  font-size: clamp(16px, 1vw + 6px, 50px);
-}
+
 /* PAGE BACKGROUND - SCANLINE TEXTURE + GREEN GLOW */
 body {
   background:

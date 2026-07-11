@@ -12,6 +12,7 @@ const profileImg = document.getElementById("profile");
 const profileDropdown = document.getElementById("profileDropdown");
 const logoutBtn = document.getElementById("logoutBtn");
 
+//CONTENT MODAL
 const contentModal = new bootstrap.Modal(document.getElementById("contentScreenModal"));
 const contentVideo = document.getElementById("contentVideo");
 const videoPlayBtn = document.getElementById("videoPlayBtn");
@@ -70,7 +71,7 @@ let currentReviews = [];
 let myReview = null;
 let selectedRating = 0;
 let reviewSort = "date";   // "date" (NEWEST FIRST, SERVER DEFAULT) OR "rating" (HIGHEST FIRST)
-let showOnlyMine = false;  // "הביקורות שלכם" FILTER - LIMITS THE LIST TO THIS USER'S OWN PROFILES
+let showOnlyMine = false;  // FILTER - LIMITS THE LIST TO THIS USER'S OWN PROFILES
 
 
 //_______________________________//

@@ -1,14 +1,10 @@
 /* GLOBAL SIZING */
-html {
-  font-size: clamp(16px, 1vw + 6px, 40px);
-}
 :root{
   --avatar-size: clamp(120px, 12vw, 400px);
 }
 
 /* PAGE BACKGROUND */
 body {
-  font-size: larger;
   font-weight: 700;
   color: rgb(0, 0, 0);
   background:
@@ -30,7 +26,7 @@ body {
 
 /* HEADLINE */
 #headline {
-  padding: 6px;
+  padding: 0.6rem;
   border: 0.2rem solid var(--black);
   border-radius: 15px;
   font-style: oblique;
@@ -46,6 +42,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.4rem;
   width: var(--avatar-size);
   text-align: center;
 }
@@ -106,13 +103,17 @@ body {
   border: none;
   background: transparent;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: transform 0.2s ease,opacity 0.3s ease;
   opacity: 0;
   pointer-events: none;
 }
 .profile:hover .edit-btn {
   opacity: 1;
   pointer-events: auto;
+}
+.edit-btn:hover{
+  transform: scale(1.2);
+  text-shadow: 0 0 1.3rem var(--black);
 }
 
 

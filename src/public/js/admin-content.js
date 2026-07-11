@@ -317,7 +317,6 @@ typeRadios.forEach(radio => {
     });
 });
 
-// ברירת מחדל: "הכל" מסומן כ-active עם טעינת הדף
 document.querySelector('input[name="typeFilter"]:checked').closest(".type-radio").classList.add("active");
 
 addBtn.addEventListener("click", openCreateModal);
